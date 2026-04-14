@@ -1,0 +1,186 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "back": "Back",
+    "confirm": "Confirm",
+    "close": "Close",
+    "noResults": "No results found.",
+    "pagination": "{from}-{to} of {total}"
+  },
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "your@email.com",
+    "passwordPlaceholder": "Your password",
+    "forgotPassword": "Forgot password?",
+    "invalidCredentials": "Invalid email or password.",
+    "sessionExpired": "Session expired. Please sign in again.",
+    "welcomeTitle": "Welcome to Olympus",
+    "welcomeSubtitle": "Your 100% autonomous business.",
+    "needHelp": "Need help?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "revenue": "Monthly revenue",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "averageTicket": "Average ticket",
+    "conversations": "Active conversations",
+    "appointments": "Appointments",
+    "leads": "New leads",
+    "dailyRevenue": "Daily revenue",
+    "roi": "ROI"
+  },
+  "crm": {
+    "title": "CRM",
+    "newLead": "New Lead",
+    "leadsInPipeline": "{count} {count, plural, =1 {lead} other {leads}} in pipeline",
+    "stages": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "converted": "Converted",
+      "lost": "Lost"
+    },
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "namePlaceholder": "Lead name",
+    "emailPlaceholder": "email@example.com",
+    "phonePlaceholder": "(11) 99999-9999",
+    "deleteConfirm": "Are you sure you want to delete this lead?",
+    "timeline": "Timeline"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "searchPlaceholder": "Search conversation...",
+    "activeCount": "{count} active {count, plural, =1 {conversation} other {conversations}}",
+    "selectConversation": "Select a conversation",
+    "selectConversationSubtitle": "Choose a conversation from the sidebar to view messages",
+    "messagePlaceholder": "Type your message...",
+    "send": "Send",
+    "handoff": {
+      "activate": "Activate Handoff",
+      "deactivate": "Deactivate Handoff",
+      "activated": "Handoff activated",
+      "deactivated": "Handoff deactivated"
+    },
+    "deleteSession": "Delete conversation",
+    "deleteConfirm": "Are you sure you want to delete this conversation?",
+    "deleteDescription": "This action cannot be undone. The conversation will be permanently removed.",
+    "agents": {
+      "horos": "Horos",
+      "kairos": "Kairos",
+      "human": "Human"
+    },
+    "status": {
+      "active": "Active",
+      "handoff": "Handoff"
+    },
+    "noConversations": "No conversations",
+    "unknown": "Unknown",
+    "allAgents": "All agents",
+    "allChannels": "All channels",
+    "startedAt": "Started on {date}",
+    "loadMoreMessages": "Load more messages",
+    "appointmentCreated": "Appointment created",
+    "responding": "{agent} responding",
+    "takeOver": "Take over conversation",
+    "youAreResponding": "You are responding.",
+    "returnTo": "Return to {agent}",
+    "aiManaging": "{agent} is managing this conversation",
+    "reconnecting": "Reconnecting..."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "noAppointments": "No appointments in this period."
+  },
+  "catalog": {
+    "title": "Catalog",
+    "services": "Services",
+    "products": "Products",
+    "newService": "New Service",
+    "newProduct": "New Product",
+    "name": "Name",
+    "description": "Description",
+    "price": "Price",
+    "active": "Active",
+    "inactive": "Inactive",
+    "agentInstructions": "Agent instructions",
+    "discounts": {
+      "pix": "PIX discount",
+      "card": "Card discount",
+      "special": "Special discount"
+    },
+    "image": "Image",
+    "imageRequirements": "JPEG, PNG or WebP. Max 5MB.",
+    "deleteConfirm": "Are you sure you want to delete this item?"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "calendar": "Calendar",
+      "agent": "Agent"
+    },
+    "agent": {
+      "name": "Agent name",
+      "tone": "Tone",
+      "tones": {
+        "friendly": "Friendly",
+        "formal": "Formal",
+        "casual": "Casual"
+      },
+      "customInstructions": "Custom instructions",
+      "customInstructionsPlaceholder": "Additional instructions for the agent..."
+    },
+    "calendar": {
+      "businessHours": "Business hours",
+      "slotDuration": "Slot duration (minutes)",
+      "minAdvance": "Minimum advance booking (hours)",
+      "minCancelAdvance": "Minimum cancellation advance (hours)"
+    },
+    "saved": "Settings saved successfully."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "crm": "CRM",
+    "conversations": "Conversations",
+    "calendar": "Calendar",
+    "services": "Services",
+    "products": "Products",
+    "catalog": "Catalog",
+    "settings": "Settings",
+    "admin": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "plans": "Plans",
+      "subscriptions": "Subscriptions",
+      "billing": "Billing",
+      "invoices": "Invoices"
+    }
+  }
+}

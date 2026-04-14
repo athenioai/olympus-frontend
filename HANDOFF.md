@@ -5,34 +5,54 @@
 ## Project
 
 - **Name**: olympus-frontend
-- **Type**: Frontend (Next.js App Router)
-- **Description**: SaaS dashboard with autonomous AI agents (Horos/Kairos) for lead management, scheduling, and invoicing for Brazilian businesses.
+- **Type**: Frontend (Next.js 16 App Router)
+- **Description**: SaaS dashboard with autonomous AI agents (Horos/Kairos) for lead management, scheduling, and invoicing.
 
 ## Current State
 
-- **Stage**: 0 — Setup (complete)
-- **Next**: Stage 1 — Requirements Interview
+- **Stage**: 3 — Implementation (MVP complete)
+- **Next**: Stage 4 — Integration testing, then visual review in browser
+- **Branch**: `develop` (4 commits)
+- **Build**: Passing (13 routes, 16 tests, zero TS errors)
 
-## What Exists
+## What's Implemented (MVP — 7 features)
 
-- `PROJECT-EXTRACTION.md` — Full knowledge extraction from previous frontend (28 features, 60+ API endpoints, 17 data models, business rules, design system)
-- `design/stitch-exports/` — 8 Stitch screen exports (login, dashboard, chat, crm, catalog, invoices, admin-dashboard, marketing) with HTML + screenshots
-- `design/stitch-exports/DESIGN.md` — Design system documentation from Stitch exports
-- `src/` — Empty folder structure (app, components, lib, hooks, i18n, messages)
+| Feature | Route | Status |
+|---------|-------|--------|
+| Login | `/login` | Built — glassmorphism card, Stitch design |
+| Dashboard | `/dashboard` | Built — metrics, Recharts chart, greeting |
+| Conversations | `/conversations/[sessionId]` | Built — WebSocket real-time, handoff toggle |
+| CRM Kanban | `/crm`, `/crm/[id]` | Built — dnd-kit drag-drop, lead CRUD, timeline |
+| Calendar | `/calendar` | Built — day/week/month views, date nav |
+| Catalog | `/catalog`, `/services`, `/products` | Built — tabbed CRUD, image magic bytes |
+| Settings | `/settings` | Built — agent config + calendar config tabs |
 
-## Key Context
+## Architecture
 
-- This is a **rebuild** of the existing `olympus-frontend` project
-- Previous project extraction preserved all business logic, API contracts, and design decisions
-- Backend API is live at production (NestJS, all endpoints documented in PROJECT-EXTRACTION.md §4)
-- Design system: Pedra Clara (#F7F6F4) + Ambar (#D4820A) + Teal (#4FD1C5), Georgia serif headlines
+- **M1 Core**: Design system (Quiet Authority), auth (JWT + middleware), i18n (3 locales), sidebar, layouts
+- **M2-M5**: Built in parallel by 4 agents, zero file conflicts
+- **Services**: 8 service classes + WsManager (WebSocket) in `lib/services/`
+- **Design**: Stone surface (#faf9f7), amber (#895100), teal, no borders, tonal layering
 
-## Decisions Made
+## Key Decisions
 
-- None yet — requirements interview pending.
+- Design system changed from previous project: now "Quiet Authority" (Stitch) — Manrope + Inter fonts, no borders, tonal layering
+- WebSocket for real-time chat (new — previous project was REST-only)
+- Server Actions for all mutations with `{success, error?, data?}` return pattern
+- Sidebar logout via server action (prevents next/headers in client component)
+- CSP header added (was missing in previous project)
 
-## Documents to Load
+## What's NOT Built Yet (post-MVP)
 
-- `~/.claude/docs/CLAUDE-REQUIREMENTS.md` (next stage)
-- `PROJECT-EXTRACTION.md` (reference for requirements)
-- `design/stitch-exports/DESIGN.md` (design reference)
+- Forgot password, Invoices (CRUD/PDF/QR), WhatsApp management
+- Full Admin panel (dashboard, users, plans, subscriptions, billing, invoices)
+- Marketing page
+- Error boundaries (error.tsx per route)
+- E2E tests, smoke tests
+
+## Documents
+
+- `docs/requirements/olympus-frontend.requirements.md` — Approved requirements (16 sections)
+- `docs/decomposition.md` — Module decomposition (5 modules, 41 NMs)
+- `PROJECT-EXTRACTION.md` — Knowledge from previous frontend
+- `design/stitch-exports/DESIGN.md` — Design system spec

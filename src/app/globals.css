@@ -1,0 +1,166 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Design System: The Quiet Authority
+ * Philosophy: Warm Corporate Minimalism
+ * Source: design/stitch-exports/DESIGN.md
+ *
+ * Rules:
+ * - No-Line Rule: no 1px borders for sectioning. Use tonal shifts + whitespace.
+ * - Tonal Layering: depth via surface stacking, not shadows.
+ * - Ghost Borders: when required (inputs), outline-variant at 15% opacity.
+ * - Ambient Shadows: only for floating elements (modals, dropdowns).
+ * - Breathing Room: min 32px padding on cards, 20% more whitespace than expected.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Custom variant: dark mode (reserved, light-only for now)           */
+/* ------------------------------------------------------------------ */
+@custom-variant dark (&:is(.dark *));
+
+/* ------------------------------------------------------------------ */
+/* Theme tokens                                                        */
+/* ------------------------------------------------------------------ */
+@theme inline {
+  /* --- Surfaces (Stone hierarchy) --- */
+  --color-surface: #faf9f7;
+  --color-surface-container-low: #f4f4f1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e6e9e6;
+  --color-surface-container-highest: #e0e3e0;
+
+  /* --- Primary (Amber) --- */
+  --color-primary: #895100;
+  --color-primary-dim: #784700;
+  --color-on-primary: #fff6f1;
+
+  /* --- Teal accent --- */
+  --color-teal: #4fd1c5;
+  --color-secondary-container: #9ff0fb;
+  --color-tertiary: #5e5f5e;
+  --color-tertiary-container: #f4f3f1;
+
+  /* --- Text --- */
+  --color-on-surface: #2f3331;
+  --color-on-surface-variant: #5c605d;
+
+  /* --- Semantic --- */
+  --color-danger: #dc2626;
+  --color-danger-muted: oklch(0.65 0.15 25 / 0.08);
+  --color-success: #16a34a;
+  --color-success-muted: oklch(0.65 0.15 155 / 0.08);
+  --color-warning: #d97706;
+  --color-warning-muted: oklch(0.75 0.12 85 / 0.08);
+
+  /* --- Borders (Ghost borders only) --- */
+  --color-outline-variant: #afb3b0;
+
+  /* --- Radius --- */
+  --radius: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* --- Shadows (ambient only — floating elements) --- */
+  --shadow-ambient: 0 8px 24px 0 rgba(47, 51, 49, 0.05);
+  --shadow-ambient-strong: 0 12px 32px 0 rgba(47, 51, 49, 0.08);
+
+  /* --- Animation --- */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+
+  /* --- Chart palette --- */
+  --color-chart-1: #895100;
+  --color-chart-2: #4fd1c5;
+  --color-chart-3: #16a34a;
+  --color-chart-4: #8b5cf6;
+  --color-chart-5: #dc2626;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base layer                                                          */
+/* ------------------------------------------------------------------ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Utility classes                                                     */
+/* ------------------------------------------------------------------ */
+@utility skeleton {
+  @apply relative overflow-hidden bg-surface-container-high;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-surface-container-lowest) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+}
+
+@utility glass {
+  background: rgba(250, 249, 247, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+@utility ghost-border {
+  outline: 1px solid rgba(175, 179, 176, 0.15);
+}
+
+@utility ghost-border-focus {
+  outline: 1px solid rgba(137, 81, 0, 0.3);
+}
+
+/* ------------------------------------------------------------------ */
+/* Keyframes                                                           */
+/* ------------------------------------------------------------------ */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion                                                      */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
