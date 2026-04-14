@@ -1,0 +1,172 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error. Inténtelo de nuevo.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "back": "Volver",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "noResults": "No se encontraron resultados.",
+    "pagination": "{from}-{to} de {total}"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "emailPlaceholder": "tu@correo.com",
+    "passwordPlaceholder": "Tu contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "invalidCredentials": "Correo o contraseña inválidos.",
+    "sessionExpired": "Sesión expirada. Inicia sesión nuevamente.",
+    "welcomeTitle": "Bienvenido a Olympus",
+    "welcomeSubtitle": "Tu empresa 100% autónoma.",
+    "needHelp": "¿Necesitas ayuda?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches"
+    },
+    "revenue": "Ingresos del mes",
+    "pending": "Pendiente",
+    "overdue": "Vencido",
+    "averageTicket": "Ticket promedio",
+    "conversations": "Conversaciones activas",
+    "appointments": "Citas",
+    "leads": "Nuevos leads",
+    "dailyRevenue": "Ingresos diarios",
+    "roi": "ROI"
+  },
+  "crm": {
+    "title": "CRM",
+    "newLead": "Nuevo Lead",
+    "leadsInPipeline": "{count} {count, plural, =1 {lead} other {leads}} en pipeline",
+    "stages": {
+      "new": "Nuevo",
+      "contacted": "Contactado",
+      "qualified": "Calificado",
+      "converted": "Convertido",
+      "lost": "Perdido"
+    },
+    "nameLabel": "Nombre",
+    "emailLabel": "Correo electrónico",
+    "phoneLabel": "Teléfono",
+    "namePlaceholder": "Nombre del lead",
+    "emailPlaceholder": "correo@ejemplo.com",
+    "phonePlaceholder": "(11) 99999-9999",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este lead?",
+    "timeline": "Línea de tiempo"
+  },
+  "conversations": {
+    "title": "Conversaciones",
+    "searchPlaceholder": "Buscar conversación...",
+    "activeCount": "{count} {count, plural, =1 {conversación activa} other {conversaciones activas}}",
+    "selectConversation": "Selecciona una conversación",
+    "selectConversationSubtitle": "Elige una conversación del panel para ver los mensajes",
+    "messagePlaceholder": "Escribe tu mensaje...",
+    "send": "Enviar",
+    "handoff": {
+      "activate": "Activar Handoff",
+      "deactivate": "Desactivar Handoff",
+      "activated": "Handoff activado",
+      "deactivated": "Handoff desactivado"
+    },
+    "deleteSession": "Eliminar conversación",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar esta conversación?",
+    "agents": {
+      "horos": "Horos",
+      "kairos": "Kairos",
+      "human": "Humano"
+    },
+    "status": {
+      "active": "Activo",
+      "handoff": "Handoff"
+    }
+  },
+  "calendar": {
+    "title": "Calendario",
+    "views": {
+      "day": "Día",
+      "week": "Semana",
+      "month": "Mes"
+    },
+    "status": {
+      "confirmed": "Confirmado",
+      "cancelled": "Cancelado"
+    },
+    "noAppointments": "No hay citas en este período."
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "services": "Servicios",
+    "products": "Productos",
+    "newService": "Nuevo Servicio",
+    "newProduct": "Nuevo Producto",
+    "name": "Nombre",
+    "description": "Descripción",
+    "price": "Precio",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "agentInstructions": "Instrucciones para el agente",
+    "discounts": {
+      "pix": "Descuento PIX",
+      "card": "Descuento Tarjeta",
+      "special": "Descuento Especial"
+    },
+    "image": "Imagen",
+    "imageRequirements": "JPEG, PNG o WebP. Máx 5MB.",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este artículo?"
+  },
+  "settings": {
+    "title": "Configuración",
+    "tabs": {
+      "calendar": "Calendario",
+      "agent": "Agente"
+    },
+    "agent": {
+      "name": "Nombre del agente",
+      "tone": "Tono",
+      "tones": {
+        "friendly": "Amigable",
+        "formal": "Formal",
+        "casual": "Casual"
+      },
+      "customInstructions": "Instrucciones personalizadas",
+      "customInstructionsPlaceholder": "Instrucciones adicionales para el agente..."
+    },
+    "calendar": {
+      "businessHours": "Horarios de atención",
+      "slotDuration": "Duración del turno (minutos)",
+      "minAdvance": "Anticipación mínima (horas)",
+      "minCancelAdvance": "Anticipación mínima para cancelación (horas)"
+    },
+    "saved": "Configuración guardada exitosamente."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "crm": "CRM",
+    "conversations": "Conversaciones",
+    "calendar": "Calendario",
+    "services": "Servicios",
+    "products": "Productos",
+    "catalog": "Catálogo",
+    "settings": "Configuración",
+    "admin": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Usuarios",
+      "plans": "Planes",
+      "subscriptions": "Suscripciones",
+      "billing": "Facturación",
+      "invoices": "Cobros"
+    }
+  }
+}
