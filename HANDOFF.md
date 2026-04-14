@@ -6,53 +6,56 @@
 
 - **Name**: olympus-frontend
 - **Type**: Frontend (Next.js 16 App Router)
-- **Description**: SaaS dashboard with autonomous AI agents (Horos/Kairos) for lead management, scheduling, and invoicing.
+- **Version**: v0.1.0 (MVP)
 
 ## Current State
 
-- **Stage**: 3 — Implementation (MVP complete)
-- **Next**: Stage 4 — Integration testing, then visual review in browser
-- **Branch**: `develop` (4 commits)
-- **Build**: Passing (13 routes, 16 tests, zero TS errors)
+- **Stage**: 5 — Finalization (release on main)
+- **Branch**: `main` (merged from develop)
+- **Build**: Passing — 13 routes, 16 tests, zero TS errors
+- **Status**: Ready for deploy + manual browser testing
 
 ## What's Implemented (MVP — 7 features)
 
-| Feature | Route | Status |
-|---------|-------|--------|
-| Login | `/login` | Built — glassmorphism card, Stitch design |
-| Dashboard | `/dashboard` | Built — metrics, Recharts chart, greeting |
-| Conversations | `/conversations/[sessionId]` | Built — WebSocket real-time, handoff toggle |
-| CRM Kanban | `/crm`, `/crm/[id]` | Built — dnd-kit drag-drop, lead CRUD, timeline |
-| Calendar | `/calendar` | Built — day/week/month views, date nav |
-| Catalog | `/catalog`, `/services`, `/products` | Built — tabbed CRUD, image magic bytes |
-| Settings | `/settings` | Built — agent config + calendar config tabs |
+| Feature | Route | Key Tech |
+|---------|-------|----------|
+| Login | `/login` | Glassmorphism, JWT httpOnly cookies |
+| Dashboard | `/dashboard` | Recharts AreaChart, BRL formatting |
+| Conversations | `/conversations/[sessionId]` | WebSocket (WsManager), handoff toggle |
+| CRM Kanban | `/crm`, `/crm/[id]` | @dnd-kit drag-drop, optimistic updates |
+| Calendar | `/calendar` | Day/week/month views, date navigation |
+| Catalog | `/catalog`, `/services`, `/products` | Image magic bytes validation, tabs |
+| Settings | `/settings` | Agent config + calendar config tabs |
 
 ## Architecture
 
-- **M1 Core**: Design system (Quiet Authority), auth (JWT + middleware), i18n (3 locales), sidebar, layouts
-- **M2-M5**: Built in parallel by 4 agents, zero file conflicts
-- **Services**: 8 service classes + WsManager (WebSocket) in `lib/services/`
-- **Design**: Stone surface (#faf9f7), amber (#895100), teal, no borders, tonal layering
+```
+src/
+├── app/[locale]/(authenticated)/   # 7 feature routes + layouts
+├── components/                      # Sidebar, providers, UI (shadcn)
+├── lib/services/                    # 8 service classes + interfaces
+├── lib/ws-manager.ts                # WebSocket with auto-reconnect
+├── i18n/                            # 3 locales (pt-BR, en-US, es)
+└── middleware.ts                    # JWT refresh + i18n routing
+```
 
-## Key Decisions
-
-- Design system changed from previous project: now "Quiet Authority" (Stitch) — Manrope + Inter fonts, no borders, tonal layering
-- WebSocket for real-time chat (new — previous project was REST-only)
-- Server Actions for all mutations with `{success, error?, data?}` return pattern
-- Sidebar logout via server action (prevents next/headers in client component)
-- CSP header added (was missing in previous project)
-
-## What's NOT Built Yet (post-MVP)
+## What's NOT Built (post-MVP)
 
 - Forgot password, Invoices (CRUD/PDF/QR), WhatsApp management
-- Full Admin panel (dashboard, users, plans, subscriptions, billing, invoices)
-- Marketing page
-- Error boundaries (error.tsx per route)
-- E2E tests, smoke tests
+- Admin panel (dashboard, users, plans, subscriptions, billing, invoices)
+- Marketing page, not-found.tsx pages
+- E2E tests (Playwright)
 
-## Documents
+## Known Issues (non-blocking)
 
-- `docs/requirements/olympus-frontend.requirements.md` — Approved requirements (16 sections)
-- `docs/decomposition.md` — Module decomposition (5 modules, 41 NMs)
-- `PROJECT-EXTRACTION.md` — Knowledge from previous frontend
-- `design/stitch-exports/DESIGN.md` — Design system spec
+- Some hardcoded UI strings (login decorative text, calendar weekdays)
+- `process.env.NEXT_PUBLIC_API_URL` duplicated in 4 files (should centralize)
+- Some component files exceed 150-line limit (dashboard-view, calendar-view)
+- Hardcoded `"en-US"` locale in message-thread date formatting
+
+## Next Steps
+
+1. `npm run dev` → test all features in browser against production backend
+2. Set `NEXT_PUBLIC_API_URL` in hosting env vars
+3. Deploy to hosting (Vercel/Railway)
+4. Smoke test in production
