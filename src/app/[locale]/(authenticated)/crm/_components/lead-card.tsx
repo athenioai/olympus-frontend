@@ -2,6 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
@@ -31,7 +32,7 @@ export function LeadCard({ lead }: LeadCardProps) {
   };
 
   return (
-    <a
+    <Link
       ref={setNodeRef}
       style={style}
       href={`/crm/${lead.id}`}
@@ -73,6 +74,6 @@ export function LeadCard({ lead }: LeadCardProps) {
           </div>
         )}
       </div>
-    </a>
+    </Link>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -79,13 +80,13 @@ export function LeadDetailView({
       className="flex flex-col gap-6"
     >
       {/* Back link */}
-      <a
+      <Link
         href="/crm"
         className="inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant transition-colors hover:text-on-surface"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         {tc("back")}
-      </a>
+      </Link>
 
       {/* Lead header card */}
       <div className="rounded-xl bg-surface-container-low p-6">

@@ -8,6 +8,7 @@ import { loginAction } from "./actions";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -142,7 +143,7 @@ export default function LoginPage() {
                 disabled={isPending}
                 type="submit"
               >
-                {isPending ? t("loading", { ns: "common" }) : t("login")}
+                {isPending ? tc("loading") : t("login")}
                 {!isPending && <ArrowRight className="h-5 w-5" />}
               </button>
             </div>

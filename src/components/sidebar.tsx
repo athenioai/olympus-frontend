@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
@@ -128,7 +129,7 @@ export function Sidebar({ user }: SidebarProps) {
         {visibleNav.map((item) => {
           const active = isActive(item.href);
           return (
-            <a
+            <Link
               className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
                   ? "bg-primary/8 text-primary"
@@ -142,12 +143,12 @@ export function Sidebar({ user }: SidebarProps) {
               )}
               <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
               {!collapsed && <span>{t(item.labelKey)}</span>}
-            </a>
+            </Link>
           );
         })}
 
-        {/* Admin section */}
-        {isAdmin && (
+        {/* Admin section — hidden until admin routes are implemented (post-MVP) */}
+        {isAdmin && false && (
           <>
             <div className="my-4 h-px bg-surface-container-high" />
             {!collapsed && (
@@ -158,7 +159,7 @@ export function Sidebar({ user }: SidebarProps) {
             {ADMIN_NAV.map((item) => {
               const active = isActive(item.href);
               return (
-                <a
+                <Link
                   className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     active
                       ? "bg-primary/8 text-primary"
@@ -172,7 +173,7 @@ export function Sidebar({ user }: SidebarProps) {
                   )}
                   <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
                   {!collapsed && <span>{t(item.labelKey)}</span>}
-                </a>
+                </Link>
               );
             })}
           </>
