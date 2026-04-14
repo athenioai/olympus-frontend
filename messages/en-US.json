@@ -81,6 +81,7 @@
     },
     "deleteSession": "Delete conversation",
     "deleteConfirm": "Are you sure you want to delete this conversation?",
+    "deleteDescription": "This action cannot be undone. The conversation will be permanently removed.",
     "agents": {
       "horos": "Horos",
       "kairos": "Kairos",
@@ -89,7 +90,20 @@
     "status": {
       "active": "Active",
       "handoff": "Handoff"
-    }
+    },
+    "noConversations": "No conversations",
+    "unknown": "Unknown",
+    "allAgents": "All agents",
+    "allChannels": "All channels",
+    "startedAt": "Started on {date}",
+    "loadMoreMessages": "Load more messages",
+    "appointmentCreated": "Appointment created",
+    "responding": "{agent} responding",
+    "takeOver": "Take over conversation",
+    "youAreResponding": "You are responding.",
+    "returnTo": "Return to {agent}",
+    "aiManaging": "{agent} is managing this conversation",
+    "reconnecting": "Reconnecting..."
   },
   "calendar": {
     "title": "Calendar",

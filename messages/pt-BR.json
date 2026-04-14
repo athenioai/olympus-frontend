@@ -81,6 +81,7 @@
     },
     "deleteSession": "Excluir conversa",
     "deleteConfirm": "Tem certeza que deseja excluir esta conversa?",
+    "deleteDescription": "Essa ação não pode ser desfeita. A conversa será removida permanentemente.",
     "agents": {
       "horos": "Horos",
       "kairos": "Kairos",
@@ -89,7 +90,20 @@
     "status": {
       "active": "Ativo",
       "handoff": "Handoff"
-    }
+    },
+    "noConversations": "Nenhuma conversa",
+    "unknown": "Desconhecido",
+    "allAgents": "Todos agentes",
+    "allChannels": "Todos canais",
+    "startedAt": "Iniciada em {date}",
+    "loadMoreMessages": "Carregar mais mensagens",
+    "appointmentCreated": "Agendamento criado",
+    "responding": "{agent} respondendo",
+    "takeOver": "Assumir conversa",
+    "youAreResponding": "Você está respondendo.",
+    "returnTo": "Devolver para {agent}",
+    "aiManaging": "O {agent} está gerenciando esta conversa",
+    "reconnecting": "Reconectando..."
   },
   "calendar": {
     "title": "Calendário",

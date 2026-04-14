@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { logoutAction } from "@/app/[locale]/(authenticated)/actions";
 import type { AuthUser } from "@/lib/services/interfaces/auth-service";
 
 interface SidebarProps {
@@ -90,8 +91,7 @@ export function Sidebar({ user }: SidebarProps) {
   }
 
   async function handleLogout() {
-    const { authService } = await import("@/lib/services/auth-service");
-    await authService.logout();
+    await logoutAction();
     router.push("/login");
   }
 
