@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Olympus Chat Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-dim": "#525352",
+                        "on-error-container": "#742410",
+                        "on-primary": "#fff6f1",
+                        "surface-variant": "#e0e3e0",
+                        "tertiary": "#5e5f5e",
+                        "on-primary-fixed": "#5e3600",
+                        "surface-container-highest": "#e0e3e0",
+                        "surface-tint": "#895100",
+                        "on-primary-container": "#774600",
+                        "background": "#faf9f7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#fff7f6",
+                        "secondary-container": "#9ff0fb",
+                        "secondary": "#006973",
+                        "on-background": "#2f3331",
+                        "primary-container": "#ffdcbc",
+                        "surface-bright": "#faf9f7",
+                        "on-surface-variant": "#5c605d",
+                        "surface-container-high": "#e6e9e6",
+                        "on-tertiary": "#faf9f7",
+                        "primary": "#895100",
+                        "primary-dim": "#784700",
+                        "outline-variant": "#afb3b0",
+                        "primary-fixed-dim": "#ffcb96",
+                        "inverse-on-surface": "#9d9d9b",
+                        "secondary-fixed": "#9ff0fb",
+                        "primary-fixed": "#ffdcbc",
+                        "outline": "#777c79",
+                        "on-secondary-fixed": "#00474d",
+                        "surface-container": "#edeeeb",
+                        "on-surface": "#2f3331",
+                        "inverse-primary": "#ffa535",
+                        "error-dim": "#5c1202",
+                        "error-container": "#fe8b70",
+                        "on-tertiary-fixed": "#494a49",
+                        "inverse-surface": "#0d0e0e",
+                        "error": "#9e422c",
+                        "secondary-fixed-dim": "#90e1ec",
+                        "on-secondary-container": "#005b63",
+                        "secondary-dim": "#005c65",
+                        "surface-dim": "#d6dbd7",
+                        "surface-container-low": "#f4f4f1",
+                        "on-tertiary-container": "#5b5c5b",
+                        "on-tertiary-fixed-variant": "#666665",
+                        "on-primary-fixed-variant": "#854f00",
+                        "on-secondary": "#eafcff",
+                        "tertiary-fixed-dim": "#e6e5e3",
+                        "on-secondary-fixed-variant": "#00656f",
+                        "tertiary-container": "#f4f3f1",
+                        "tertiary-fixed": "#f4f3f1",
+                        "surface": "#faf9f7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden">
+<!-- Left Panel: Session List (320px) -->
+<aside class="w-[320px] h-full flex flex-col bg-surface-container-low border-r border-outline-variant/10">
+<!-- Header Section -->
+<div class="p-6 space-y-4">
+<div class="flex items-center justify-between">
+<h1 class="text-2xl font-bold tracking-tight text-on-surface">Conversas</h1>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-2 rounded-xl transition-all">filter_list</span>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/60" placeholder="Buscar leads ou agentes..." type="text"/>
+</div>
+</div>
+<!-- Session List -->
+<div class="flex-1 overflow-y-auto px-3 space-y-2 pb-6">
+<!-- Active Session Card -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-primary/5 cursor-pointer hover:bg-white transition-all group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Lead" data-alt="Close up portrait of a professional man with friendly expression, neutral studio background, high quality photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXm2z7KhdnPIwlQE2wF-DGD-ss0BemURzrNnCYGuLNPyEio0aGAqHoMC66_LHjy5nrj-_LDavhvmm93wpfmlZdhEgWL7_PJBnE-38Bqs1bAvtdRZ5osDvsR5cSmLri9uwYudfIWUg2MMCELaPml5Sm7ONhtkX35G6XJYxtL08bvMYI5j7rAFgoRKj6HJjB9oypmyxVHUf0hZdgdFOz6gQ81ovg87AXXRl7YKAqkuEt4l90sp220xbHCfT0vDeRa4-pQ29ZxYuAiR_S"/>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Felipe Mendes</h3>
+<div class="flex gap-1 mt-0.5">
+<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-secondary-container text-on-secondary-container font-medium uppercase tracking-wider">Horos</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="text-[10px] text-on-surface-variant font-medium">10:42</span>
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">chat</span>
+<p class="text-xs truncate">Pode confirmar o horário das 15h?</p>
+</div>
+</div>
+<!-- Queued Session Card -->
+<div class="p-4 rounded-xl hover:bg-surface-container-high transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Lead" data-alt="Portrait of a young woman with creative styling, bright minimalist background, editorial photography lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxhTr3G5urgYc72nicJ4lYWEDKWObijw0U_oc2QjT1Yzcl6Lyjtzt-Jj02kEVB4Vj7UUbuegSJsLNv0mpn9zKZzj5GJuWGj1eNmo8EhN2TChydN6BFE1TGLKtO3qqBkzNpfEjDL8i8QS0KXUc33TlAiLY3YT9wfSZ3jv0zYUP75uGKWLzz3WaWnoqbJBcoLoShyjhlq649NGyuuPmGoc0McoyQm8MsNicp4Vjvbydu_ThFWdXCngOnG-jW_as7yy6rvU8YuvFfuViS"/>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Ana Beatriz</h3>
+<div class="flex gap-1 mt-0.5">
+<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-[#ffdcbc] text-[#895100] font-medium uppercase tracking-wider">Kairos</span>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-on-surface-variant font-medium">Ontem</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">chat</span>
+<p class="text-xs truncate">Obrigada pelo retorno!</p>
+</div>
+</div>
+<!-- Human Session Card -->
+<div class="p-4 rounded-xl hover:bg-surface-container-high transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Lead" data-alt="Business professional profile photo, warm indoor lighting, high end corporate aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUiHT7npDptm4GaAoO1tRY4o-Gk8Es4dvgYht4E4L31p9K146VDbw7jnjy7WeAa4eUOTbwoG-z3OvjV2RBJ387065odbfBgErTEhYbXR8ZLJeqRKztPWzHFgEgKJO0ndlEN2nCAX8kZVEm-biNTbGcmrGgVNhZOy6F5y1t-2egdUPlDyL9W2wSXrhBMEzVxBROObphVqleWaFTi-sOeR_-fxE9PU7oVzHwkZxm1-6GBCHPGPY2APv1tl7viFwK3syCZwgleHzLRiAM"/>
+</div>
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Rodrigo Silva</h3>
+<div class="flex gap-1 mt-0.5">
+<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-[#E9D5FF] text-[#6B21A8] font-medium uppercase tracking-wider">Humano</span>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-on-surface-variant font-medium">Seg</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">chat</span>
+<p class="text-xs truncate">Enviando os documentos em anexo.</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Panel: Message Thread -->
+<main class="flex-1 flex flex-col bg-surface overflow-hidden relative">
+<!-- Top Bar -->
+<header class="h-20 bg-surface/80 backdrop-blur-xl flex items-center justify-between px-8 z-10">
+<div class="flex items-center gap-4">
+<div class="w-11 h-11 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="Felipe" data-alt="Detail of a face, warm lighting, professional photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjgTfgqt56vVZKD2iZYg-pLIQgsNvLbvxHx8MgplU002i26b4aLf0Bk40yE947N0ypOCaY5RvmGQ1YuQw42qCwpEA2NGtfWmH7XsMKQWOHP9KA6YhZGQj9s0O5N2d6q95MC6eIk8TymcfkY3AxnuxDWN6nALMD1GF-CCOnFAlpSCdOA11MOigoZ_76e2pXlOZXf1LVG_vIYdjnVABJCodmLmPLI3vhLCKKfoaQwAWgGzJxEiyT-_MpR90JerX7IknfR8agJSyfgWPh"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="text-lg font-bold text-on-surface leading-tight">Felipe Mendes</h2>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold uppercase tracking-tighter">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Ativo
+                        </span>
+</div>
+<div class="flex gap-2 items-center mt-0.5">
+<span class="text-[11px] text-on-surface-variant font-medium">Agente:</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-semibold uppercase">Horos AI</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 pr-6 border-r border-outline-variant/20">
+<span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Ativar Handoff</span>
+<button class="w-10 h-5 bg-surface-container-highest rounded-full relative p-0.5 group transition-colors hover:bg-surface-container-high">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm transition-transform translate-x-0"></div>
+</button>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container-low transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">call</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container-low transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Message Area -->
+<section class="flex-1 overflow-y-auto p-8 space-y-8 bg-surface">
+<!-- Assistant Message -->
+<div class="flex items-start gap-3 max-w-[70%]">
+<div class="w-8 h-8 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="space-y-1">
+<div class="bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-on-surface leading-relaxed border border-surface-container-high">
+                        Olá Felipe! Sou o Horos, assistente virtual da Olympus. Como posso ajudar você com seu investimento hoje?
+                    </div>
+<span class="text-[10px] text-on-surface-variant ml-1">10:40 • Horos AI</span>
+</div>
+</div>
+<!-- Lead Message -->
+<div class="flex flex-row-reverse items-start gap-3 max-w-[70%] ml-auto">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm border border-primary-container">
+<img alt="Felipe" data-alt="Profile icon for lead user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBChi207m5_gi2co_HwfFH3nuu0td0fnQa5xE_X6AMWjwfbI_hP-hiR991TpQbus6SXMeAkpKwRo8k7O7oc5FRvm7P9RtmAEYCUoityrKzq03IZq4bGEin7j3dPYRV4VftMY3qtHOdRWBx1Ha-WwDgVw29EH5bZy_lX-7sHJwzwf6aKfxPXd1_6a7t4-JZuyhSDsu-hCo8ath7ChvX1frXS-MgTijVXTaIvQcbgoyAP87r0JLAWvEuGeDT1zO4VPlWoQHZXy8kHH3it"/>
+</div>
+<div class="space-y-1 items-end flex flex-col">
+<div class="bg-primary-container/40 p-4 rounded-2xl rounded-tr-none text-sm text-on-surface leading-relaxed">
+                        Gostaria de agendar uma consultoria para entender melhor o portfólio de renda fixa.
+                    </div>
+<span class="text-[10px] text-on-surface-variant mr-1">10:41</span>
+</div>
+</div>
+<!-- Assistant Message with Action -->
+<div class="flex items-start gap-3 max-w-[70%]">
+<div class="w-8 h-8 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-on-surface leading-relaxed border border-surface-container-high">
+                        Com certeza! Temos horários disponíveis para amanhã. Qual destes períodos funciona melhor para você?
+                    </div>
+<!-- System Message: Appointment Card -->
+<div class="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 w-full max-w-sm space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-white flex flex-col items-center justify-center shadow-sm">
+<span class="text-[10px] font-bold text-primary uppercase">Out</span>
+<span class="text-lg font-extrabold text-on-surface leading-none">24</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Consultoria de Portfólio</h4>
+<p class="text-xs text-on-surface-variant">Duração: 45 min • Online</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2 rounded-lg bg-surface-container-lowest text-xs font-semibold text-on-surface border border-surface-container-high hover:border-primary/30 transition-all">09:00 - 10:00</button>
+<button class="py-2 rounded-lg bg-surface-container-lowest text-xs font-semibold text-on-surface border border-surface-container-high hover:border-primary/30 transition-all">14:30 - 15:30</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Lead Message -->
+<div class="flex flex-row-reverse items-start gap-3 max-w-[70%] ml-auto">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm border border-primary-container">
+<img alt="Felipe" data-alt="Lead user profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-7mUDFw04oIXom2Tlk9C0K5CJoIHThmiMJqoiZyHYk4wDkYFK73UhE4XCbCeRz-JP-XKO57NPFHtUHk1dDjh8QaULNislwQSf2KCaBbsSkgymfVO6tfdkTmG6pucCFb0wPmxinFeTi9MF-X7k02bZB9Pti-xwnFKUInPi59aHFNgwsZaf7e2EZvuWhebtTuz411yix94ibHkPAcz_ktPSS-OvHVIcYovVFnYZP_U5uY9lcdqI0w5uLuvIlIybigLxUMN9SQ8bTscu"/>
+</div>
+<div class="space-y-1 items-end flex flex-col">
+<div class="bg-primary-container/40 p-4 rounded-2xl rounded-tr-none text-sm text-on-surface leading-relaxed">
+                        Pode ser às 14:30.
+                    </div>
+<span class="text-[10px] text-on-surface-variant mr-1">10:42</span>
+</div>
+</div>
+<!-- System Message: Success -->
+<div class="flex justify-center py-4">
+<div class="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-container/20 text-on-secondary-container text-xs font-medium">
+<span class="material-symbols-outlined text-sm">event_available</span>
+                    Agendamento criado com sucesso para amanhã às 14:30.
+                </div>
+</div>
+</section>
+<!-- Input Area -->
+<footer class="p-6 bg-surface-container-lowest border-t border-outline-variant/10">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-end gap-3 opacity-50 cursor-not-allowed">
+<div class="flex-1 bg-surface-container-high rounded-2xl p-2 flex items-end">
+<button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 resize-none placeholder:text-on-surface-variant/60" disabled="" placeholder="Handoff desativado. Ative para responder..." rows="1"></textarea>
+<button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+</div>
+<button class="w-12 h-12 rounded-2xl bg-surface-container-high text-on-surface-variant flex items-center justify-center" disabled="">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<p class="text-center text-[10px] text-on-surface-variant/60 mt-3 font-medium uppercase tracking-[0.1em]">
+                    O Horos AI está gerenciando esta conversa
+                </p>
+</div>
+</footer>
+</main>
+</body></html>

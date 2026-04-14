@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e0e3e0",
+                        "surface": "#faf9f7",
+                        "error": "#9e422c",
+                        "on-background": "#2f3331",
+                        "on-surface": "#2f3331",
+                        "background": "#faf9f7",
+                        "primary": "#895100",
+                        "on-secondary-fixed": "#00474d",
+                        "tertiary-dim": "#525352",
+                        "on-error": "#fff7f6",
+                        "surface-tint": "#895100",
+                        "on-primary-fixed-variant": "#854f00",
+                        "surface-container": "#edeeeb",
+                        "on-secondary-fixed-variant": "#00656f",
+                        "tertiary-fixed-dim": "#e6e5e3",
+                        "tertiary": "#5e5f5e",
+                        "on-secondary-container": "#005b63",
+                        "on-tertiary": "#faf9f7",
+                        "tertiary-fixed": "#f4f3f1",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#afb3b0",
+                        "primary-fixed": "#ffdcbc",
+                        "error-dim": "#5c1202",
+                        "secondary-container": "#9ff0fb",
+                        "on-secondary": "#eafcff",
+                        "surface-dim": "#d6dbd7",
+                        "secondary": "#006973",
+                        "surface-bright": "#faf9f7",
+                        "inverse-surface": "#0d0e0e",
+                        "on-tertiary-fixed-variant": "#666665",
+                        "secondary-dim": "#005c65",
+                        "inverse-primary": "#ffa535",
+                        "on-primary-fixed": "#5e3600",
+                        "error-container": "#fe8b70",
+                        "inverse-on-surface": "#9d9d9b",
+                        "primary-fixed-dim": "#ffcb96",
+                        "primary-container": "#ffdcbc",
+                        "surface-container-high": "#e6e9e6",
+                        "on-primary": "#fff6f1",
+                        "on-tertiary-container": "#5b5c5b",
+                        "surface-container-highest": "#e0e3e0",
+                        "on-tertiary-fixed": "#494a49",
+                        "secondary-fixed-dim": "#90e1ec",
+                        "on-primary-container": "#774600",
+                        "on-surface-variant": "#5c605d",
+                        "on-error-container": "#742410",
+                        "outline": "#777c79",
+                        "tertiary-container": "#f4f3f1",
+                        "secondary-fixed": "#9ff0fb",
+                        "primary-dim": "#784700",
+                        "surface-container-low": "#f4f4f1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f7;
+            color: #2f3331;
+        }
+        h1, h2, h3, .headline {
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(250, 249, 247, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-screen w-64 left-0 top-0 fixed bg-[#f4f4f1] dark:bg-stone-800 p-4 gap-2 z-40 hidden md:flex">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">odp</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-[#2f3331] tracking-tighter">Olympus</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Enterprise SaaS</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-[#5c605d] hover:bg-[#e6e9e6] hover:translate-x-1 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-[#5c605d] hover:bg-[#e6e9e6] hover:translate-x-1 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm bg-white text-[#895100] font-semibold rounded-lg shadow-sm" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+                Agent Ares
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-[#5c605d] hover:bg-[#e6e9e6] hover:translate-x-1 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">hub</span>
+                Integrations
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm text-[#5c605d] hover:bg-[#e6e9e6] hover:translate-x-1 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto p-4 bg-white rounded-xl">
+<p class="text-xs font-semibold mb-2">Upgrade Plan</p>
+<p class="text-[11px] text-on-surface-variant mb-3">Get more AI power for your outreach.</p>
+<button class="w-full bg-primary text-on-primary py-2 rounded-lg text-xs font-bold">Upgrade Now</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 relative bg-surface">
+<!-- TopNavBar Shell Implementation -->
+<header class="fixed top-0 right-0 left-0 md:left-64 h-16 glass-nav flex justify-between items-center px-8 z-30 border-b border-transparent">
+<h1 class="text-xl font-bold tracking-tighter text-[#2f3331]">Agent Ares</h1>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center gap-6 text-sm font-medium">
+<span class="text-[#895100] border-b-2 border-[#895100] pb-1 cursor-default">Agent Ares</span>
+<span class="text-[#5c605d] hover:text-[#2f3331] cursor-pointer">Performance</span>
+<span class="text-[#5c605d] hover:text-[#2f3331] cursor-pointer">History</span>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity">Launch Ares</button>
+</div>
+</header>
+<div class="pt-24 pb-20 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Hero Section -->
+<section class="grid lg:grid-cols-2 gap-12 items-center mb-24">
+<div class="space-y-6">
+<div>
+<span class="inline-block py-1 px-3 rounded-full bg-primary-container text-on-primary-container text-[11px] font-bold uppercase tracking-wider mb-4">AI Activation</span>
+<h2 class="text-6xl font-extrabold tracking-tight text-on-surface leading-tight">Ares</h2>
+<h3 class="text-2xl font-medium text-primary mt-1">Seu agente de atração</h3>
+</div>
+<p class="text-xl text-on-surface-variant leading-relaxed font-light">Ares não espera o lead aparecer. <span class="font-semibold text-on-surface italic">Ele vai buscar.</span></p>
+<div class="pt-4">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-3 shadow-lg hover:translate-y-[-2px] transition-all">
+                            Ativar o Ares
+                            <span class="material-symbols-outlined">bolt</span>
+</button>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-square bg-surface-container-low rounded-[40px] flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-90 mix-blend-multiply" data-alt="abstract 3D render of flowing golden and copper metallic spheres creating a sense of proactive movement and growth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWhsAyEOSfQQRlhue4QBnTdSdGDrNtYCMLHX4Kv4kDeRiCpyKPpDE7wBRWBzHwo65X3w2Jar8HnyB-DW7BeLbJTKbdx1buu5RT1yBggA5V82pcdS-RkyuOqBuzv6fenW_lq16bIPazqPt4okM6CcDOOzsM37Wr62MhkIfAJwq298HZn3TwX0SZrg1JvAswgwpGyeh7pgl6ZmCgeRlMovJRn9SsOK9j6J5fYhgJbMShnUjA4XFgugRxUk9EwInKdkzFCsidh3S3Y2nH"/>
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8 p-6 glass-nav rounded-2xl border border-white/20">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-white">radar</span>
+</div>
+<div>
+<p class="text-sm font-bold">Proactive Hunting</p>
+<p class="text-[11px] text-on-surface-variant">Ares is scanning 14 channels currently.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Metrics Bento Grid -->
+<section class="mb-24">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-transparent">
+<p class="text-sm text-on-surface-variant mb-2">Leads gerados/mês</p>
+<div class="flex items-end justify-between">
+<h4 class="text-3xl font-extrabold tracking-tighter">428</h4>
+<span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-transparent">
+<p class="text-sm text-on-surface-variant mb-2">Campanhas ativas</p>
+<h4 class="text-3xl font-extrabold tracking-tighter">14</h4>
+<div class="mt-4 flex gap-1">
+<div class="h-1 w-full bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-transparent">
+<p class="text-sm text-on-surface-variant mb-2">Custo por lead</p>
+<h4 class="text-3xl font-extrabold tracking-tighter text-secondary">R$ 8,40</h4>
+<p class="text-[10px] text-on-surface-variant mt-2 uppercase tracking-wide">Otimizado por IA</p>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-transparent">
+<p class="text-sm text-on-surface-variant mb-2">Conversão p/ MQL</p>
+<h4 class="text-3xl font-extrabold tracking-tighter">24%</h4>
+<div class="mt-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary">trending_up</span>
+<span class="text-[10px] text-on-surface-variant">Benchmark: 18%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features -->
+<section class="mb-24">
+<div class="mb-12">
+<h2 class="text-3xl font-bold tracking-tight mb-2">O que o Ares faz por você</h2>
+<p class="text-on-surface-variant">A automação total da sua boca de funil.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<div class="flex gap-6 p-6 rounded-2xl hover:bg-surface-container-low transition-colors group">
+<div class="w-14 h-14 shrink-0 rounded-xl bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">auto_graph</span>
+</div>
+<div>
+<h4 class="font-bold mb-2">Gerenciamento Automático</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Cria e gerencia campanhas de atração automaticamente, ajustando orçamentos em tempo real.</p>
+</div>
+</div>
+<div class="flex gap-6 p-6 rounded-2xl hover:bg-surface-container-low transition-colors group">
+<div class="w-14 h-14 shrink-0 rounded-xl bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">person_search</span>
+</div>
+<div>
+<h4 class="font-bold mb-2">Encontra Potenciais Clientes</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Localiza leads nos canais certos e na hora exata, garantindo maior relevância na abordagem.</p>
+</div>
+</div>
+<div class="flex gap-6 p-6 rounded-2xl hover:bg-surface-container-low transition-colors group">
+<div class="w-14 h-14 shrink-0 rounded-xl bg-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">cyclone</span>
+</div>
+<div>
+<h4 class="font-bold mb-2">Demanda Contínua</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Gera demanda 24/7 sem depender da intervenção direta do dono da empresa.</p>
+</div>
+</div>
+<div class="flex gap-6 p-6 rounded-2xl hover:bg-surface-container-low transition-colors group">
+<div class="w-14 h-14 shrink-0 rounded-xl bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">input_circle</span>
+</div>
+<div>
+<h4 class="font-bold mb-2">Alimentação do Fluxo</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Envia leads qualificados diretamente para o Kairos realizar a conversão final.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How it works -->
+<section class="mb-24 bg-surface-container-low p-12 rounded-[32px]">
+<h2 class="text-3xl font-bold tracking-tight mb-12 text-center">Como funciona</h2>
+<div class="grid md:grid-cols-3 gap-12 relative">
+<!-- Connector line (visual only) -->
+<div class="hidden md:block absolute top-10 left-1/4 right-1/4 h-px bg-outline-variant opacity-30"></div>
+<div class="flex flex-col items-center text-center space-y-4">
+<div class="w-20 h-20 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm z-10">
+<span class="text-2xl font-bold text-primary">01</span>
+</div>
+<h4 class="font-bold">Análise de Mercado</h4>
+<p class="text-sm text-on-surface-variant">Ares analisa profundamente seu público-alvo e o comportamento do mercado atual.</p>
+</div>
+<div class="flex flex-col items-center text-center space-y-4">
+<div class="w-20 h-20 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm z-10">
+<span class="text-2xl font-bold text-primary">02</span>
+</div>
+<h4 class="font-bold">Ativação de Canais</h4>
+<p class="text-sm text-on-surface-variant">Ares cria e dispara campanhas hiper-personalizadas nos canais ideais para seu nicho.</p>
+</div>
+<div class="flex flex-col items-center text-center space-y-4">
+<div class="w-20 h-20 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm z-10">
+<span class="text-2xl font-bold text-primary">03</span>
+</div>
+<h4 class="font-bold">Entrega no Fluxo</h4>
+<p class="text-sm text-on-surface-variant">Leads qualificados entram automaticamente no seu Fluxo Olímpico para fechamento.</p>
+</div>
+</div>
+</section>
+<!-- Olympic Flow Diagram -->
+<section class="mb-24 max-w-4xl mx-auto">
+<div class="bg-surface-container-highest/30 p-10 rounded-3xl border border-white/50 backdrop-blur-sm">
+<h3 class="text-2xl font-bold tracking-tight mb-8 text-center">Conexão com o Fluxo Olímpico</h3>
+<div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
+<div class="flex flex-col items-center gap-4">
+<div class="w-24 h-24 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-primary/20">
+<span class="material-symbols-outlined text-white text-4xl">bolt</span>
+</div>
+<div class="text-center">
+<p class="font-bold text-primary">Ares</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Atrai</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hidden md:block">arrow_forward</span>
+<span class="material-symbols-outlined text-outline-variant md:hidden">arrow_downward</span>
+<div class="flex flex-col items-center gap-4">
+<div class="w-24 h-24 rounded-2xl bg-secondary flex items-center justify-center shadow-xl shadow-secondary/20">
+<span class="material-symbols-outlined text-white text-4xl">diversity_3</span>
+</div>
+<div class="text-center">
+<p class="font-bold text-secondary">Kairos</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Converte</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant hidden md:block">arrow_forward</span>
+<span class="material-symbols-outlined text-outline-variant md:hidden">arrow_downward</span>
+<div class="flex flex-col items-center gap-4">
+<div class="w-24 h-24 rounded-2xl bg-tertiary flex items-center justify-center shadow-xl shadow-tertiary/20">
+<span class="material-symbols-outlined text-white text-4xl">grid_view</span>
+</div>
+<div class="text-center">
+<p class="font-bold text-tertiary">Horos</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Organiza</p>
+</div>
+</div>
+</div>
+<div class="text-center max-w-2xl mx-auto border-t border-outline-variant/20 pt-8">
+<p class="text-on-surface-variant italic leading-relaxed">
+                            "O Ares é o primeiro movimento. Ele traz os leads. <br class="hidden md:block"/>
+                            O Kairos fecha. O Horos organiza."
+                        </p>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="text-center space-y-8 bg-surface-container-low p-16 rounded-[40px] overflow-hidden relative">
+<div class="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 right-0 w-96 h-96 bg-secondary/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+<h2 class="text-4xl font-extrabold tracking-tight relative z-10">Pronto para escalar sua atração?</h2>
+<p class="text-on-surface-variant text-lg max-w-xl mx-auto relative z-10">
+                    Ative o Ares hoje e deixe a inteligência artificial encontrar seus melhores clientes enquanto você foca no que importa.
+                </p>
+<div class="relative z-10">
+<button class="bg-primary text-on-primary px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all">
+                        Ativar o Ares
+                    </button>
+<p class="text-[11px] text-on-surface-variant mt-4 font-medium">Configuração inicial em menos de 5 minutos</p>
+</div>
+</section>
+</div>
+<footer class="mt-12 py-8 px-12 border-t border-surface-container-high flex justify-between items-center text-[12px] text-on-surface-variant">
+<p>© 2024 Olympus Platforms. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary" href="#">Termos</a>
+<a class="hover:text-primary" href="#">Privacidade</a>
+<a class="hover:text-primary" href="#">Ajuda</a>
+</div>
+</footer>
+</main>
+<!-- Mobile Bottom NavBar (Visible only on mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 glass-nav h-16 flex justify-around items-center px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-[#5c605d]">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#5c605d]">
+<span class="material-symbols-outlined">monitoring</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#895100]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#5c605d]">
+<span class="material-symbols-outlined">hub</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#5c605d]">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</body></html>

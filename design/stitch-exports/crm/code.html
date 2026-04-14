@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Olympus CRM | Kanban Board</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#0d0e0e",
+                        "surface-dim": "#d6dbd7",
+                        "surface-tint": "#895100",
+                        "on-error": "#fff7f6",
+                        "surface": "#faf9f7",
+                        "on-surface-variant": "#5c605d",
+                        "secondary-fixed": "#9ff0fb",
+                        "on-tertiary": "#faf9f7",
+                        "error-dim": "#5c1202",
+                        "tertiary-container": "#f4f3f1",
+                        "on-primary-container": "#774600",
+                        "background": "#faf9f7",
+                        "on-secondary-fixed": "#00474d",
+                        "surface-bright": "#faf9f7",
+                        "secondary-fixed-dim": "#90e1ec",
+                        "primary": "#895100",
+                        "secondary-container": "#9ff0fb",
+                        "tertiary-fixed-dim": "#e6e5e3",
+                        "on-tertiary-fixed": "#494a49",
+                        "on-primary": "#fff6f1",
+                        "on-background": "#2f3331",
+                        "error": "#9e422c",
+                        "secondary-dim": "#005c65",
+                        "surface-container-low": "#f4f4f1",
+                        "inverse-on-surface": "#9d9d9b",
+                        "error-container": "#fe8b70",
+                        "inverse-primary": "#ffa535",
+                        "primary-dim": "#784700",
+                        "primary-fixed-dim": "#ffcb96",
+                        "on-secondary": "#eafcff",
+                        "surface-container-highest": "#e0e3e0",
+                        "surface-container": "#edeeeb",
+                        "on-primary-fixed": "#5e3600",
+                        "on-primary-fixed-variant": "#854f00",
+                        "surface-container-high": "#e6e9e6",
+                        "on-surface": "#2f3331",
+                        "primary-container": "#ffdcbc",
+                        "secondary": "#006973",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#742410",
+                        "on-tertiary-fixed-variant": "#666665",
+                        "tertiary-fixed": "#f4f3f1",
+                        "tertiary": "#5e5f5e",
+                        "on-secondary-fixed-variant": "#00656f",
+                        "primary-fixed": "#ffdcbc",
+                        "surface-variant": "#e0e3e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, h4, span, p, a, button, input { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="hidden md:flex flex-col h-screen w-64 bg-[#faf9f7] fixed left-0 top-0 z-40 overflow-y-auto p-6 gap-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="cloud">cloud</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-[#2f3331] leading-none">Olympus</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-extrabold mt-1">Enterprise Tier</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 flex-grow">
+<!-- Project / Dashboard Active -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#895100] bg-[#ffffff] rounded-xl shadow-sm transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-semibold text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#5c605d] hover:bg-[#f4f4f1] hover:text-[#2f3331] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-semibold text-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#5c605d] hover:bg-[#f4f4f1] hover:text-[#2f3331] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-semibold text-sm">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#5c605d] hover:bg-[#f4f4f1] hover:text-[#2f3331] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-semibold text-sm">Team</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#5c605d] hover:bg-[#f4f4f1] hover:text-[#2f3331] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-semibold text-sm">Reports</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/10 pt-6">
+<a class="flex items-center gap-3 px-4 py-2 text-[#5c605d] hover:bg-[#f4f4f1] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="text-sm font-medium">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#5c605d] hover:bg-[#f4f4f1] rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-sm font-medium">Account</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-grow md:ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar (Authority: JSON) -->
+<header class="fixed top-0 right-0 left-0 md:left-64 z-30 bg-[#faf9f7]/80 backdrop-blur-3xl px-10 py-4 flex justify-between items-center w-auto">
+<div class="flex items-center gap-8">
+<h1 class="text-xl font-extrabold tracking-tighter text-[#2f3331]">Kanban Board</h1>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-surface-container-high border-none rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:ring-1 focus:ring-primary/30 transition-all font-medium" placeholder="Search deals..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4">
+<button class="p-2 rounded-full hover:bg-[#e0e3e0] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-[#e0e3e0] transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="professional portrait of a corporate executive in a modern office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQpVkDA_GKDvFKc875p6nRbUYG8wUSj8BnzOBRijRQqUqBNI-GdSuT2NkPM2ZdfzZXjG5d3tbGJaYXIkP68sQpUB5anqtTWpMUi5YXDNzUeZE2xePzr8YUOYioHEheUiSg7NvBesG11WWJc0CkNdDAihGl2OUh8ErWmnF61EcwFePgTSifsjGcDRnUZjtfEf3-Yi25Du8yU6VvzAz0VTUHWbjlU7fILuf5eOPXhVpinoLyS4cbQzC7cE3DgmDGpuD3zdU4XhLb5JXV"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="mt-24 px-10 pb-10 flex-grow">
+<!-- Page Header/Stats (Subtle Tonal Shift) -->
+<div class="flex flex-wrap items-end justify-between gap-6 mb-12">
+<div>
+<p class="text-xs font-extrabold text-primary mb-1 uppercase tracking-widest">Active Pipeline</p>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface leading-none">Enterprise Q3 Leads</h2>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container-low px-6 py-4 rounded-xl flex flex-col">
+<span class="text-[10px] font-extrabold text-on-surface-variant uppercase tracking-wider">Total Value</span>
+<span class="text-xl font-extrabold text-on-surface mt-1">$4.2M</span>
+</div>
+<div class="bg-secondary-container/30 px-6 py-4 rounded-xl flex flex-col">
+<span class="text-[10px] font-extrabold text-on-secondary-container uppercase tracking-wider">Win Rate</span>
+<span class="text-xl font-extrabold text-secondary mt-1">68%</span>
+</div>
+</div>
+</div>
+<!-- Kanban Board Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Column 1: Discovery -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h3 class="font-extrabold text-on-surface text-xs uppercase tracking-widest">Discovery</h3>
+</div>
+<span class="text-xs font-extrabold text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-md">04</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-4 flex flex-col gap-4 min-h-[600px]">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-primary transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">SaaS</span>
+<span class="material-symbols-outlined text-outline-variant text-lg" data-icon="more_horiz">more_horiz</span>
+</div>
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Global Tech Logistics Expansion</h4>
+<p class="text-sm text-on-surface-variant mb-6 line-clamp-2 font-medium">Initial consultation for fleet management software integration across EU regions.</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-high overflow-hidden">
+<img alt="Team member" class="w-full h-full object-cover" data-alt="professional male headshot in business attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWoK-aJ39sPvU-PYbwo0XbPe8cDJqMUwDumxBmMok_Fc9BBEDjTWjbmhYmagyF9czbdlkBWXXzIm8JVwKLdmjvThuyzWXVAal3Od17rLWYgexUhBPblQ89C_NSRfCUZXAVzZisshMyJ25rMhO8PwIQ1BOydUiJXUCIfeegYJDJ9hcK3M4sUWMWo03ESv4-7asnaWqMq_xKp4hoPUgdv8uSKtfSJ3mWmI1-pxug-BI9FCJdRLw6s2wq5_Kz93Yrl29MRizCQleOv7vY"/>
+</div>
+</div>
+<div class="flex items-center gap-1 text-primary font-extrabold text-sm">
+<span class="material-symbols-outlined text-sm" data-icon="attach_money">attach_money</span>
+<span>85k</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm transition-all hover:translate-y-[-4px] cursor-pointer">
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Nexus Corp CRM Audit</h4>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-error text-xs" data-icon="schedule" data-weight="fill" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<span class="text-[11px] font-extrabold text-error uppercase">Overdue</span>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="text-[11px] text-on-surface-variant font-bold">Updated 2h ago</div>
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-[10px] font-extrabold">NC</div>
+</div>
+</div>
+<button class="w-full py-4 rounded-xl border-2 border-dashed border-outline-variant/20 text-on-surface-variant text-sm font-bold hover:bg-surface-container-high hover:border-primary/30 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                            Add Lead
+                        </button>
+</div>
+</div>
+<!-- Column 2: Proposal -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h3 class="font-extrabold text-on-surface text-xs uppercase tracking-widest">Proposal</h3>
+</div>
+<span class="text-xs font-extrabold text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-md">02</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-4 flex flex-col gap-4 min-h-[600px]">
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<span class="bg-tertiary-container text-on-tertiary-container text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">Consulting</span>
+</div>
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Horizon FinTech Strategy</h4>
+<p class="text-sm text-on-surface-variant mb-6 line-clamp-2 font-medium">Full digital transformation roadmap including cloud migration and security protocols.</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img alt="Team member" class="w-full h-full object-cover" data-alt="professional female architect or consultant in office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQBliSuprdMsmkohsTRUhaghvfJQAlH1xWJGqUSdyINl9KDe0mmrRJ22FVOD_MBSJx8CS5Vwtc6E8prWeCqYaBWRE3VSQrHO5AMFaMRVI1HbMS3XaEsscGDWw8mTmZilWORCDVrM9jIBPrJteCTlIW2j1NFt6ctdx0ed4dlLzb_TKH1jMnRV6BK9xDsYQo1k89Ob3t2IMsEBeTBp7VTR66V5R8qeI6NdDqDPXFR2ykU07oX7kxibpG9wsIpSz00ug0CHbzAm7mo6o6"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container flex items-center justify-center text-[10px] font-extrabold text-primary">JD</div>
+</div>
+<div class="flex items-center gap-1 text-primary font-extrabold text-sm">
+<span class="material-symbols-outlined text-sm" data-icon="attach_money">attach_money</span>
+<span>210k</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm transition-all hover:translate-y-[-4px] cursor-pointer">
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Retail Giant Inventory AI</h4>
+<div class="flex items-center gap-4 text-xs font-bold text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span> 12</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" data-icon="link">link</span> 3</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 3: Negotiation -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<h3 class="font-extrabold text-on-surface text-xs uppercase tracking-widest">Negotiation</h3>
+</div>
+<span class="text-xs font-extrabold text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-md">01</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-4 flex flex-col gap-4 min-h-[600px]">
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-t-4 border-error transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-extrabold px-2 py-1 rounded-full uppercase">High Value</span>
+</div>
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">BioHealth Systems Annual Contract</h4>
+<p class="text-sm text-on-surface-variant mb-6 font-medium">Final pricing review with procurement team. Targeting Q4 start.</p>
+<div class="bg-surface-container-high rounded-lg p-3 flex items-center justify-between mb-4">
+<span class="text-[11px] font-extrabold text-on-surface-variant uppercase">Probability</span>
+<span class="text-sm font-black text-secondary">92%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img alt="Lead owner" class="w-full h-full object-cover" data-alt="mature professional businessman smiling in bright office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAETwdSIpUz--18pKE0GA3P5IsFHHjDOc7DViRZ6ln3p0s9QQ1uEOj4kIVq-E9K9GPxRPE2D4jHDCdueMUG9pfk4PrrTa78SaxrTWTz-9tBcBKCm0R1CX8FHWhaMGUYoh9IJci91Frxt7yyM790cdlDXA2MxmeaJagWNiHLjYgzgLKorLEE27ajVyKS-RaMrfoK1CR_WVwgFoCVRKLgpG7ImVwscvx6f8rSys0YGHdsafTI0f26oAcY1-a6pl8VkaBnTmpaaPPMjEaQ"/>
+</div>
+<div class="text-primary font-extrabold text-sm">$1.2M</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 4: Closed -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<h3 class="font-extrabold text-on-surface text-xs uppercase tracking-widest">Closed</h3>
+</div>
+<span class="text-xs font-extrabold text-on-surface-variant bg-surface-container-high px-2 py-1 rounded-md">08</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-4 flex flex-col gap-4 min-h-[600px] opacity-60">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm transition-all grayscale hover:grayscale-0 cursor-not-allowed">
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Acme Analytics Portal</h4>
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[11px] font-extrabold uppercase tracking-wider">Completed</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm transition-all grayscale cursor-not-allowed">
+<h4 class="font-extrabold text-lg text-on-surface mb-2 leading-snug">Vanguard Security Audit</h4>
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[11px] font-extrabold uppercase tracking-wider">Completed</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation (Authority: JSON/Design System) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-[#faf9f7] h-16 flex items-center justify-around z-50 shadow-[0_-8px_24px_rgba(47,51,49,0.06)] px-4">
+<a class="flex flex-col items-center gap-1 text-[#895100]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-extrabold uppercase">Board</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#5c605d]" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-[10px] font-extrabold uppercase">Data</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#5c605d]" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px] font-extrabold uppercase">Team</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#5c605d]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-extrabold uppercase">More</span>
+</a>
+</nav>
+</body></html>

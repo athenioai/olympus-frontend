@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Catalog Management | Authority</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#2f3331",
+                      "on-secondary-fixed": "#00474d",
+                      "on-tertiary-fixed": "#494a49",
+                      "on-primary-fixed": "#5e3600",
+                      "on-secondary-fixed-variant": "#00656f",
+                      "on-error-container": "#742410",
+                      "secondary-container": "#9ff0fb",
+                      "on-surface": "#2f3331",
+                      "surface-container-highest": "#e0e3e0",
+                      "surface-variant": "#e0e3e0",
+                      "inverse-surface": "#0d0e0e",
+                      "secondary-dim": "#005c65",
+                      "on-primary-container": "#774600",
+                      "outline-variant": "#afb3b0",
+                      "inverse-primary": "#ffa535",
+                      "inverse-on-surface": "#9d9d9b",
+                      "tertiary-dim": "#525352",
+                      "surface": "#faf9f7",
+                      "tertiary": "#5e5f5e",
+                      "secondary-fixed": "#9ff0fb",
+                      "secondary-fixed-dim": "#90e1ec",
+                      "surface-container-high": "#e6e9e6",
+                      "error": "#9e422c",
+                      "error-dim": "#5c1202",
+                      "tertiary-container": "#f4f3f1",
+                      "primary-fixed": "#ffdcbc",
+                      "on-primary": "#fff6f1",
+                      "on-secondary-container": "#005b63",
+                      "surface-dim": "#d6dbd7",
+                      "on-error": "#fff7f6",
+                      "on-tertiary": "#faf9f7",
+                      "error-container": "#fe8b70",
+                      "background": "#faf9f7",
+                      "on-surface-variant": "#5c605d",
+                      "surface-container": "#edeeeb",
+                      "on-tertiary-fixed-variant": "#666665",
+                      "surface-bright": "#faf9f7",
+                      "primary-fixed-dim": "#ffcb96",
+                      "tertiary-fixed-dim": "#e6e5e3",
+                      "tertiary-fixed": "#f4f3f1",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#f4f4f1",
+                      "primary": "#895100",
+                      "surface-tint": "#895100",
+                      "secondary": "#006973",
+                      "primary-container": "#ffdcbc",
+                      "outline": "#777c79",
+                      "on-tertiary-container": "#5b5c5b",
+                      "on-primary-fixed-variant": "#854f00",
+                      "on-secondary": "#eafcff",
+                      "primary-dim": "#784700"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope", "sans-serif"],
+                      "body": ["Manrope", "sans-serif"],
+                      "label": ["Manrope", "sans-serif"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #faf9f7;
+            color: #2f3331;
+        }
+        h1, h2, h3, .brand-font, .font-headline, .font-body, .font-label {
+            font-family: 'Manrope', sans-serif !important;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased font-body">
+<!-- TopNavBar Shell -->
+<header class="w-full sticky top-0 z-40 bg-[#faf9f7]/80 backdrop-blur-3xl">
+<div class="flex justify-between items-center px-8 h-20 w-full ml-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#2f3331] brand-font">Authority</span>
+<nav class="hidden md:flex items-center gap-6 font-headline tracking-tight font-medium">
+<a class="text-[#5c605d] hover:text-[#2f3331] transition-colors duration-300" href="#">Dashboard</a>
+<a class="text-[#895100] font-semibold" href="#">Catalog</a>
+<a class="text-[#5c605d] hover:text-[#2f3331] transition-colors duration-300" href="#">Operations</a>
+<a class="text-[#5c605d] hover:text-[#2f3331] transition-colors duration-300" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 font-body" placeholder="Search catalog..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-[#f4f4f1]/50 p-2 rounded-full transition-all">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-[#f4f4f1]/50 p-2 rounded-full transition-all">settings</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/10">
+<img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGF0HRHsJbDe6C6RD9UN2t8TldUHzOh9UkuyW97KqYCNuPENAv5jfagx9tvCm5jGhd1PQxKVkJk2YmmbH8rYUVcZi3xop2AemxF0_EI3iNX5596SjQYiI38aQKt1f7ZzfpEN9umB8nN4pSls6ZSyBPFmnXYteQtcLRoJNgYcRZavxJglLUz80O0JvlAbrKcoewfSeI9LuJPq26kX0ahcAaY2QdDoHnzge4aLph-Db4CiJnd-bMVdV7ffmp4Fqju3TQ0wy6IRkKzLgJ"/>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#f4f4f1] h-[1px] w-full"></div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-[#f4f4f1] flex flex-col py-8 pr-4 h-full hidden lg:flex">
+<div class="px-8 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<div>
+<div class="font-headline font-extrabold text-[#2f3331]">Global Ops</div>
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-headline">Enterprise Tier</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#895100] bg-[#ffffff]/60 font-bold rounded-r-full font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span>Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Operations</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Financials</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Team</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span>Analytics</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-8 py-3 text-[#5c605d] hover:bg-[#e6e9e6] transition-all duration-200 font-headline text-sm tracking-wide text-error" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-72 p-8 md:p-12">
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight mb-2 font-headline">Catalog Management</h1>
+<p class="text-on-surface-variant max-w-xl font-body">Configure and manage your organization's service offerings and physical assets through a high-contrast editorial interface.</p>
+</div>
+</header>
+<!-- Tabbed Navigation -->
+<div class="flex items-center gap-8 mb-8 border-b border-surface-container-high pb-4">
+<button class="relative py-2 px-1 font-headline font-bold text-primary group transition-all">
+                Services
+                <div class="absolute bottom-[-17px] left-0 w-full h-[2px] bg-primary"></div>
+</button>
+<button class="relative py-2 px-1 font-headline font-medium text-on-surface-variant hover:text-on-surface transition-all">
+                Products
+            </button>
+<div class="ml-auto flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">filter_list</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">sort</span>
+</div>
+</div>
+<!-- Bento Content Grid / Table Replacement -->
+<section class="space-y-6">
+<!-- Header of the 'Table' -->
+<div class="grid grid-cols-12 px-6 py-4 text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline">
+<div class="col-span-6 md:col-span-5">Item Name &amp; Thumbnail</div>
+<div class="hidden md:block col-span-2 text-right">Price (USD)</div>
+<div class="col-span-3 md:col-span-3 text-center">Status</div>
+<div class="col-span-3 md:col-span-2 text-right">Actions</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 items-center bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_0_rgba(47,51,49,0.04)] hover:bg-surface-container-low transition-colors group">
+<div class="col-span-6 md:col-span-5 flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high overflow-hidden shrink-0 border border-outline-variant/5">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeaPTZXFDhV4JhiGqLiZ3xQXPuN4xQQ2Vq5Ey8yFQ2C0GGF31CFOBQ-AKHXqxEnHXek5rUa5DR50Oxl0QwgK0VZI5oRpoJbqvj8lXry8S9pfnLKQOhlV4nmyrNiz2Bz56c7dbIRqyukMmtO4Z1gFfwZF-tZ4uzKgHSg1Sd9UNg6bEU_sKZ8E9-IMBSlArILayB_eNJ3iWIhG2NFcnBOUyujup48ZkNQ2hkTYI30sZSzQPqZu8GG6US0fUs-glSyZXeWR3An7nIl2Pd"/>
+</div>
+<div>
+<div class="font-headline font-bold text-lg leading-none mb-1">Infrastructure Audit</div>
+<div class="text-sm text-on-surface-variant font-body">Annual security and performance review</div>
+</div>
+</div>
+<div class="hidden md:block col-span-2 text-right font-headline font-bold text-lg">$2,400.00</div>
+<div class="col-span-3 md:col-span-3 flex justify-center">
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="col-span-3 md:col-span-2 text-right">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 items-center bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_0_rgba(47,51,49,0.04)] hover:bg-surface-container-low transition-colors group">
+<div class="col-span-6 md:col-span-5 flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high overflow-hidden shrink-0 border border-outline-variant/5">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvXaT9YmHGLbjA5rhDaCMOzXl0afM27buDyhim8tlKKcV005Wv1oWnUTvLN3GUsPflbfWVbXp0F5siOP3dgcFCXCoDz_QsxTDpBhpKzPVH7GN6O96kCVrU_xA1f0rFkn-GDJTwhCMni3B9XAFFbpfpjzKfD7V1sxzrL50hQyVPHPDsEy9oHnUlkGbOgNRnpup0C4IbYMg5_jPvQtOpojbKs4mkATkP5_RLeypF5cFsbXMQ_JpfA6d7FfnTtgVYW3csUZDC6qM5YH0P"/>
+</div>
+<div>
+<div class="font-headline font-bold text-lg leading-none mb-1">Cloud Integration</div>
+<div class="text-sm text-on-surface-variant font-body">Cross-platform migration &amp; syncing</div>
+</div>
+</div>
+<div class="hidden md:block col-span-2 text-right font-headline font-bold text-lg">$850.00</div>
+<div class="col-span-3 md:col-span-3 flex justify-center">
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-surface-container-highest">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="col-span-3 md:col-span-2 text-right">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 items-center bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_0_rgba(47,51,49,0.04)] hover:bg-surface-container-low transition-colors group">
+<div class="col-span-6 md:col-span-5 flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high overflow-hidden shrink-0 border border-outline-variant/5">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD04EmWK7e-5WVEyAt-rdk-NPu52WB0sp7o8dKA3pM-We1_ccpI0j7mJlbUkv338NKbxCLsX5dNJOZiH_MVlpSa0hC_IaDxbzxla71zNNrTrZi17-rmUpCP2I8zSd8dCYJUX_zerl3ti3TVlcZvtfdVzTqgqevuSN10ZRC9BNTyqChFI81U9TZXn0Fo0yYo_KzoWy70wc1pxfXyr25JXTclUXfKUddkMjaTckAYhcRL-MKxPz2yN9YBYOomvFykzPkw8zWtUig69q5l"/>
+</div>
+<div>
+<div class="font-headline font-bold text-lg leading-none mb-1">Executive Coaching</div>
+<div class="text-sm text-on-surface-variant font-body">1-on-1 leadership strategy sessions</div>
+</div>
+</div>
+<div class="hidden md:block col-span-2 text-right font-headline font-bold text-lg">$1,200.00</div>
+<div class="col-span-3 md:col-span-3 flex justify-center">
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="col-span-3 md:col-span-2 text-right">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 items-center bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_0_rgba(47,51,49,0.04)] hover:bg-surface-container-low transition-colors group">
+<div class="col-span-6 md:col-span-5 flex items-center gap-4">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high overflow-hidden shrink-0 border border-outline-variant/5">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0ZslMo1BfgRJJ37B7wVq06IK8kMP5i2LUKVfWw9WeEovsf-3wdT8PWIS1gPCAsrW-aicAWyTI5ZMnHI--zN6rZEg1ntcwW-VdKYSdzJbwxhghxHDyagIyzIeOJjmTZqsy81k5TZ_Mnnxf2E055Wd5ExBgc3yc_3wtj9uRY7hYeucV3J980YS9nhzEtgRgoxbysomV7k4K8j6VAUhMmLgu1mW7sFdDfgy3eANG4rhcLhCe_LmQFwT9A63-lr5_yqCjpmNAzSe4_y20"/>
+</div>
+<div>
+<div class="font-headline font-bold text-lg leading-none mb-1">Market Analysis</div>
+<div class="text-sm text-on-surface-variant font-body">Quarterly industry trend forecasting</div>
+</div>
+</div>
+<div class="hidden md:block col-span-2 text-right font-headline font-bold text-lg">$3,750.00</div>
+<div class="col-span-3 md:col-span-3 flex justify-center">
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="col-span-3 md:col-span-2 text-right">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Bottom Stats Section -->
+<footer class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-8 bg-surface-container-low rounded-2xl flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline">Active Services</span>
+<span class="text-4xl font-extrabold font-headline">124</span>
+<div class="mt-4 flex items-center gap-1 text-primary font-bold text-sm font-headline">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                    +12% from last month
+                </div>
+</div>
+<div class="p-8 bg-surface-container-low rounded-2xl flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline">Total Catalog Value</span>
+<span class="text-4xl font-extrabold font-headline">$42.8M</span>
+<div class="mt-4 flex items-center gap-1 text-on-surface-variant font-medium text-sm font-headline">
+                    Enterprise Portfolio
+                </div>
+</div>
+<div class="p-8 bg-primary rounded-2xl flex flex-col gap-1 text-on-primary">
+<span class="text-xs font-bold uppercase tracking-widest opacity-80 font-headline">Catalog Integrity</span>
+<span class="text-4xl font-extrabold font-headline">99.2%</span>
+<div class="mt-4 flex items-center gap-1 font-bold text-sm font-headline">
+<span class="material-symbols-outlined text-sm">verified</span>
+                    Audit passed yesterday
+                </div>
+</div>
+</footer>
+</main>
+</div>
+<!-- Mobile Navigation Shell -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low z-50 px-6 py-4 flex justify-between items-center shadow-2xl border-t border-outline-variant/10">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter font-headline">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter font-headline">Catalog</span>
+</button>
+<button class="bg-primary -mt-12 w-14 h-14 rounded-full flex items-center justify-center text-on-primary shadow-xl shadow-primary/30">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter font-headline">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter font-headline">Profile</span>
+</button>
+</div>
+</body></html>
