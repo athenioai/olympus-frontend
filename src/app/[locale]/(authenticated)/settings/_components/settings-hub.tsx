@@ -6,6 +6,7 @@ import { CalendarDays, Bot, Building2, Radio, ExternalLink, Loader2, Trash2, Zap
 import { WhatsAppIcon, TelegramIcon, InstagramIcon, SmsIcon } from "@/components/icons/channel-icons";
 import { toast } from "sonner";
 import { TelegramWizard } from "./telegram-wizard";
+import { BusinessProfileSettings } from "./business-profile-settings";
 import { cn } from "@/lib/utils";
 import { updateCalendarConfig, updatePrepaymentSetting, listChannels, disconnectChannel } from "../actions";
 import { updateAgentConfig } from "../agent-actions";
@@ -1000,19 +1001,7 @@ export function SettingsHub({
       <div className="min-w-0 flex-1 overflow-y-auto rounded-xl bg-surface-container-lowest">
         <div className="mx-auto max-w-5xl p-8 lg:p-12">
           {activeTab === "profile" && (
-            <div className="space-y-10">
-              <div>
-                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
-                  {t("profile.title")}
-                </h2>
-                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
-                  {t("profile.subtitle")}
-                </p>
-              </div>
-              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
-                <p className="text-sm text-on-surface-variant">Carregando perfil...</p>
-              </div>
-            </div>
+            <BusinessProfileSettings />
           )}
           {activeTab === "agent" && (
             <AgentSettings config={agentConfig} />
