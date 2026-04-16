@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   AgentConfig,
   IAgentConfigService,
@@ -13,15 +14,7 @@ class AgentConfigService implements IAgentConfigService {
    */
   async getConfig(): Promise<AgentConfig> {
     const response = await authFetch("/agent/config");
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch agent config",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<AgentConfig>(response);
   }
 
   /**
@@ -37,15 +30,7 @@ class AgentConfigService implements IAgentConfigService {
       method: "PUT",
       body: JSON.stringify(params),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update agent config",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<AgentConfig>(response);
   }
 }
 

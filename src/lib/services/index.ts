@@ -7,6 +7,7 @@ export { financeService } from "./finance-service";
 export { appointmentService } from "./appointment-service";
 export { agentConfigService } from "./agent-config-service";
 export { calendarConfigService } from "./calendar-config-service";
+export { channelAccountService } from "./channel-account-service";
 
 // Auth types
 export type {
@@ -29,9 +30,12 @@ export type {
 // Lead types
 export type {
   LeadStatus,
+  LeadTemperature,
+  LeadChannel,
   TimelineEntryType,
   LeadPublic,
-  LeadBoard,
+  BoardColumnCount,
+  PaginatedColumnResponse,
   CreateLeadPayload,
   UpdateLeadPayload,
   ListLeadsParams,
@@ -46,6 +50,11 @@ export type {
 
 // Finance types
 export type {
+  DailyDataPoint,
+  TodayAppointment,
+  LeadToFollowUp,
+  PendingInvoiceDueSoon,
+  BestService,
   Service,
   Product,
   Invoice,
@@ -61,7 +70,6 @@ export type {
 // Appointment types
 export type {
   Appointment,
-  AppointmentPagination,
   PaginatedAppointments,
   ListAppointmentsParams,
   IAppointmentService,
@@ -75,6 +83,13 @@ export type {
 } from "./interfaces/agent-config-service";
 
 // Calendar config types
+// Channel account types
+export type {
+  ChannelAccount,
+  CreateChannelAccountPayload,
+  IChannelAccountService,
+} from "./interfaces/channel-account-service";
+
 export type {
   BusinessHour,
   CalendarConfig,

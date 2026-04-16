@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -67,8 +68,9 @@ export async function authFetch(
     throw new Error("NOT_AUTHENTICATED");
   }
 
-  const tokens: { accessToken: string; refreshToken: string } =
-    await refreshResponse.json();
+  const tokens = await unwrapEnvelope<{ accessToken: string; refreshToken: string }>(
+    refreshResponse,
+  );
 
   // Update cookies (may silently fail in Server Component context)
   try {

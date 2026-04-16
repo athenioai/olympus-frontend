@@ -97,12 +97,14 @@ export function LeadDetailView({
             </h1>
 
             <div className="mt-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-on-surface-variant" />
-                <span className="text-[14px] text-on-surface-variant">
-                  {lead.email}
-                </span>
-              </div>
+              {lead.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-on-surface-variant" />
+                  <span className="text-[14px] text-on-surface-variant">
+                    {lead.email}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-on-surface-variant" />
                 <span className="text-[14px] text-on-surface-variant">
@@ -135,10 +137,10 @@ export function LeadDetailView({
             {t(`stages.${lead.status}`)}
           </span>
           <span className="text-[12px] text-on-surface-variant">
-            {formatDate(lead.created_at, "pt-BR")}
+            {formatDate(lead.createdAt, "pt-BR")}
           </span>
           <span className="text-[12px] text-on-surface-variant">
-            {formatDate(lead.updated_at, "pt-BR")}
+            {formatDate(lead.updatedAt, "pt-BR")}
           </span>
         </div>
       </div>

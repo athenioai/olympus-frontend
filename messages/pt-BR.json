@@ -29,21 +29,75 @@
     "needHelp": "Precisa de ajuda?"
   },
   "dashboard": {
-    "title": "Dashboard",
+    "title": "Visão geral",
     "greeting": {
       "morning": "Bom dia",
       "afternoon": "Boa tarde",
       "evening": "Boa noite"
     },
-    "revenue": "Receita do mês",
-    "pending": "Pendente",
-    "overdue": "Vencido",
-    "averageTicket": "Ticket médio",
-    "conversations": "Conversas ativas",
-    "appointments": "Agendamentos",
-    "leads": "Novos leads",
-    "dailyRevenue": "Receita diária",
-    "roi": "ROI"
+    "status": {
+      "overdue": "Atenção: {count} {count, plural, =1 {cobrança vencida} other {cobranças vencidas}} ({amount})",
+      "hotLeads": "Você tem {count} {count, plural, =1 {lead quente} other {leads quentes}} esperando resposta!",
+      "todayAppointments": "Você tem {count} {count, plural, =1 {atendimento} other {atendimentos}} hoje",
+      "growing": "Receita crescendo {value}% — continue assim!",
+      "stable": "Sua operação está estável. O Olympus continua trabalhando por você."
+    },
+    "momentum": {
+      "revenue": "Receita do mês",
+      "growth": "vs mês anterior",
+      "conversion": "Conversão",
+      "avgTicket": "Ticket médio",
+      "emptyRevenue": "Crie seu primeiro serviço para começar!"
+    },
+    "urgency": {
+      "hotLeads": "{count} {count, plural, =1 {lead quente aguardando} other {leads quentes aguardando}}",
+      "overdueInvoices": "{count} {count, plural, =1 {cobrança vencida} other {cobranças vencidas}}",
+      "overdueAmount": "em atraso",
+      "coldLeads": "{count} {count, plural, =1 {lead esfriando} other {leads esfriando}}",
+      "coldSubtitle": "sem contato há 7+ dias",
+      "viewLeads": "Ver leads",
+      "viewInvoices": "Ver cobranças"
+    },
+    "today": {
+      "title": "Hoje",
+      "appointments": "Agenda de hoje",
+      "followUp": "Leads para acompanhar",
+      "invoicesDue": "Cobranças próximas",
+      "emptyAppointments": "Agenda livre hoje — bom momento para fazer follow-up!",
+      "emptyFollowUp": "Todos os leads em dia!",
+      "emptyInvoices": "Sem cobranças próximas.",
+      "daysAgo": "{days} {days, plural, =1 {dia} other {dias}} sem contato",
+      "duesToday": "vence hoje",
+      "duesTomorrow": "vence amanhã",
+      "duesIn": "vence em {days} dias",
+      "overdue": "vencida há {days} {days, plural, =1 {dia} other {dias}}"
+    },
+    "projection": {
+      "label": "Se mantiver esse ritmo",
+      "bestService": "Serviço campeão",
+      "ofRevenue": "da receita"
+    },
+    "funnel": {
+      "title": "Funil de leads",
+      "thisMonth": "+{count} este mês",
+      "stages": {
+        "new": "Novos",
+        "contacted": "Contatados",
+        "qualified": "Qualificados",
+        "converted": "Convertidos",
+        "lost": "Perdidos"
+      }
+    },
+    "chart": {
+      "title": "Evolução da receita",
+      "empty": "Seu gráfico vai ganhar vida assim que as primeiras vendas chegarem.",
+      "emptyHint": "Configure seus serviços e deixe o Olympus trabalhar por você."
+    },
+    "kpis": {
+      "collection": "Recebimento",
+      "invoices": "Faturas",
+      "roi": "ROI"
+    }
   },
   "crm": {
     "title": "CRM",
@@ -93,6 +147,7 @@
     },
     "noConversations": "Nenhuma conversa",
     "unknown": "Desconhecido",
+    "needsHuman": "Aguardando humano",
     "allAgents": "Todos agentes",
     "allChannels": "Todos canais",
     "startedAt": "Iniciada em {date}",
@@ -119,7 +174,6 @@
     "noAppointments": "Nenhum agendamento neste período."
   },
   "catalog": {
-    "title": "Catálogo",
     "services": "Serviços",
     "products": "Produtos",
     "newService": "Novo Serviço",
@@ -137,13 +191,17 @@
     },
     "image": "Imagem",
     "imageRequirements": "JPEG, PNG ou WebP. Máx 5MB.",
-    "deleteConfirm": "Tem certeza que deseja excluir este item?"
+    "deleteConfirm": "Tem certeza que deseja excluir este item?",
+    "searchPlaceholder": "Buscar por nome...",
+    "allStatuses": "Todos",
+    "filterStatus": "Status"
   },
   "settings": {
     "title": "Configurações",
     "tabs": {
       "calendar": "Calendário",
-      "agent": "Agente"
+      "agent": "Agente",
+      "channels": "Canais"
     },
     "agent": {
       "name": "Nome do agente",
@@ -158,11 +216,72 @@
     },
     "calendar": {
       "businessHours": "Horários de funcionamento",
-      "slotDuration": "Duração do slot (minutos)",
-      "minAdvance": "Antecedência mínima (horas)",
-      "minCancelAdvance": "Antecedência mínima para cancelamento (horas)"
+      "slotDuration": "Duração do atendimento",
+      "slotDurationHint": "Quanto tempo dura cada atendimento agendado.",
+      "minAdvance": "Antecedência para agendar",
+      "minAdvanceHint": "Quantas horas antes o cliente precisa agendar.",
+      "minCancelAdvance": "Antecedência para cancelar",
+      "minCancelAdvanceHint": "Quantas horas antes o cliente pode cancelar sem penalidade.",
+      "days": {
+        "Sunday": "Domingo",
+        "Monday": "Segunda",
+        "Tuesday": "Terça",
+        "Wednesday": "Quarta",
+        "Thursday": "Quinta",
+        "Friday": "Sexta",
+        "Saturday": "Sábado"
+      }
     },
-    "saved": "Configurações salvas com sucesso."
+    "saved": "Configurações salvas com sucesso.",
+    "channels": {
+      "title": "Canais de atendimento",
+      "subtitle": "Conecte os canais por onde seus clientes entram em contato.",
+      "whatsapp": {
+        "name": "WhatsApp",
+        "description": "Conecte sua conta do WhatsApp Business para receber e responder mensagens automaticamente.",
+        "connect": "Conectar WhatsApp",
+        "connected": "Conectado",
+        "notConnected": "Não conectado"
+      },
+      "telegram": {
+        "name": "Telegram",
+        "description": "Receba mensagens dos seus clientes pelo Telegram.",
+        "connect": "Conectar",
+        "connected": "Conectado",
+        "disconnect": "Desconectar",
+        "wizard": {
+          "title": "Conectar Telegram",
+          "step1Title": "Criar seu bot",
+          "step1Desc": "Abra o Telegram e busque por @BotFather. Envie o comando /newbot e siga as instruções para criar um bot. Escolha um nome e um username (ex: meuNegocio_bot).",
+          "step1Cta": "Abrir BotFather",
+          "step2Title": "Copiar o token",
+          "step2Desc": "Após criar o bot, o BotFather vai enviar um token. Copie e cole abaixo.",
+          "step2Placeholder": "Cole o token do bot aqui",
+          "step2Invalid": "Token inválido. O formato correto é: 123456789:ABCdef...",
+          "step3Title": "Conectando...",
+          "step3Desc": "Estamos vinculando o bot à sua conta. Isso leva apenas alguns segundos.",
+          "step4Title": "Tudo pronto!",
+          "step4Desc": "Seu bot do Telegram está conectado. Agora seus clientes podem conversar com você por lá.",
+          "step4Cta": "Envie uma mensagem de teste pro seu bot",
+          "next": "Próximo",
+          "back": "Voltar",
+          "connect": "Conectar bot",
+          "close": "Fechar",
+          "error": "Erro ao conectar. Verifique o token e tente novamente.",
+          "conflict": "Você já tem um bot do Telegram conectado."
+        }
+      },
+      "instagram": {
+        "name": "Instagram",
+        "description": "Responda mensagens do Instagram Direct automaticamente.",
+        "comingSoon": "Em breve"
+      },
+      "sms": {
+        "name": "SMS",
+        "description": "Envie e receba mensagens por SMS.",
+        "comingSoon": "Em breve"
+      }
+    }
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -171,7 +290,6 @@
     "calendar": "Calendário",
     "services": "Serviços",
     "products": "Produtos",
-    "catalog": "Catálogo",
     "settings": "Configurações",
     "admin": {
       "title": "Admin",

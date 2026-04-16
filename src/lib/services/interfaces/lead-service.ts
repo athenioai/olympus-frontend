@@ -5,31 +5,44 @@ export type LeadStatus =
   | "converted"
   | "lost";
 
+export type LeadTemperature = "cold" | "warm" | "hot";
+
+export type LeadChannel = "whatsapp" | "telegram" | null;
+
 export type TimelineEntryType = "message" | "appointment" | "status_change";
 
 export interface LeadPublic {
   readonly id: string;
-  readonly owner_id: string;
+  readonly ownerId: string;
   readonly name: string;
-  readonly email: string;
+  readonly email: string | null;
   readonly phone: string | null;
+  readonly contactId: string | null;
+  readonly channel: LeadChannel;
   readonly status: LeadStatus;
-  readonly metadata: Record<string, unknown>;
-  readonly created_at: string;
-  readonly updated_at: string;
+  readonly temperature: LeadTemperature;
+  readonly nameConfirmed: boolean;
+  readonly metadata: Record<string, unknown> | null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly deletedAt: null;
 }
 
-export interface LeadBoard {
-  readonly new: LeadPublic[];
-  readonly contacted: LeadPublic[];
-  readonly qualified: LeadPublic[];
-  readonly converted: LeadPublic[];
-  readonly lost: LeadPublic[];
+export interface BoardColumnCount {
+  readonly status: LeadStatus;
+  readonly count: number;
+}
+
+export interface PaginatedColumnResponse {
+  readonly data: LeadPublic[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
 }
 
 export interface CreateLeadPayload {
   readonly name: string;
-  readonly email: string;
+  readonly email?: string;
   readonly phone?: string;
   readonly status?: LeadStatus;
   readonly metadata?: Record<string, unknown>;
@@ -37,9 +50,10 @@ export interface CreateLeadPayload {
 
 export interface UpdateLeadPayload {
   readonly name?: string;
-  readonly email?: string;
+  readonly email?: string | null;
   readonly phone?: string | null;
   readonly status?: LeadStatus;
+  readonly temperature?: LeadTemperature;
   readonly metadata?: Record<string, unknown> | null;
 }
 
@@ -48,15 +62,14 @@ export interface ListLeadsParams {
   readonly limit?: number;
   readonly status?: LeadStatus;
   readonly search?: string;
+  readonly temperature?: LeadTemperature;
 }
 
 export interface PaginatedLeadResponse {
   readonly data: LeadPublic[];
-  readonly pagination: {
-    readonly page: number;
-    readonly limit: number;
-    readonly total: number;
-  };
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
 }
 
 export interface TimelineMessage {
@@ -100,7 +113,11 @@ export interface TimelineParams {
 }
 
 export interface ILeadService {
-  getBoard(): Promise<LeadBoard>;
+  getBoard(): Promise<BoardColumnCount[]>;
+  getColumnLeads(
+    status: LeadStatus,
+    params?: { page?: number; limit?: number },
+  ): Promise<PaginatedColumnResponse>;
   listLeads(params?: ListLeadsParams): Promise<PaginatedLeadResponse>;
   getLead(id: string): Promise<LeadPublic>;
   createLead(payload: CreateLeadPayload): Promise<LeadPublic>;

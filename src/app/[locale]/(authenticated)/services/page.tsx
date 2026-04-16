@@ -1,6 +1,6 @@
 import { financeService } from "@/lib/services";
 import type { Service, FinancePagination } from "@/lib/services";
-import { ServicesTable } from "../catalog/_components/services-table";
+import { ServicesTable } from "./_components/services-table";
 
 interface ServicesPageProps {
   readonly searchParams: Promise<{

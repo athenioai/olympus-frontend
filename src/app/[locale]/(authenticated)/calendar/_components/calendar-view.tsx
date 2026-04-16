@@ -114,11 +114,12 @@ function AppointmentCard({ appointment }: { readonly appointment: Appointment })
           : "bg-danger-muted text-on-surface-variant line-through",
       )}
     >
-      <div className="font-medium">{appointment.leadName}</div>
-      <div className="text-on-surface-variant">
+      <div className="font-medium">
         {appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}
       </div>
-      <div className="mt-0.5 text-on-surface-variant">{appointment.serviceType}</div>
+      <div className="text-on-surface-variant">
+        {appointment.status === "confirmed" ? "Confirmado" : "Cancelado"}
+      </div>
     </div>
   );
 }
@@ -138,33 +139,35 @@ function DayView({
   const dayAppointments = appointments.filter((a) => a.date === date);
 
   return (
-    <div className="rounded-xl bg-surface-container-lowest">
-      {HOURS.map((hour) => {
-        const hourApps = dayAppointments.filter(
-          (a) => getHourFromTime(a.startTime) === hour,
-        );
+    <div className="flex min-h-0 flex-1 flex-col rounded-xl bg-surface-container-lowest">
+      <div className="flex-1 overflow-y-auto">
+        {HOURS.map((hour) => {
+          const hourApps = dayAppointments.filter(
+            (a) => getHourFromTime(a.startTime) === hour,
+          );
 
-        return (
-          <div
-            className="flex min-h-[64px] border-b border-surface-container-high/30 last:border-b-0"
-            key={hour}
-          >
-            <div className="w-16 shrink-0 px-3 py-2 text-xs text-on-surface-variant">
-              {formatHourLabel(hour)}
+          return (
+            <div
+              className="flex min-h-[64px] border-b border-surface-container-high/30 last:border-b-0"
+              key={hour}
+            >
+              <div className="w-16 shrink-0 px-3 py-2 text-xs text-on-surface-variant">
+                {formatHourLabel(hour)}
+              </div>
+              <div className="flex-1 space-y-1 px-2 py-1">
+                {hourApps.map((app) => (
+                  <AppointmentCard appointment={app} key={app.id} />
+                ))}
+              </div>
             </div>
-            <div className="flex-1 space-y-1 px-2 py-1">
-              {hourApps.map((app) => (
-                <AppointmentCard appointment={app} key={app.id} />
-              ))}
-            </div>
+          );
+        })}
+        {dayAppointments.length === 0 && (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <p className="text-sm text-on-surface-variant">{t("noAppointments")}</p>
           </div>
-        );
-      })}
-      {dayAppointments.length === 0 && (
-        <div className="flex min-h-[200px] items-center justify-center">
-          <p className="text-sm text-on-surface-variant">{t("noAppointments")}</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -186,10 +189,10 @@ function WeekView({
   );
 
   return (
-    <div className="overflow-x-auto rounded-xl bg-surface-container-lowest">
+    <div className="flex min-h-0 flex-1 flex-col overflow-x-auto rounded-xl bg-surface-container-lowest">
       <div className="min-w-[800px]">
-        {/* Header */}
-        <div className="grid grid-cols-[64px_repeat(7,1fr)]">
+        {/* Header — sticky */}
+        <div className="sticky top-0 z-10 grid grid-cols-[64px_repeat(7,1fr)] bg-surface-container-lowest">
           <div className="px-3 py-3" />
           {days.map((day, i) => {
             const iso = formatISODate(day);
@@ -215,8 +218,10 @@ function WeekView({
             );
           })}
         </div>
+      </div>
 
-        {/* Time grid */}
+      {/* Time grid — scrollable */}
+      <div className="min-w-[800px] flex-1 overflow-y-auto">
         {HOURS.map((hour) => (
           <div
             className="grid min-h-[52px] grid-cols-[64px_repeat(7,1fr)] border-t border-surface-container-high/30"
@@ -313,7 +318,7 @@ function MonthView({
                         )}
                         key={app.id}
                       >
-                        {app.startTime.slice(0, 5)} {app.leadName}
+                        {app.startTime.slice(0, 5)} - {app.endTime.slice(0, 5)}
                       </div>
                     ))}
                     {dayApps.length > 3 && (
@@ -410,14 +415,14 @@ export function CalendarView({
   }, [dateObj, currentView]);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4" style={{ height: "calc(100vh - 8rem)" }}>
       {/* Title */}
-      <h1 className="font-display text-3xl font-extrabold tracking-tight text-on-surface">
+      <h1 className="shrink-0 font-display text-3xl font-extrabold tracking-tight text-on-surface">
         {t("title")}
       </h1>
 
       {/* Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* View tabs */}
         <div className="flex gap-1 rounded-xl bg-surface-container-high p-1">
           {(["day", "week", "month"] as const).map((view) => (
@@ -458,7 +463,7 @@ export function CalendarView({
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center gap-4">
+      <div className="mt-4 flex shrink-0 items-center gap-4">
         <button
           className="rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
           onClick={() => navigateDate(-1)}
@@ -478,7 +483,7 @@ export function CalendarView({
         </button>
       </div>
 
-      {/* Calendar content */}
+      {/* Calendar content — fills remaining space */}
       {currentView === "day" && (
         <DayView appointments={appointments} date={currentDate} />
       )}

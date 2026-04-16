@@ -2,8 +2,8 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { calendarConfigService, financeService } from "@/lib/services";
-import type { CalendarConfig, PrepaymentSetting } from "@/lib/services";
+import { calendarConfigService, financeService, channelAccountService } from "@/lib/services";
+import type { CalendarConfig, PrepaymentSetting, ChannelAccount } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -25,10 +25,10 @@ const businessHourSchema = z.object({
 });
 
 const calendarConfigSchema = z.object({
-  business_hours: z.array(businessHourSchema).optional(),
-  slot_duration_minutes: z.coerce.number().int().min(5).max(480).optional(),
-  min_advance_hours: z.coerce.number().int().min(0).max(720).optional(),
-  min_cancel_advance_hours: z.coerce.number().int().min(0).max(720).optional(),
+  businessHours: z.array(businessHourSchema).optional(),
+  slotDurationMinutes: z.coerce.number().int().min(5).max(480).optional(),
+  minAdvanceHours: z.coerce.number().int().min(0).max(720).optional(),
+  minCancelAdvanceHours: z.coerce.number().int().min(0).max(720).optional(),
 });
 
 /**
@@ -59,12 +59,12 @@ export async function updateCalendarConfig(
 // ---------------------------------------------------------------------------
 
 const prepaymentSchema = z.object({
-  enabled: z.boolean(),
+  requirePrepayment: z.boolean(),
 });
 
 /**
  * Update the prepayment setting.
- * @param params - Object with enabled boolean
+ * @param params - Object with requirePrepayment boolean
  * @returns Action result with updated prepayment setting or error
  */
 export async function updatePrepaymentSetting(
@@ -76,11 +76,76 @@ export async function updatePrepaymentSetting(
   }
 
   try {
-    const data = await financeService.updatePrepaymentSetting(parsed.data.enabled);
+    const data = await financeService.updatePrepaymentSetting(parsed.data.requirePrepayment);
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Channel accounts
+// ---------------------------------------------------------------------------
+
+/**
+ * Connect a channel account (e.g. Telegram bot token).
+ * @param channel - Channel type
+ * @param accessToken - Access/bot token
+ * @returns Created channel account or error
+ */
+export async function connectChannel(
+  channel: string,
+  accessToken: string,
+): Promise<ActionResult<ChannelAccount>> {
+  if (!channel || !accessToken.trim()) {
+    return { success: false, error: "Token obrigatório." };
+  }
+
+  try {
+    const data = await channelAccountService.create({ channel, accessToken: accessToken.trim() });
+    revalidatePath("/settings");
+    return { success: true, data };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    if (msg.includes("já está conectado") || msg.includes("CONFLICT")) {
+      return { success: false, error: "CONFLICT" };
+    }
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * List all connected channel accounts.
+ * @returns Array of channel accounts or error
+ */
+export async function listChannels(): Promise<ActionResult<ChannelAccount[]>> {
+  try {
+    const data = await channelAccountService.list();
+    return { success: true, data };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Disconnect a channel account.
+ * @param id - Channel account ID
+ * @returns Success or error
+ */
+export async function disconnectChannel(
+  id: string,
+): Promise<ActionResult> {
+  if (!id) return { success: false, error: "ID obrigatório." };
+
+  try {
+    await channelAccountService.remove(id);
+    revalidatePath("/settings");
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: msg };
   }
 }

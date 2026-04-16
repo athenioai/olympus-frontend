@@ -52,10 +52,10 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
 
   try {
     const result = await appointmentService.list({
-      date_from: dateFrom,
-      date_to: dateTo,
+      dateFrom,
+      dateTo,
       status,
-      limit: 500,
+      limit: 100,
     });
 
     return (
@@ -66,7 +66,8 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
         currentView={view}
       />
     );
-  } catch {
+  } catch (err) {
+    console.error("[CALENDAR ERROR]", err);
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-sm text-on-surface-variant">

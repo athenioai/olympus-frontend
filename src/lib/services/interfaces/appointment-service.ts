@@ -1,8 +1,6 @@
 export interface Appointment {
   readonly id: string;
-  readonly sessionId: string;
-  readonly leadName: string;
-  readonly serviceType: string;
+  readonly serviceId: string;
   readonly date: string;
   readonly startTime: string;
   readonly endTime: string;
@@ -10,24 +8,19 @@ export interface Appointment {
   readonly createdAt: string;
 }
 
-export interface AppointmentPagination {
-  readonly page: number;
-  readonly limit: number;
-  readonly total: number;
-}
-
 export interface PaginatedAppointments {
   readonly data: Appointment[];
-  readonly pagination: AppointmentPagination;
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
 }
 
 export interface ListAppointmentsParams {
   readonly page?: number;
   readonly limit?: number;
   readonly status?: "confirmed" | "cancelled";
-  readonly date_from?: string;
-  readonly date_to?: string;
-  readonly user_id?: string;
+  readonly dateFrom?: string;
+  readonly dateTo?: string;
 }
 
 export interface IAppointmentService {

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   AuthUser,
   IAuthService,
@@ -21,7 +22,7 @@ const TOKEN_CONFIG = {
 class AuthService implements IAuthService {
   /**
    * Authenticate user with email and password.
-   * Sets JWT tokens in httpOnly cookies on success.
+   * Returns tokens and user data without setting cookies.
    * @param email - User email
    * @param password - User password
    * @returns Login response with tokens and user data
@@ -36,28 +37,38 @@ class AuthService implements IAuthService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message ?? "INVALID_CREDENTIALS");
+      const message = errorData?.error?.message;
+      const errorText = Array.isArray(message) ? message[0] : message;
+      throw new Error(errorText ?? "INVALID_CREDENTIALS");
     }
 
-    const data: LoginResponse = await response.json();
+    return unwrapEnvelope<LoginResponse>(response);
+  }
 
+  /**
+   * Set JWT tokens in httpOnly cookies.
+   * @param accessToken - JWT access token
+   * @param refreshToken - JWT refresh token
+   */
+  async setTokenCookies(
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<void> {
     const cookieStore = await cookies();
-    cookieStore.set("access_token", data.accessToken, {
+    cookieStore.set("access_token", accessToken, {
       maxAge: TOKEN_CONFIG.accessMaxAge,
       httpOnly: TOKEN_CONFIG.httpOnly,
       sameSite: TOKEN_CONFIG.sameSite,
       path: TOKEN_CONFIG.path,
       secure: TOKEN_CONFIG.secure,
     });
-    cookieStore.set("refresh_token", data.refreshToken, {
+    cookieStore.set("refresh_token", refreshToken, {
       maxAge: TOKEN_CONFIG.refreshMaxAge,
       httpOnly: TOKEN_CONFIG.httpOnly,
       sameSite: TOKEN_CONFIG.sameSite,
       path: TOKEN_CONFIG.path,
       secure: TOKEN_CONFIG.secure,
     });
-
-    return data;
   }
 
   /**
@@ -83,7 +94,7 @@ class AuthService implements IAuthService {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!response.ok) return null;
-      return response.json();
+      return unwrapEnvelope<AuthUser>(response);
     } catch {
       return null;
     }

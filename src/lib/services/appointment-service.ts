@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   Appointment,
   IAppointmentService,
@@ -20,23 +21,14 @@ class AppointmentService implements IAppointmentService {
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
     if (params?.status) searchParams.set("status", params.status);
-    if (params?.date_from) searchParams.set("date_from", params.date_from);
-    if (params?.date_to) searchParams.set("date_to", params.date_to);
-    if (params?.user_id) searchParams.set("user_id", params.user_id);
+    if (params?.dateFrom) searchParams.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) searchParams.set("dateTo", params.dateTo);
 
     const query = searchParams.toString();
     const path = query ? `/appointments?${query}` : "/appointments";
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to list appointments",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedAppointments>(response);
   }
 
   /**
@@ -47,15 +39,7 @@ class AppointmentService implements IAppointmentService {
    */
   async getById(id: string): Promise<Appointment> {
     const response = await authFetch(`/appointments/${id}`);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch appointment",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<Appointment>(response);
   }
 }
 

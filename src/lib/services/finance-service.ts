@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   FinanceDashboard,
   IFinanceService,
@@ -39,15 +40,7 @@ class FinanceService implements IFinanceService {
     const path = query ? `/services?${query}` : "/services";
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to list services",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedResponse<Service>>(response);
   }
 
   /**
@@ -61,15 +54,7 @@ class FinanceService implements IFinanceService {
       method: "POST",
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to create service",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<Service>(response);
   }
 
   /**
@@ -87,15 +72,7 @@ class FinanceService implements IFinanceService {
       method: "PATCH",
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update service",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<Service>(response);
   }
 
   /**
@@ -107,13 +84,7 @@ class FinanceService implements IFinanceService {
     const response = await authFetch(`/services/${id}`, {
       method: "DELETE",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to delete service",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -129,15 +100,7 @@ class FinanceService implements IFinanceService {
     const path = query ? `/products?${query}` : "/products";
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to list products",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedResponse<Product>>(response);
   }
 
   /**
@@ -151,15 +114,7 @@ class FinanceService implements IFinanceService {
       method: "POST",
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to create product",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<Product>(response);
   }
 
   /**
@@ -177,15 +132,7 @@ class FinanceService implements IFinanceService {
       method: "PATCH",
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update product",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<Product>(response);
   }
 
   /**
@@ -197,13 +144,7 @@ class FinanceService implements IFinanceService {
     const response = await authFetch(`/products/${id}`, {
       method: "DELETE",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to delete product",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -212,16 +153,8 @@ class FinanceService implements IFinanceService {
    * @throws Error if the request fails
    */
   async getFinanceDashboard(): Promise<FinanceDashboard> {
-    const response = await authFetch("/invoices/dashboard");
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch finance dashboard",
-      );
-    }
-
-    return response.json();
+    const response = await authFetch("/dashboard");
+    return unwrapEnvelope<FinanceDashboard>(response);
   }
 
   /**
@@ -231,15 +164,7 @@ class FinanceService implements IFinanceService {
    */
   async getPrepaymentSetting(): Promise<PrepaymentSetting> {
     const response = await authFetch("/settings/prepayment");
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch prepayment setting",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PrepaymentSetting>(response);
   }
 
   /**
@@ -249,21 +174,13 @@ class FinanceService implements IFinanceService {
    * @throws Error if the request fails
    */
   async updatePrepaymentSetting(
-    enabled: boolean,
+    requirePrepayment: boolean,
   ): Promise<PrepaymentSetting> {
     const response = await authFetch("/settings/prepayment", {
       method: "PATCH",
-      body: JSON.stringify({ enabled }),
+      body: JSON.stringify({ requirePrepayment }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update prepayment setting",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PrepaymentSetting>(response);
   }
 }
 

@@ -15,7 +15,7 @@ export default async function AuthenticatedLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar user={user} />
       <main className="flex-1 overflow-y-auto">
         <div className="p-6 pt-16 lg:p-8">{children}</div>

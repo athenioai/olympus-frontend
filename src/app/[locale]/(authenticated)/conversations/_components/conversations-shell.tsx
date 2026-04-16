@@ -24,11 +24,11 @@ export function ConversationsShell({
     logicalPath !== "/conversations";
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] lg:h-[calc(100vh-2rem)] lg:gap-0">
+    <div className="-m-6 -mt-16 flex h-screen p-6 pt-16 lg:-m-8 lg:p-8">
       {/* Left panel -- session list */}
       <div
         className={cn(
-          "relative w-full flex-col overflow-hidden bg-surface-container-low lg:flex lg:w-[320px] lg:shrink-0",
+          "relative w-full flex-col overflow-hidden rounded-xl bg-surface-container-low lg:flex lg:w-[320px] lg:shrink-0",
           isDetail ? "hidden" : "flex",
         )}
       >
@@ -38,7 +38,7 @@ export function ConversationsShell({
       {/* Right panel -- message thread */}
       <div
         className={cn(
-          "min-w-0 flex-1 flex-col overflow-hidden bg-surface lg:flex",
+          "min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-surface-container-lowest lg:flex",
           isDetail ? "flex" : "hidden",
         )}
       >

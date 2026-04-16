@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   CalendarConfig,
   ICalendarConfigService,
@@ -13,15 +14,7 @@ class CalendarConfigService implements ICalendarConfigService {
    */
   async get(): Promise<CalendarConfig> {
     const response = await authFetch("/calendar-config");
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch calendar config",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<CalendarConfig>(response);
   }
 
   /**
@@ -37,15 +30,7 @@ class CalendarConfigService implements ICalendarConfigService {
       method: "PUT",
       body: JSON.stringify(params),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update calendar config",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<CalendarConfig>(response);
   }
 }
 

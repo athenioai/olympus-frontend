@@ -35,14 +35,20 @@
       "afternoon": "Good afternoon",
       "evening": "Good evening"
     },
-    "revenue": "Monthly revenue",
+    "revenue": "Total revenue",
     "pending": "Pending",
     "overdue": "Overdue",
     "averageTicket": "Average ticket",
-    "conversations": "Active conversations",
+    "invoices": "Invoices",
+    "collectionRate": "Collection rate",
+    "revenueGrowth": "Growth",
+    "totalLeads": "Active leads",
+    "newLeads": "New leads",
     "appointments": "Appointments",
-    "leads": "New leads",
+    "upcomingAppointments": "Upcoming appointments",
     "dailyRevenue": "Daily revenue",
+    "dailyLeads": "Daily new leads",
+    "dailyAppointments": "Daily appointments",
     "roi": "ROI"
   },
   "crm": {
@@ -119,7 +125,6 @@
     "noAppointments": "No appointments in this period."
   },
   "catalog": {
-    "title": "Catalog",
     "services": "Services",
     "products": "Products",
     "newService": "New Service",
@@ -137,13 +142,17 @@
     },
     "image": "Image",
     "imageRequirements": "JPEG, PNG or WebP. Max 5MB.",
-    "deleteConfirm": "Are you sure you want to delete this item?"
+    "deleteConfirm": "Are you sure you want to delete this item?",
+    "searchPlaceholder": "Search by name...",
+    "allStatuses": "All",
+    "filterStatus": "Status"
   },
   "settings": {
     "title": "Settings",
     "tabs": {
       "calendar": "Calendar",
-      "agent": "Agent"
+      "agent": "Agent",
+      "channels": "Channels"
     },
     "agent": {
       "name": "Agent name",
@@ -158,9 +167,21 @@
     },
     "calendar": {
       "businessHours": "Business hours",
-      "slotDuration": "Slot duration (minutes)",
-      "minAdvance": "Minimum advance booking (hours)",
-      "minCancelAdvance": "Minimum cancellation advance (hours)"
+      "slotDuration": "Appointment duration",
+      "slotDurationHint": "How long each scheduled appointment lasts.",
+      "minAdvance": "Advance booking time",
+      "minAdvanceHint": "How many hours in advance a client must book.",
+      "minCancelAdvance": "Cancellation window",
+      "minCancelAdvanceHint": "How many hours before a client can cancel without penalty.",
+      "days": {
+        "Sunday": "Sunday",
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday",
+        "Saturday": "Saturday"
+      }
     },
     "saved": "Settings saved successfully."
   },
@@ -171,7 +192,6 @@
     "calendar": "Calendar",
     "services": "Services",
     "products": "Products",
-    "catalog": "Catalog",
     "settings": "Settings",
     "admin": {
       "title": "Admin",

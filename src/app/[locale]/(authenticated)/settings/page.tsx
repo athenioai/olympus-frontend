@@ -3,6 +3,7 @@ import {
   agentConfigService,
   financeService,
 } from "@/lib/services";
+import { authService } from "@/lib/services/auth-service";
 import type {
   CalendarConfig,
   AgentConfig,
@@ -19,6 +20,8 @@ export default async function SettingsPage() {
   let calendarConfig: CalendarConfig;
   let agentConfig: AgentConfig;
   let prepaymentSetting: PrepaymentSetting;
+
+  const user = await authService.getSession();
 
   try {
     [calendarConfig, agentConfig, prepaymentSetting] = await Promise.all([
@@ -41,6 +44,7 @@ export default async function SettingsPage() {
       agentConfig={agentConfig}
       calendarConfig={calendarConfig}
       prepaymentSetting={prepaymentSetting}
+      userId={user?.id ?? ""}
     />
   );
 }

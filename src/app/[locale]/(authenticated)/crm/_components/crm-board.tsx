@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useEffect, useCallback, useMemo, useTransition } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -18,70 +18,69 @@ import {
 } from "@dnd-kit/sortable";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { Plus, Sparkles, Phone, MessageSquare, Trophy, XCircle } from "lucide-react";
+import { Plus, Sparkles, Phone, MessageSquare, Trophy, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { fadeInUp, staggerContainer, DURATION, EASING } from "@/lib/motion";
+import { fadeInUp, staggerContainer } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import type {
-  LeadBoard,
+  BoardColumnCount,
   LeadPublic,
   LeadStatus,
 } from "@/lib/services/interfaces/lead-service";
 import { LeadCard } from "./lead-card";
 import { CreateLeadDialog } from "./create-lead-dialog";
-import { updateLeadStatus } from "../actions";
+import { updateLeadStatus, fetchColumnLeads } from "../actions";
 
 interface ColumnConfig {
   readonly id: LeadStatus;
   readonly icon: React.ComponentType<{ className?: string }>;
   readonly dotColor: string;
-  readonly bgAccent: string;
 }
 
 const COLUMNS: ColumnConfig[] = [
-  {
-    id: "new",
-    icon: Sparkles,
-    dotColor: "bg-teal",
-    bgAccent: "bg-teal/[0.08]",
-  },
-  {
-    id: "contacted",
-    icon: Phone,
-    dotColor: "bg-primary",
-    bgAccent: "bg-primary/[0.08]",
-  },
-  {
-    id: "qualified",
-    icon: MessageSquare,
-    dotColor: "bg-[#8b5cf6]",
-    bgAccent: "bg-[#8b5cf6]/[0.08]",
-  },
-  {
-    id: "converted",
-    icon: Trophy,
-    dotColor: "bg-success",
-    bgAccent: "bg-success/[0.08]",
-  },
-  {
-    id: "lost",
-    icon: XCircle,
-    dotColor: "bg-danger",
-    bgAccent: "bg-danger/[0.06]",
-  },
+  { id: "new", icon: Sparkles, dotColor: "bg-teal" },
+  { id: "contacted", icon: Phone, dotColor: "bg-primary" },
+  { id: "qualified", icon: MessageSquare, dotColor: "bg-[#8b5cf6]" },
+  { id: "converted", icon: Trophy, dotColor: "bg-success" },
+  { id: "lost", icon: XCircle, dotColor: "bg-danger" },
 ];
 
+const PAGE_SIZE = 20;
+
+interface ColumnState {
+  leads: LeadPublic[];
+  total: number;
+  page: number;
+  loading: boolean;
+}
+
+type BoardState = Record<LeadStatus, ColumnState>;
+
+function buildInitialBoardState(counters: BoardColumnCount[]): BoardState {
+  const state: Partial<BoardState> = {};
+  for (const col of COLUMNS) {
+    const counter = counters.find((c) => c.status === col.id);
+    state[col.id] = {
+      leads: [],
+      total: counter?.count ?? 0,
+      page: 0,
+      loading: false,
+    };
+  }
+  return state as BoardState;
+}
+
 interface CrmBoardProps {
-  readonly initialBoard: LeadBoard;
+  readonly initialCounters: BoardColumnCount[];
 }
 
 /**
- * CRM Kanban board with drag-and-drop and optimistic updates.
+ * CRM Kanban board with drag-and-drop, optimistic updates, and lazy column loading.
  */
-export function CrmBoard({ initialBoard }: CrmBoardProps) {
+export function CrmBoard({ initialCounters }: CrmBoardProps) {
   const t = useTranslations("crm");
-  const [board, setBoard] = useState<LeadBoard>(initialBoard);
+  const [board, setBoard] = useState<BoardState>(() => buildInitialBoardState(initialCounters));
   const [activeLead, setActiveLead] = useState<LeadPublic | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [, startTransition] = useTransition();
@@ -91,14 +90,44 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
   );
 
   const totalLeads = useMemo(
-    () =>
-      board.new.length +
-      board.contacted.length +
-      board.qualified.length +
-      board.converted.length +
-      board.lost.length,
+    () => COLUMNS.reduce((sum, col) => sum + board[col.id].total, 0),
     [board],
   );
+
+  const loadColumn = useCallback(async (status: LeadStatus, page: number) => {
+    setBoard((prev) => ({
+      ...prev,
+      [status]: { ...prev[status], loading: true },
+    }));
+
+    const result = await fetchColumnLeads(status, page, PAGE_SIZE);
+
+    if (result.success && result.data) {
+      setBoard((prev) => ({
+        ...prev,
+        [status]: {
+          leads: page === 1
+            ? result.data!.data
+            : [...prev[status].leads, ...result.data!.data],
+          total: result.data!.total,
+          page,
+          loading: false,
+        },
+      }));
+    } else {
+      setBoard((prev) => ({
+        ...prev,
+        [status]: { ...prev[status], loading: false },
+      }));
+    }
+  }, []);
+
+  // Load first page of each column on mount
+  useEffect(() => {
+    for (const col of COLUMNS) {
+      loadColumn(col.id, 1);
+    }
+  }, [loadColumn]);
 
   function handleDragStart(event: DragStartEvent) {
     const lead = event.active.data.current?.lead as LeadPublic | undefined;
@@ -121,37 +150,46 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
 
     // Optimistic update
     setBoard((prev) => {
-      const next = { ...prev };
-      next[oldStatus] = prev[oldStatus].filter((l) => l.id !== lead.id);
-      const updatedLead = {
-        ...lead,
-        status: targetColumn,
-        updated_at: new Date().toISOString(),
+      const updatedLead = { ...lead, status: targetColumn, updatedAt: new Date().toISOString() };
+      return {
+        ...prev,
+        [oldStatus]: {
+          ...prev[oldStatus],
+          leads: prev[oldStatus].leads.filter((l) => l.id !== lead.id),
+          total: prev[oldStatus].total - 1,
+        },
+        [targetColumn]: {
+          ...prev[targetColumn],
+          leads: [updatedLead, ...prev[targetColumn].leads],
+          total: prev[targetColumn].total + 1,
+        },
       };
-      next[targetColumn] = [updatedLead, ...prev[targetColumn]];
-      return next;
     });
 
-    // Server call in background
     startTransition(async () => {
       const result = await updateLeadStatus(lead.id, targetColumn);
       if (!result.success) {
-        // Revert on failure
-        setBoard((prev) => {
-          const next = { ...prev };
-          next[targetColumn] = prev[targetColumn].filter(
-            (l) => l.id !== lead.id,
-          );
-          next[oldStatus] = [lead, ...prev[oldStatus]];
-          return next;
-        });
-        toast.error(result.error ?? t("stages.new"));
+        // Revert
+        setBoard((prev) => ({
+          ...prev,
+          [targetColumn]: {
+            ...prev[targetColumn],
+            leads: prev[targetColumn].leads.filter((l) => l.id !== lead.id),
+            total: prev[targetColumn].total - 1,
+          },
+          [oldStatus]: {
+            ...prev[oldStatus],
+            leads: [lead, ...prev[oldStatus].leads],
+            total: prev[oldStatus].total + 1,
+          },
+        }));
+        toast.error(result.error ?? "Erro ao mover lead.");
       }
     });
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="-m-6 -mt-16 flex flex-col p-4 pt-6 lg:-m-8 lg:p-5 lg:pt-6" style={{ height: "100vh" }}>
       {/* Header */}
       <div className="flex items-center justify-between pb-6">
         <div>
@@ -169,7 +207,7 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
       </div>
 
       {/* Board */}
-      <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4">
+      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden pb-4">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
@@ -180,15 +218,15 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="flex h-full gap-4"
-            style={{ minWidth: COLUMNS.length * 272 }}
+            className="flex h-full min-w-[1200px] gap-4"
           >
             {COLUMNS.map((col) => (
               <KanbanColumn
                 key={col.id}
                 column={col}
                 label={t(`stages.${col.id}`)}
-                leads={board[col.id]}
+                state={board[col.id]}
+                onLoadMore={() => loadColumn(col.id, board[col.id].page + 1)}
               />
             ))}
           </motion.div>
@@ -219,21 +257,25 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
 function KanbanColumn({
   column,
   label,
-  leads,
+  state,
+  onLoadMore,
 }: {
   readonly column: ColumnConfig;
   readonly label: string;
-  readonly leads: readonly LeadPublic[];
+  readonly state: ColumnState;
+  readonly onLoadMore: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
-  const t = useTranslations("common");
+  const tc = useTranslations("common");
+
+  const hasMore = state.page * PAGE_SIZE < state.total;
 
   return (
     <motion.div
       variants={fadeInUp}
       ref={setNodeRef}
       className={cn(
-        "flex h-full min-w-[260px] flex-1 flex-col rounded-2xl bg-surface-container-low/50 transition-colors duration-200",
+        "flex h-full flex-1 flex-col rounded-2xl bg-surface-container-low/50 transition-colors duration-200",
         isOver && "bg-primary/[0.03]",
       )}
     >
@@ -244,24 +286,46 @@ function KanbanColumn({
           {label}
         </span>
         <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-surface-container-high px-1.5 text-[11px] font-extrabold text-on-surface-variant">
-          {leads.length}
+          {state.total}
         </span>
       </div>
 
       {/* Cards */}
-      <div className="flex-1 space-y-2.5 overflow-y-auto px-3 pb-3">
+      <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3 pb-3">
         <SortableContext
-          items={leads.map((l) => l.id)}
+          items={state.leads.map((l) => l.id)}
           strategy={verticalListSortingStrategy}
         >
-          {leads.length === 0 ? (
-            <div className="flex h-24 items-center justify-center rounded-xl bg-surface-container-high/30">
+          {state.loading && state.leads.length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-on-surface-variant/40" />
+            </div>
+          ) : state.leads.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-xl bg-surface-container-high/30">
               <p className="text-[12px] text-on-surface-variant">
-                {t("noResults")}
+                {tc("noResults")}
               </p>
             </div>
           ) : (
-            leads.map((lead) => <LeadCard key={lead.id} lead={lead} />)
+            <>
+              {state.leads.map((lead) => (
+                <LeadCard key={lead.id} lead={lead} />
+              ))}
+              {hasMore && (
+                <button
+                  className="flex w-full items-center justify-center gap-2 rounded-xl py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/5"
+                  disabled={state.loading}
+                  onClick={onLoadMore}
+                  type="button"
+                >
+                  {state.loading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Carregar mais"
+                  )}
+                </button>
+              )}
+            </>
           )}
         </SortableContext>
       </div>

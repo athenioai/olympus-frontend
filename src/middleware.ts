@@ -85,8 +85,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return redirectToLogin(request);
     }
 
-    const tokens: { accessToken: string; refreshToken: string } =
-      await refreshResponse.json();
+    const envelope: {
+      success: boolean;
+      data: { accessToken: string; refreshToken: string } | null;
+    } = await refreshResponse.json();
+
+    if (!envelope.success || !envelope.data) {
+      return redirectToLogin(request);
+    }
+
+    const tokens = envelope.data;
 
     const response = intlMiddleware(request);
 

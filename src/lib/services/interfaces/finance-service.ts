@@ -44,27 +44,93 @@ export interface Invoice {
   readonly updatedAt: string;
 }
 
+export interface DailyDataPoint {
+  readonly date: string;
+  readonly value: number;
+}
+
+export interface TodayAppointment {
+  readonly id: string;
+  readonly leadName: string;
+  readonly serviceName: string;
+  readonly startTime: string;
+  readonly endTime: string;
+  readonly status: string;
+}
+
+export interface LeadToFollowUp {
+  readonly id: string;
+  readonly name: string;
+  readonly channel: string;
+  readonly status: string;
+  readonly temperature: string;
+  readonly daysSinceUpdate: number;
+}
+
+export interface PendingInvoiceDueSoon {
+  readonly id: string;
+  readonly leadName: string;
+  readonly description: string;
+  readonly finalAmount: number;
+  readonly dueDate: string;
+  readonly isOverdue: boolean;
+}
+
+export interface BestService {
+  readonly serviceId: string;
+  readonly serviceName: string;
+  readonly revenue: number;
+  readonly percentage: number;
+}
+
 export interface FinanceDashboard {
+  // Momentum
   readonly revenueThisMonth: number;
-  readonly pendingAmount: number;
-  readonly overdueAmount: number;
-  readonly averageTicket: number;
-  readonly byType: {
-    readonly service: number;
-    readonly product: number;
-    readonly manual: number;
-  };
-  readonly conversationsThisMonth: number;
-  readonly appointmentsThisMonth: number;
-  readonly appointmentsCancelledThisMonth: number;
-  readonly leadsThisMonth: number;
+  readonly revenueGrowth: number;
   readonly conversionRate: number;
-  readonly dailyRevenue: ReadonlyArray<{
-    readonly date: string;
-    readonly amount: number;
-  }>;
-  readonly planCost: number;
-  readonly roi: number | null;
+  readonly averageTicket: number;
+
+  // Urgency
+  readonly hotLeadsWaiting: number;
+  readonly overdueInvoices: number;
+  readonly overdueAmount: number;
+  readonly leadsGoneCold: number;
+
+  // Today
+  readonly todayAppointments: readonly TodayAppointment[];
+  readonly leadsToFollowUp: readonly LeadToFollowUp[];
+  readonly pendingInvoicesDueSoon: readonly PendingInvoiceDueSoon[];
+
+  // Projection
+  readonly revenueProjection: number;
+  readonly bestService: BestService | null;
+
+  // Funnel
+  readonly leadFunnel: {
+    readonly new?: number;
+    readonly contacted?: number;
+    readonly qualified?: number;
+    readonly converted?: number;
+    readonly lost?: number;
+  };
+
+  // Summary
+  readonly totalLeads: number;
+  readonly newLeadsThisMonth: number;
+  readonly appointmentsThisMonth: number;
+  readonly upcomingAppointments: number;
+  readonly invoiceCount: number;
+  readonly totalRevenue: number;
+  readonly totalPending: number;
+  readonly collectionRate: number;
+  readonly roi: number;
+
+  // Charts
+  readonly charts: {
+    readonly dailyRevenue: readonly DailyDataPoint[];
+    readonly dailyNewLeads: readonly DailyDataPoint[];
+    readonly dailyAppointments: readonly DailyDataPoint[];
+  };
 }
 
 export interface Pagination {
@@ -87,7 +153,7 @@ export interface ListServicesParams {
 export type ListProductsParams = ListServicesParams;
 
 export interface PrepaymentSetting {
-  readonly enabled: boolean;
+  readonly requirePrepayment: boolean;
 }
 
 export interface IFinanceService {
@@ -105,5 +171,5 @@ export interface IFinanceService {
   deleteProduct(id: string): Promise<void>;
   getFinanceDashboard(): Promise<FinanceDashboard>;
   getPrepaymentSetting(): Promise<PrepaymentSetting>;
-  updatePrepaymentSetting(enabled: boolean): Promise<PrepaymentSetting>;
+  updatePrepaymentSetting(requirePrepayment: boolean): Promise<PrepaymentSetting>;
 }

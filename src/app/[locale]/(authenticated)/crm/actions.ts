@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { leadService } from "@/lib/services";
 import type {
-  LeadBoard,
+  BoardColumnCount,
   LeadPublic,
   LeadStatus,
+  PaginatedColumnResponse,
   TimelineEntry,
   TimelineEntryType,
 } from "@/lib/services/interfaces/lead-service";
@@ -60,12 +61,12 @@ function safeError(error: unknown, fallback: string): string {
 }
 
 /**
- * Fetch the Kanban board with leads grouped by status.
- * @returns Board data or error
+ * Fetch board column counters.
+ * @returns Array of {status, count} or error
  */
 export async function fetchBoard(): Promise<{
   success: boolean;
-  data?: LeadBoard;
+  data?: BoardColumnCount[];
   error?: string;
 }> {
   try {
@@ -75,6 +76,37 @@ export async function fetchBoard(): Promise<{
     return {
       success: false,
       error: safeError(error, "Erro ao carregar o board."),
+    };
+  }
+}
+
+/**
+ * Fetch paginated leads for a specific board column.
+ * @param status - The column status
+ * @param page - Page number (default 1)
+ * @param limit - Items per page (default 20)
+ * @returns Paginated leads or error
+ */
+export async function fetchColumnLeads(
+  status: LeadStatus,
+  page = 1,
+  limit = 20,
+): Promise<{
+  success: boolean;
+  data?: PaginatedColumnResponse;
+  error?: string;
+}> {
+  if (!isValidStatus(status)) {
+    return { success: false, error: "Status invalido." };
+  }
+
+  try {
+    const data = await leadService.getColumnLeads(status, { page, limit });
+    return { success: true, data };
+  } catch (error) {
+    return {
+      success: false,
+      error: safeError(error, "Erro ao carregar leads."),
     };
   }
 }

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
   ChatMessage,
   ChatSession,
@@ -27,15 +28,7 @@ class ChatService implements IChatService {
     const path = query ? `/chats?${query}` : "/chats";
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to list chat sessions",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedResponse<ChatSession>>(response);
   }
 
   /**
@@ -59,15 +52,7 @@ class ChatService implements IChatService {
       : `/chats/${sessionId}/messages`;
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch chat messages",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedResponse<ChatMessage>>(response);
   }
 
   /**
@@ -79,13 +64,7 @@ class ChatService implements IChatService {
     const response = await authFetch(`/chats/${sessionId}`, {
       method: "DELETE",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to delete chat session",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -99,13 +78,7 @@ class ChatService implements IChatService {
       method: "POST",
       body: JSON.stringify({ session_id: sessionId, message }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to send message",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -117,13 +90,7 @@ class ChatService implements IChatService {
     const response = await authFetch(`/chats/${sessionId}/handoff`, {
       method: "POST",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to activate handoff",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -135,13 +102,7 @@ class ChatService implements IChatService {
     const response = await authFetch(`/chats/${sessionId}/handoff`, {
       method: "DELETE",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to deactivate handoff",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 }
 

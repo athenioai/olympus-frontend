@@ -5,19 +5,19 @@ export interface BusinessHour {
 
 export interface CalendarConfig {
   readonly id: string;
-  readonly user_id: string;
-  readonly business_hours: BusinessHour[];
-  readonly slot_duration_minutes: number;
-  readonly min_advance_hours: number;
-  readonly min_cancel_advance_hours: number;
-  readonly updated_at: string;
+  readonly userId: string;
+  readonly businessHours: BusinessHour[];
+  readonly slotDurationMinutes: number;
+  readonly minAdvanceHours: number;
+  readonly minCancelAdvanceHours: number;
+  readonly updatedAt: string;
 }
 
 export interface UpdateCalendarConfigParams {
-  readonly business_hours?: BusinessHour[];
-  readonly slot_duration_minutes?: number;
-  readonly min_advance_hours?: number;
-  readonly min_cancel_advance_hours?: number;
+  readonly businessHours?: BusinessHour[];
+  readonly slotDurationMinutes?: number;
+  readonly minAdvanceHours?: number;
+  readonly minCancelAdvanceHours?: number;
 }
 
 export interface ICalendarConfigService {

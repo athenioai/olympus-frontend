@@ -1,10 +1,13 @@
 import { authFetch } from "./auth-fetch";
+import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
+  BoardColumnCount,
   CreateLeadPayload,
   ILeadService,
-  LeadBoard,
   LeadPublic,
+  LeadStatus,
   ListLeadsParams,
+  PaginatedColumnResponse,
   PaginatedLeadResponse,
   TimelineEntry,
   TimelineParams,
@@ -13,26 +16,42 @@ import type {
 
 class LeadService implements ILeadService {
   /**
-   * Get the Kanban board with leads grouped by status.
-   * @returns Board with leads organized by status columns
+   * Get board column counters.
+   * @returns Array of {status, count} for each kanban column
    * @throws Error if the request fails
    */
-  async getBoard(): Promise<LeadBoard> {
+  async getBoard(): Promise<BoardColumnCount[]> {
     const response = await authFetch("/leads/board");
+    return unwrapEnvelope<BoardColumnCount[]>(response);
+  }
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch lead board",
-      );
-    }
+  /**
+   * Get paginated leads for a specific board column.
+   * @param status - The column status to fetch
+   * @param params - Optional pagination: page, limit
+   * @returns Paginated leads for the column
+   * @throws Error if the request fails
+   */
+  async getColumnLeads(
+    status: LeadStatus,
+    params?: { page?: number; limit?: number },
+  ): Promise<PaginatedColumnResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
 
-    return response.json();
+    const query = searchParams.toString();
+    const path = query
+      ? `/leads/board/${status}?${query}`
+      : `/leads/board/${status}`;
+
+    const response = await authFetch(path);
+    return unwrapEnvelope<PaginatedColumnResponse>(response);
   }
 
   /**
    * List leads with optional filtering and pagination.
-   * @param params - Optional filters: page, limit, status, search
+   * @param params - Optional filters: page, limit, status, search, temperature
    * @returns Paginated list of leads
    * @throws Error if the request fails
    */
@@ -44,20 +63,13 @@ class LeadService implements ILeadService {
     if (params?.limit) searchParams.set("limit", String(params.limit));
     if (params?.status) searchParams.set("status", params.status);
     if (params?.search) searchParams.set("search", params.search);
+    if (params?.temperature) searchParams.set("temperature", params.temperature);
 
     const query = searchParams.toString();
     const path = query ? `/leads?${query}` : "/leads";
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to list leads",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<PaginatedLeadResponse>(response);
   }
 
   /**
@@ -68,15 +80,7 @@ class LeadService implements ILeadService {
    */
   async getLead(id: string): Promise<LeadPublic> {
     const response = await authFetch(`/leads/${id}`);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch lead",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<LeadPublic>(response);
   }
 
   /**
@@ -90,15 +94,7 @@ class LeadService implements ILeadService {
       method: "POST",
       body: JSON.stringify(payload),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to create lead",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<LeadPublic>(response);
   }
 
   /**
@@ -116,15 +112,7 @@ class LeadService implements ILeadService {
       method: "PATCH",
       body: JSON.stringify(payload),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to update lead",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<LeadPublic>(response);
   }
 
   /**
@@ -136,13 +124,7 @@ class LeadService implements ILeadService {
     const response = await authFetch(`/leads/${id}`, {
       method: "DELETE",
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to delete lead",
-      );
-    }
+    await unwrapEnvelope<unknown>(response);
   }
 
   /**
@@ -166,15 +148,7 @@ class LeadService implements ILeadService {
       : `/leads/${id}/timeline`;
 
     const response = await authFetch(path);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.message ?? "Failed to fetch lead timeline",
-      );
-    }
-
-    return response.json();
+    return unwrapEnvelope<{ data: TimelineEntry[] }>(response);
   }
 }
 

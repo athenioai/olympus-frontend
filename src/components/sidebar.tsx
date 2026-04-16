@@ -21,7 +21,6 @@ import {
   CreditCard,
   FileText,
   Receipt,
-  Layers,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -44,7 +43,6 @@ const USER_NAV: NavItem[] = [
   { key: "crm", href: "/crm", icon: Users, labelKey: "sidebar.crm" },
   { key: "conversations", href: "/conversations", icon: MessageSquare, labelKey: "sidebar.conversations" },
   { key: "calendar", href: "/calendar", icon: CalendarDays, labelKey: "sidebar.calendar" },
-  { key: "catalog", href: "/catalog", icon: Layers, labelKey: "sidebar.catalog" },
   { key: "services", href: "/services", icon: Package, labelKey: "sidebar.services" },
   { key: "products", href: "/products", icon: ShoppingBag, labelKey: "sidebar.products" },
   { key: "settings", href: "/settings", icon: Settings, labelKey: "sidebar.settings" },

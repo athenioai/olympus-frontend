@@ -86,11 +86,18 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [agentFilter, setAgentFilter] = useState("");
   const [channelFilter, setChannelFilter] = useState("");
+  const [handoffOnly, setHandoffOnly] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleting, startDelete] = useTransition();
 
+  const handoffCount = useMemo(() => sessions.filter((s) => s.handoff).length, [sessions]);
+
   const filtered = useMemo(() => {
     let result = sessions;
+
+    if (handoffOnly) {
+      result = result.filter((s) => s.handoff);
+    }
 
     if (agentFilter) {
       result = result.filter((s) =>
@@ -110,7 +117,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
     }
 
     return result;
-  }, [sessions, agentFilter, channelFilter, searchQuery]);
+  }, [sessions, handoffOnly, agentFilter, channelFilter, searchQuery]);
 
   const logicalPath = pathname.replace(/^\/(pt-BR|en-US|es)/, "");
   const activeSessionId = logicalPath.startsWith("/conversations/")
@@ -132,7 +139,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
     });
   }
 
-  const hasFilters = agentFilter || channelFilter || searchQuery;
+  const hasFilters = agentFilter || channelFilter || searchQuery || handoffOnly;
 
   return (
     <div className="flex h-full flex-col">
@@ -163,6 +170,29 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
           )}
         </div>
 
+        {/* Handoff filter */}
+        <button
+          className={cn(
+            "flex h-9 w-full items-center justify-center gap-2 rounded-xl text-[13px] font-semibold transition-colors",
+            handoffOnly
+              ? "bg-[#8b5cf6]/10 text-[#8b5cf6]"
+              : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest",
+          )}
+          onClick={() => setHandoffOnly((prev) => !prev)}
+          type="button"
+        >
+          <UserRound className="h-4 w-4" />
+          {t("needsHuman")}
+          {handoffCount > 0 && (
+            <span className={cn(
+              "flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold",
+              handoffOnly ? "bg-[#8b5cf6]/20 text-[#8b5cf6]" : "bg-on-surface-variant/10 text-on-surface-variant",
+            )}>
+              {handoffCount}
+            </span>
+          )}
+        </button>
+
         {/* Filters */}
         <div className="flex items-center gap-2">
           <select
@@ -191,6 +221,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
         {hasFilters && (
           <button
             onClick={() => {
+              setHandoffOnly(false);
               setAgentFilter("");
               setChannelFilter("");
               setSearchQuery("");

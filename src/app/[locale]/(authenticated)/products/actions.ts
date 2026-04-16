@@ -142,7 +142,6 @@ export async function createService(
   try {
     const fd = buildServiceFormData(parsed.data, formData);
     const data = await financeService.createService(fd);
-    revalidatePath("/catalog");
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
@@ -186,7 +185,6 @@ export async function updateService(
   try {
     const fd = buildServiceFormData(parsed.data, formData);
     const data = await financeService.updateService(id, fd);
-    revalidatePath("/catalog");
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
@@ -210,7 +208,6 @@ export async function deleteService(
 
   try {
     await financeService.deleteService(id);
-    revalidatePath("/catalog");
     revalidatePath("/services");
     return { success: true };
   } catch (err) {
@@ -251,7 +248,6 @@ export async function createProduct(
   try {
     const fd = buildServiceFormData(parsed.data, formData);
     const data = await financeService.createProduct(fd);
-    revalidatePath("/catalog");
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
@@ -295,7 +291,6 @@ export async function updateProduct(
   try {
     const fd = buildServiceFormData(parsed.data, formData);
     const data = await financeService.updateProduct(id, fd);
-    revalidatePath("/catalog");
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
@@ -319,7 +314,33 @@ export async function deleteProduct(
 
   try {
     await financeService.deleteProduct(id);
-    revalidatePath("/catalog");
+    revalidatePath("/products");
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Toggle a product's active status.
+ * @param id - UUID of the product
+ * @param active - New active state
+ * @returns Action result indicating success or error
+ */
+export async function toggleProductStatus(
+  id: string,
+  active: boolean,
+): Promise<ActionResult> {
+  const idResult = uuidSchema.safeParse(id);
+  if (!idResult.success) {
+    return { success: false, error: "Invalid product ID." };
+  }
+
+  try {
+    const fd = new FormData();
+    fd.set("active", String(active));
+    await financeService.updateProduct(id, fd);
     revalidatePath("/products");
     return { success: true };
   } catch (err) {

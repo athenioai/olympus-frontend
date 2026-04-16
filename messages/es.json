@@ -35,14 +35,20 @@
       "afternoon": "Buenas tardes",
       "evening": "Buenas noches"
     },
-    "revenue": "Ingresos del mes",
+    "revenue": "Ingresos totales",
     "pending": "Pendiente",
     "overdue": "Vencido",
     "averageTicket": "Ticket promedio",
-    "conversations": "Conversaciones activas",
+    "invoices": "Facturas",
+    "collectionRate": "Tasa de cobro",
+    "revenueGrowth": "Crecimiento",
+    "totalLeads": "Leads activos",
+    "newLeads": "Nuevos leads",
     "appointments": "Citas",
-    "leads": "Nuevos leads",
+    "upcomingAppointments": "Citas futuras",
     "dailyRevenue": "Ingresos diarios",
+    "dailyLeads": "Nuevos leads por día",
+    "dailyAppointments": "Citas por día",
     "roi": "ROI"
   },
   "crm": {
@@ -119,7 +125,6 @@
     "noAppointments": "No hay citas en este período."
   },
   "catalog": {
-    "title": "Catálogo",
     "services": "Servicios",
     "products": "Productos",
     "newService": "Nuevo Servicio",
@@ -137,13 +142,17 @@
     },
     "image": "Imagen",
     "imageRequirements": "JPEG, PNG o WebP. Máx 5MB.",
-    "deleteConfirm": "¿Estás seguro de que deseas eliminar este artículo?"
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este artículo?",
+    "searchPlaceholder": "Buscar por nombre...",
+    "allStatuses": "Todos",
+    "filterStatus": "Estado"
   },
   "settings": {
     "title": "Configuración",
     "tabs": {
       "calendar": "Calendario",
-      "agent": "Agente"
+      "agent": "Agente",
+      "channels": "Canales"
     },
     "agent": {
       "name": "Nombre del agente",
@@ -158,9 +167,21 @@
     },
     "calendar": {
       "businessHours": "Horarios de atención",
-      "slotDuration": "Duración del turno (minutos)",
-      "minAdvance": "Anticipación mínima (horas)",
-      "minCancelAdvance": "Anticipación mínima para cancelación (horas)"
+      "slotDuration": "Duración de la cita",
+      "slotDurationHint": "Cuánto dura cada cita agendada.",
+      "minAdvance": "Anticipación para agendar",
+      "minAdvanceHint": "Cuántas horas antes debe agendar el cliente.",
+      "minCancelAdvance": "Anticipación para cancelar",
+      "minCancelAdvanceHint": "Cuántas horas antes puede cancelar el cliente sin penalidad.",
+      "days": {
+        "Sunday": "Domingo",
+        "Monday": "Lunes",
+        "Tuesday": "Martes",
+        "Wednesday": "Miércoles",
+        "Thursday": "Jueves",
+        "Friday": "Viernes",
+        "Saturday": "Sábado"
+      }
     },
     "saved": "Configuración guardada exitosamente."
   },
@@ -171,7 +192,6 @@
     "calendar": "Calendario",
     "services": "Servicios",
     "products": "Productos",
-    "catalog": "Catálogo",
     "settings": "Configuración",
     "admin": {
       "title": "Admin",

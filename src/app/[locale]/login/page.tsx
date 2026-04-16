@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff, ArrowRight, Hexagon } from "lucide-react";
 import { loginAction } from "./actions";
@@ -9,7 +8,6 @@ import { loginAction } from "./actions";
 export default function LoginPage() {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +17,7 @@ export default function LoginPage() {
     startTransition(async () => {
       const result = await loginAction(formData);
       if (result.success) {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setError(result.error ?? null);
       }
