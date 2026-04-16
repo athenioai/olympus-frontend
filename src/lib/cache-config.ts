@@ -26,4 +26,8 @@ export const CACHE_TAGS = {
   agentConfig: "agent-config",
   prepayment: "prepayment",
   channels: "channels",
+  businessProfile: "business-profile",
+  businessScore: "business-score",
+  businessFaqs: "business-faqs",
+  businessExceptions: "business-exceptions",
 } as const;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarDays, Bot, Settings2, Radio, ExternalLink, Loader2, Trash2, Zap } from "lucide-react";
+import { CalendarDays, Bot, Building2, Radio, ExternalLink, Loader2, Trash2, Zap, HelpCircle, CalendarOff } from "lucide-react";
 import { WhatsAppIcon, TelegramIcon, InstagramIcon, SmsIcon } from "@/components/icons/channel-icons";
 import { toast } from "sonner";
 import { TelegramWizard } from "./telegram-wizard";
@@ -21,7 +21,7 @@ import type {
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "calendar" | "agent" | "channels";
+type Tab = "profile" | "agent" | "calendar" | "faqs" | "exceptions" | "channels";
 
 interface SettingsHubProps {
   readonly calendarConfig: CalendarConfig;
@@ -944,8 +944,11 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
 // ---------------------------------------------------------------------------
 
 const TABS: { key: Tab; icon: React.ComponentType<{ className?: string }>; labelKey: string }[] = [
-  { key: "calendar", icon: CalendarDays, labelKey: "tabs.calendar" },
+  { key: "profile", icon: Building2, labelKey: "tabs.profile" },
   { key: "agent", icon: Bot, labelKey: "tabs.agent" },
+  { key: "calendar", icon: CalendarDays, labelKey: "tabs.calendar" },
+  { key: "faqs", icon: HelpCircle, labelKey: "tabs.faqs" },
+  { key: "exceptions", icon: CalendarOff, labelKey: "tabs.exceptions" },
   { key: "channels", icon: Radio, labelKey: "tabs.channels" },
 ];
 
@@ -956,7 +959,7 @@ export function SettingsHub({
   userId,
 }: SettingsHubProps) {
   const t = useTranslations("settings");
-  const [activeTab, setActiveTab] = useState<Tab>("calendar");
+  const [activeTab, setActiveTab] = useState<Tab>("profile");
 
   return (
     <div className="-m-6 -mt-16 flex p-6 pt-6 lg:-m-8 lg:p-8" style={{ height: "100vh" }}>
@@ -964,7 +967,7 @@ export function SettingsHub({
       <nav className="flex w-56 shrink-0 flex-col rounded-xl bg-surface px-4 pt-8">
         <div className="mb-8 flex items-center gap-3 px-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
-            <Settings2 className="h-4 w-4 text-primary" />
+            <Building2 className="h-4 w-4 text-primary" />
           </div>
           <h1 className="font-display text-lg font-extrabold tracking-tight text-on-surface">
             {t("title")}
@@ -996,11 +999,56 @@ export function SettingsHub({
       {/* Content — scrollable */}
       <div className="min-w-0 flex-1 overflow-y-auto rounded-xl bg-surface-container-lowest">
         <div className="mx-auto max-w-5xl p-8 lg:p-12">
-          {activeTab === "calendar" && (
-            <CalendarSettings config={calendarConfig} prepayment={prepaymentSetting} />
+          {activeTab === "profile" && (
+            <div className="space-y-10">
+              <div>
+                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
+                  {t("profile.title")}
+                </h2>
+                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
+                  {t("profile.subtitle")}
+                </p>
+              </div>
+              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
+                <p className="text-sm text-on-surface-variant">Carregando perfil...</p>
+              </div>
+            </div>
           )}
           {activeTab === "agent" && (
             <AgentSettings config={agentConfig} />
+          )}
+          {activeTab === "calendar" && (
+            <CalendarSettings config={calendarConfig} prepayment={prepaymentSetting} />
+          )}
+          {activeTab === "faqs" && (
+            <div className="space-y-10">
+              <div>
+                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
+                  {t("faqs.title")}
+                </h2>
+                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
+                  {t("faqs.subtitle")}
+                </p>
+              </div>
+              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
+                <p className="text-sm text-on-surface-variant">Carregando FAQs...</p>
+              </div>
+            </div>
+          )}
+          {activeTab === "exceptions" && (
+            <div className="space-y-10">
+              <div>
+                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
+                  {t("exceptions.title")}
+                </h2>
+                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
+                  {t("exceptions.subtitle")}
+                </p>
+              </div>
+              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
+                <p className="text-sm text-on-surface-variant">Carregando datas especiais...</p>
+              </div>
+            </div>
           )}
           {activeTab === "channels" && (
             <ChannelsSettings userId={userId} />

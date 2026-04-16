@@ -197,10 +197,13 @@
     "filterStatus": "Status"
   },
   "settings": {
-    "title": "Configurações",
+    "title": "Meu Negócio",
     "tabs": {
-      "calendar": "Calendário",
+      "profile": "Perfil",
       "agent": "Agente",
+      "calendar": "Agenda",
+      "faqs": "FAQs",
+      "exceptions": "Datas Especiais",
       "channels": "Canais"
     },
     "agent": {
@@ -269,6 +272,119 @@
       }
     },
     "saved": "Configurações salvas com sucesso.",
+    "profile": {
+      "title": "Perfil do Negócio",
+      "subtitle": "Quanto mais completo o perfil, melhor o seu agente atende. Complete os campos para desbloquear canais e subir de nível.",
+      "required": "Obrigatório",
+      "optional": "Opcional",
+      "save": "Salvar perfil",
+      "discard": "Descartar",
+      "sections": {
+        "required": "Dados obrigatórios",
+        "requiredDesc": "Esses campos são necessários para conectar um canal de atendimento.",
+        "address": "Endereço",
+        "addressDesc": "Endereço do seu estabelecimento.",
+        "addAddress": "Adicionar endereço",
+        "removeAddress": "Remover endereço",
+        "legal": "Dados legais",
+        "legalDesc": "CNPJ e razão social do seu negócio.",
+        "extras": "Diferenciais & Escalação",
+        "extrasDesc": "Informações que ajudam o agente a responder melhor.",
+        "social": "Redes sociais",
+        "socialDesc": "Links do seu negócio nas redes. Plataformas com ⭐ aumentam seu score.",
+        "addSocial": "Adicionar rede",
+        "areas": "Áreas de atendimento",
+        "areasDesc": "Regiões onde você atende (exceto presencial).",
+        "addArea": "Adicionar área"
+      },
+      "fields": {
+        "businessName": "Nome do negócio",
+        "businessNamePlaceholder": "Ex: Barbearia do Lucas",
+        "businessDescription": "Descrição",
+        "businessDescriptionPlaceholder": "Descreva o que seu negócio faz...",
+        "serviceModality": "Modalidade de atendimento",
+        "modalities": {
+          "presencial": "Presencial",
+          "remoto": "Remoto",
+          "domicilio": "A domicílio",
+          "hibrido": "Híbrido"
+        },
+        "paymentPolicy": "Política de pagamento",
+        "paymentPolicyPlaceholder": "Descreva as formas de pagamento aceitas...",
+        "cancellationPolicy": "Política de cancelamento",
+        "cancellationPolicyPlaceholder": "Descreva as regras de cancelamento...",
+        "street": "Rua / Avenida",
+        "neighborhood": "Bairro",
+        "city": "Cidade",
+        "state": "Estado (UF)",
+        "cnpj": "CNPJ",
+        "cnpjPlaceholder": "00.000.000/0000-00",
+        "legalName": "Razão social",
+        "legalNamePlaceholder": "Nome legal da empresa",
+        "foundedYear": "Ano de fundação",
+        "differentials": "Diferenciais",
+        "differentialsPlaceholder": "O que diferencia seu negócio da concorrência...",
+        "escalationRules": "Regras de escalação",
+        "escalationRulesPlaceholder": "Quando o agente deve transferir para um humano...",
+        "platform": "Plataforma",
+        "url": "URL",
+        "urlPlaceholder": "https://...",
+        "areaName": "Cidade ou bairro",
+        "areaNamePlaceholder": "Ex: Moema, São Paulo"
+      },
+      "score": {
+        "title": "Nível do seu negócio",
+        "points": "pontos",
+        "nextTier": "Faltam {points} pontos para {tier}",
+        "missingFields": "Preencha {count} {count, plural, =1 {campo obrigatório} other {campos obrigatórios}} para conectar um canal",
+        "canConnect": "Você pode conectar canais de atendimento!",
+        "tiers": {
+          "none": "Comece a preencher",
+          "bronze": "Agente básico",
+          "silver": "Agente experiente",
+          "gold": "Agente especialista",
+          "diamond": "Agente perfeito"
+        }
+      }
+    },
+    "faqs": {
+      "title": "Perguntas Frequentes",
+      "subtitle": "Adicione perguntas e respostas que seu agente pode usar para atender melhor.",
+      "add": "Nova pergunta",
+      "question": "Pergunta",
+      "questionPlaceholder": "Ex: Quais as formas de pagamento?",
+      "answer": "Resposta",
+      "answerPlaceholder": "Ex: Aceitamos PIX, cartão e dinheiro.",
+      "empty": "Nenhuma FAQ cadastrada.",
+      "emptyHint": "Adicione perguntas frequentes para que seu agente saiba responder automaticamente.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "deleteConfirm": "Tem certeza que deseja excluir esta FAQ?",
+      "edit": "Editar",
+      "delete": "Excluir"
+    },
+    "exceptions": {
+      "title": "Datas Especiais",
+      "subtitle": "Marque feriados, recessos e dias com horários diferentes do normal.",
+      "add": "Nova data",
+      "date": "Data",
+      "type": "Tipo",
+      "types": {
+        "closed": "Fechado",
+        "special_hours": "Horário especial"
+      },
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ex: Natal, Recesso...",
+      "ranges": "Horários",
+      "addRange": "+ Horário",
+      "empty": "Nenhuma data especial cadastrada.",
+      "emptyHint": "Adicione feriados e recessos para que seu agente não agende nesses dias.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "deleteConfirm": "Tem certeza que deseja excluir esta data?",
+      "closed": "Fechado",
+      "specialHours": "Horário especial"
+    },
     "channels": {
       "title": "Canais de atendimento",
       "subtitle": "Conecte os canais por onde seus clientes entram em contato.",
@@ -326,7 +442,7 @@
     "calendar": "Calendário",
     "services": "Serviços",
     "products": "Produtos",
-    "settings": "Configurações",
+    "business": "Meu Negócio",
     "admin": {
       "title": "Admin",
       "dashboard": "Dashboard",

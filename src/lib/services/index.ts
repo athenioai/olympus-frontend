@@ -8,6 +8,9 @@ export { appointmentService } from "./appointment-service";
 export { agentConfigService } from "./agent-config-service";
 export { calendarConfigService } from "./calendar-config-service";
 export { channelAccountService } from "./channel-account-service";
+export { businessProfileService } from "./business-profile-service";
+export { businessFaqService } from "./business-faq-service";
+export { businessExceptionService } from "./business-exception-service";
 
 // Auth types
 export type {
@@ -97,3 +100,39 @@ export type {
   UpdateCalendarConfigParams,
   ICalendarConfigService,
 } from "./interfaces/calendar-config-service";
+
+// Business profile types
+export type {
+  ServiceModality,
+  SocialPlatform,
+  ScoreTier,
+  BusinessProfile,
+  BusinessAddress,
+  BusinessSocialLink,
+  BusinessServiceArea,
+  ScoreResult,
+  BusinessProfileView,
+  UpdateBusinessProfilePayload,
+  UpdateAddressPayload,
+  CreateSocialLinkPayload,
+  CreateServiceAreaPayload,
+  IBusinessProfileService,
+} from "./interfaces/business-profile-service";
+
+// Business FAQ types
+export type {
+  BusinessFaq,
+  CreateFaqPayload,
+  UpdateFaqPayload,
+  IBusinessFaqService,
+} from "./interfaces/business-faq-service";
+
+// Business exception types
+export type {
+  ExceptionType,
+  BusinessExceptionRange,
+  BusinessException,
+  CreateExceptionPayload,
+  UpdateExceptionPayload,
+  IBusinessExceptionService,
+} from "./interfaces/business-exception-service";

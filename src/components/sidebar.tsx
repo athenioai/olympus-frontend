@@ -11,7 +11,7 @@ import {
   CalendarDays,
   Package,
   ShoppingBag,
-  Settings,
+  Building2,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -45,7 +45,7 @@ const USER_NAV: NavItem[] = [
   { key: "calendar", href: "/calendar", icon: CalendarDays, labelKey: "sidebar.calendar" },
   { key: "services", href: "/services", icon: Package, labelKey: "sidebar.services" },
   { key: "products", href: "/products", icon: ShoppingBag, labelKey: "sidebar.products" },
-  { key: "settings", href: "/settings", icon: Settings, labelKey: "sidebar.settings" },
+  { key: "settings", href: "/settings", icon: Building2, labelKey: "sidebar.business" },
 ];
 
 const ADMIN_NAV: NavItem[] = [
