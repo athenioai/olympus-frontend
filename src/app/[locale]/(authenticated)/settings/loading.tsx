@@ -1,31 +1,62 @@
 /**
- * Settings loading skeleton — displayed while the Server Component
- * fetches calendar and agent configuration data.
+ * Settings loading skeleton — matches the sidebar + content layout.
  */
 export default function SettingsLoading() {
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      {/* Title */}
-      <div className="skeleton h-9 w-48 rounded-lg" />
-
-      {/* Tabs */}
-      <div className="skeleton h-10 w-52 rounded-xl" />
-
-      {/* Content card */}
-      <div className="space-y-6 rounded-xl bg-surface-container-lowest p-8">
-        {Array.from({ length: 4 }, (_, i) => (
-          <div className="space-y-1.5" key={i}>
+    <div className="-m-6 -mt-16 flex p-6 pt-6 lg:-m-8 lg:p-8" style={{ height: "100vh" }}>
+      {/* Left nav skeleton */}
+      <div className="flex w-56 shrink-0 flex-col rounded-xl bg-surface px-4 pt-8">
+        <div className="mb-8 flex items-center gap-3 px-2">
+          <div className="skeleton h-9 w-9 rounded-xl" />
+          <div className="skeleton h-5 w-28 rounded-lg" />
+        </div>
+        <div className="space-y-1">
+          {[1, 2, 3].map((i) => (
             <div
-              className="skeleton h-4 w-32 rounded"
-              style={{ opacity: 1 - i * 0.1 }}
+              className="skeleton h-11 w-full rounded-xl"
+              key={i}
+              style={{ opacity: 1 - (i - 1) * 0.2 }}
             />
-            <div
-              className="skeleton h-10 w-full rounded-xl sm:w-48"
-              style={{ opacity: 0.9 - i * 0.1 }}
-            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content skeleton */}
+      <div className="min-w-0 flex-1 rounded-xl bg-surface-container-lowest">
+        <div className="mx-auto max-w-5xl space-y-8 p-8 lg:p-12">
+          {/* Hero */}
+          <div className="space-y-2">
+            <div className="skeleton h-7 w-56 rounded-lg" />
+            <div className="skeleton h-4 w-96 rounded-lg" />
           </div>
-        ))}
-        <div className="skeleton h-10 w-24 rounded-xl" />
+
+          {/* Bento grid */}
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+            <div className="skeleton h-36 rounded-xl lg:col-span-8" />
+            <div className="skeleton h-36 rounded-xl lg:col-span-4" />
+          </div>
+
+          {/* Section */}
+          <div className="space-y-3">
+            <div className="skeleton h-5 w-44 rounded-lg" />
+            {[1, 2, 3].map((i) => (
+              <div
+                className="skeleton h-14 w-full rounded-xl"
+                key={i}
+                style={{ opacity: 1 - (i - 1) * 0.15 }}
+              />
+            ))}
+          </div>
+
+          {/* Section */}
+          <div className="skeleton h-48 w-full rounded-xl" />
+
+          {/* Footer */}
+          <div className="flex justify-end gap-4 pt-4">
+            <div className="skeleton h-11 w-28 rounded-xl" />
+            <div className="skeleton h-11 w-40 rounded-xl" />
+          </div>
+        </div>
       </div>
     </div>
   );

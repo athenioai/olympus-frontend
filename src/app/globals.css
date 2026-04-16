@@ -92,6 +92,15 @@
     border-color: transparent;
   }
 
+  button,
+  [role="button"],
+  a,
+  select,
+  [type="checkbox"],
+  [type="radio"] {
+    cursor: pointer;
+  }
+
   html {
     scroll-behavior: smooth;
   }

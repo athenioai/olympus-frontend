@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   AgentConfig,
   IAgentConfigService,
@@ -13,7 +14,10 @@ class AgentConfigService implements IAgentConfigService {
    * @throws Error if the request fails
    */
   async getConfig(): Promise<AgentConfig> {
-    const response = await authFetch("/agent/config");
+    const response = await authFetch("/agent/config", {
+      revalidate: CACHE_TIMES.settings,
+      tags: [CACHE_TAGS.agentConfig],
+    });
     return unwrapEnvelope<AgentConfig>(response);
   }
 

@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   ChannelAccount,
   CreateChannelAccountPayload,
@@ -13,7 +14,10 @@ class ChannelAccountService implements IChannelAccountService {
    * @throws Error if the request fails
    */
   async list(): Promise<ChannelAccount[]> {
-    const response = await authFetch("/channel-accounts");
+    const response = await authFetch("/channel-accounts", {
+      revalidate: CACHE_TIMES.channels,
+      tags: [CACHE_TAGS.channels],
+    });
     return unwrapEnvelope<ChannelAccount[]>(response);
   }
 

@@ -204,24 +204,60 @@
       "channels": "Canais"
     },
     "agent": {
+      "title": "Identidade do Agente",
+      "subtitle": "Defina a persona e os limites operacionais do seu agente autônomo. Essas configurações influenciam como ele representa sua marca em todos os pontos de contato.",
       "name": "Nome do agente",
-      "tone": "Tom",
+      "namePlaceholder": "Ex: Luna, Atlas, Aria...",
+      "profession": "Função principal",
+      "professionPlaceholder": "Ex: Recepcionista, Consultor de vendas...",
+      "status": {
+        "title": "Estado do Agente",
+        "active": "Ativo",
+        "description": "O agente está sincronizado e respondendo automaticamente seus clientes."
+      },
+      "tone": "Tom de Voz",
+      "toneSubtitle": "Selecione o perfil linguístico para interações com clientes.",
       "tones": {
         "friendly": "Amigável",
+        "friendlyDesc": "Caloroso, acessível e empático. Ideal para atendimento ao cliente e onboarding.",
         "formal": "Formal",
-        "casual": "Casual"
+        "formalDesc": "Preciso, objetivo e profissional. Ideal para relatórios executivos e comunicação corporativa.",
+        "casual": "Casual",
+        "casualDesc": "Breve, moderno e direto. Ideal para ferramentas internas e comunicação rápida."
       },
-      "customInstructions": "Instruções personalizadas",
-      "customInstructionsPlaceholder": "Instruções adicionais para o agente..."
+      "selectTone": "Selecionar",
+      "activeTone": "Ativo",
+      "directives": "Instruções Operacionais",
+      "directivesPlaceholder": "Defina a lógica e restrições do comportamento do agente...",
+      "directivesHint": "Essas instruções são a camada principal do prompt e não podem ser ignoradas pelo usuário final.",
+      "characters": "caracteres",
+      "discard": "Descartar",
+      "save": "Salvar configuração"
     },
     "calendar": {
+      "title": "Configuração da Agenda",
+      "subtitle": "Defina os horários de atendimento e regras de agendamento. Essas configurações determinam quando seus clientes podem marcar através do agente.",
+      "status": {
+        "title": "Agenda Ativa",
+        "active": "Online",
+        "description": "Seu agente está aceitando agendamentos automaticamente nos horários configurados."
+      },
       "businessHours": "Horários de funcionamento",
+      "businessHoursDesc": "Ative os dias e defina os intervalos de atendimento.",
       "slotDuration": "Duração do atendimento",
       "slotDurationHint": "Quanto tempo dura cada atendimento agendado.",
       "minAdvance": "Antecedência para agendar",
       "minAdvanceHint": "Quantas horas antes o cliente precisa agendar.",
       "minCancelAdvance": "Antecedência para cancelar",
       "minCancelAdvanceHint": "Quantas horas antes o cliente pode cancelar sem penalidade.",
+      "scheduling": "Regras de Agendamento",
+      "schedulingDesc": "Configure duração e antecedências mínimas para seus atendimentos.",
+      "prepayment": "Pré-pagamento",
+      "prepaymentDesc": "Exigir pagamento antecipado antes de confirmar o agendamento.",
+      "discard": "Descartar",
+      "save": "Salvar configuração",
+      "closed": "Fechado",
+      "addRange": "+ Intervalo",
       "days": {
         "Sunday": "Domingo",
         "Monday": "Segunda",

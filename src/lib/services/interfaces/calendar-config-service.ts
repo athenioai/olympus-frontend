@@ -1,23 +1,28 @@
-export interface BusinessHour {
+export interface TimeRange {
+  readonly start: string;
+  readonly end: string;
+}
+
+export interface BusinessHourEntry {
   readonly day: string;
-  readonly schedule: string;
+  readonly ranges: TimeRange[];
 }
 
 export interface CalendarConfig {
   readonly id: string;
   readonly userId: string;
-  readonly businessHours: BusinessHour[];
+  readonly businessHours: BusinessHourEntry[];
   readonly slotDurationMinutes: number;
-  readonly minAdvanceHours: number;
-  readonly minCancelAdvanceHours: number;
+  readonly minAdvanceMinutes: number;
+  readonly minCancelAdvanceMinutes: number;
   readonly updatedAt: string;
 }
 
 export interface UpdateCalendarConfigParams {
-  readonly businessHours?: BusinessHour[];
+  readonly businessHours?: BusinessHourEntry[];
   readonly slotDurationMinutes?: number;
-  readonly minAdvanceHours?: number;
-  readonly minCancelAdvanceHours?: number;
+  readonly minAdvanceMinutes?: number;
+  readonly minCancelAdvanceMinutes?: number;
 }
 
 export interface ICalendarConfigService {

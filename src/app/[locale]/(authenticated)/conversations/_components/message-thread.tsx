@@ -15,12 +15,13 @@ import {
   ChevronUp,
   Clock,
   Flame,
+  MoreVertical,
+  Bot,
   UserRound,
   Zap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { formatDate, formatTime } from "@/lib/format";
+import { formatTime } from "@/lib/format";
 import { WsManager } from "@/lib/ws-manager";
 import type { WsState } from "@/lib/ws-manager";
 import {
@@ -35,46 +36,51 @@ import type { ChatMessage, Pagination } from "@/lib/services/interfaces/chat-ser
 type AgentKey = "horos" | "kairos" | "human";
 
 interface AgentVisual {
-  readonly bgLight: string;
-  readonly bgBubble: string;
+  readonly bg: string;
   readonly text: string;
   readonly label: string;
   readonly icon: typeof Clock;
+  readonly badgeBg: string;
+  readonly badgeText: string;
 }
 
 function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): AgentVisual {
   switch (agent) {
     case "horos":
       return {
-        bgLight: "bg-teal/10",
-        bgBubble: "bg-teal/[0.06]",
+        bg: "bg-teal/10",
         text: "text-teal",
         label: t("agents.horos"),
         icon: Clock,
+        badgeBg: "bg-secondary-container",
+        badgeText: "text-on-secondary-container",
       };
     case "kairos":
       return {
-        bgLight: "bg-primary/10",
-        bgBubble: "bg-primary/[0.06]",
+        bg: "bg-primary/10",
         text: "text-primary",
         label: t("agents.kairos"),
         icon: Zap,
+        badgeBg: "bg-primary-container",
+        badgeText: "text-primary",
       };
     case "human":
       return {
-        bgLight: "bg-[#8b5cf6]/10",
-        bgBubble: "bg-[#8b5cf6]/[0.06]",
+        bg: "bg-[#8b5cf6]/10",
         text: "text-[#8b5cf6]",
         label: t("agents.human"),
         icon: UserRound,
+        badgeBg: "bg-[#E9D5FF]",
+        badgeText: "text-[#6B21A8]",
       };
     default:
       return {
-        bgLight: "bg-on-surface-variant/10",
-        bgBubble: "bg-on-surface-variant/[0.06]",
+        bg: "bg-on-surface-variant/10",
         text: "text-on-surface-variant",
         label: agent,
         icon: Flame,
+        badgeBg: "bg-surface-container-high",
+        badgeText: "text-on-surface-variant",
       };
   }
 }
@@ -114,7 +120,6 @@ export function MessageThread({
   const activeAgent = handoff ? "human" : agent;
   const agentVisual = getAgentVisual(activeAgent, t);
   const aiVisual = getAgentVisual(agent, t);
-  const AgentIcon = agentVisual.icon;
 
   /* -- Scroll helpers -- */
   const scrollToBottom = useCallback(() => {
@@ -125,7 +130,6 @@ export function MessageThread({
     });
   }, []);
 
-  /* -- Scroll to bottom on mount -- */
   useEffect(() => {
     scrollToBottom();
   }, [scrollToBottom]);
@@ -172,7 +176,7 @@ export function MessageThread({
     };
   }, [sessionId, scrollToBottom]);
 
-  /* -- Load more messages -- */
+  /* -- Load more -- */
   const handleLoadMore = useCallback(() => {
     const prevPage = currentPage - 1;
     if (prevPage < 1) return;
@@ -188,15 +192,14 @@ export function MessageThread({
 
         requestAnimationFrame(() => {
           if (container) {
-            container.scrollTop =
-              container.scrollHeight - prevScrollHeight;
+            container.scrollTop = container.scrollHeight - prevScrollHeight;
           }
         });
       }
     });
   }, [currentPage, sessionId]);
 
-  /* -- Optimistic message add -- */
+  /* -- Optimistic message -- */
   const handleMessageSent = useCallback(
     (optimistic: ChatMessage) => {
       setMessages((prev) => [...prev, optimistic]);
@@ -209,61 +212,57 @@ export function MessageThread({
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
   }, []);
 
-  /* -- Handoff state change -- */
   const handleHandoffChange = useCallback((active: boolean) => {
     setHandoff(active);
   }, []);
 
-  /* -- Date header helper -- */
-  const startDate =
-    messages.length > 0 ? formatDate(messages[0].createdAt, "en-US") : "";
-
   return (
     <div className="flex h-full flex-col">
-      {/* Header bar */}
-      <header className="flex shrink-0 items-center gap-3 bg-surface/80 px-6 py-4 backdrop-blur-xl">
-        <Link href="/conversations" className="lg:hidden">
-          <Button variant="ghost" size="icon-sm">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
+      {/* ── Header ────────────────────────────────────────── */}
+      <header className="flex h-20 shrink-0 items-center justify-between bg-surface/80 px-8 backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+          <Link href="/conversations" className="lg:hidden">
+            <button className="rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high" type="button">
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+          </Link>
 
-        {/* Lead name */}
-        <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-full",
-              agentVisual.bgLight,
-              agentVisual.text,
-            )}
-          >
-            <AgentIcon className="h-5 w-5" />
+          {/* Avatar */}
+          <div className={cn("flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-container", agentVisual.bg)}>
+            <Bot className={cn("h-5 w-5", agentVisual.text)} />
           </div>
+
+          {/* Name + agent */}
           <div>
-            <h2 className="text-base font-bold text-on-surface leading-tight">
-              {leadName ?? t("unknown")}
-            </h2>
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider",
-                agentVisual.text,
-              )}
-            >
-              <AgentIcon className="h-3 w-3" />
-              {agentVisual.label}
-            </span>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold leading-tight text-on-surface">
+                {leadName ?? t("unknown")}
+              </h2>
+              <span className="flex items-center gap-1 rounded-full bg-secondary-container/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter text-on-secondary-container">
+                <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
+                {t("status.active")}
+              </span>
+            </div>
+            <div className="mt-0.5 flex items-center gap-2">
+              <span className="text-[11px] font-medium text-on-surface-variant">
+                Agente:
+              </span>
+              <span className={cn("rounded px-2 py-0.5 text-[10px] font-semibold uppercase", agentVisual.badgeBg, agentVisual.badgeText)}>
+                {agentVisual.label}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Start date */}
-        {startDate && (
-          <span className="ml-auto text-xs text-on-surface-variant">
-            {t("startedAt", { date: startDate })}
-          </span>
-        )}
+        {/* Right actions */}
+        <div className="flex items-center gap-3">
+          <button className="rounded-xl p-2.5 text-on-surface-variant transition-colors hover:bg-surface-container-low" type="button">
+            <MoreVertical className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
-      {/* Reconnecting indicator */}
+      {/* Reconnecting */}
       {wsState === "reconnecting" && (
         <div className="flex items-center justify-center gap-2 bg-warning-muted px-4 py-1.5 text-xs font-medium text-warning">
           <span className="h-2 w-2 animate-pulse rounded-full bg-warning" />
@@ -271,18 +270,17 @@ export function MessageThread({
         </div>
       )}
 
-      {/* Messages — scrollable */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-6 py-6 2xl:max-w-4xl">
-          {/* Load more button */}
+      {/* ── Messages ──────────────────────────────────────── */}
+      <section ref={scrollRef} className="flex-1 overflow-y-auto bg-surface">
+        <div className="mx-auto max-w-3xl space-y-8 px-8 py-8 2xl:max-w-4xl">
+          {/* Load more */}
           {hasMore && (
-            <div className="mb-6 flex justify-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLoadMore}
+            <div className="flex justify-center">
+              <button
+                className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high"
                 disabled={isLoadingMore}
-                className="text-on-surface-variant"
+                onClick={handleLoadMore}
+                type="button"
               >
                 {isLoadingMore ? (
                   <span className="flex items-center gap-1.5">
@@ -295,94 +293,65 @@ export function MessageThread({
                     {t("loadMoreMessages")}
                   </>
                 )}
-              </Button>
+              </button>
             </div>
           )}
 
-          {/* Message bubbles */}
-          <div className="space-y-4">
-            {messages.map((message) => {
-              const isAssistant = message.role === "assistant";
-              const msgVisual = getAgentVisual(
-                isAssistant ? message.agent : "lead",
-                t,
-              );
-              const MsgIcon = msgVisual.icon;
+          {/* Bubbles */}
+          {messages.map((message) => {
+            const isAssistant = message.role === "assistant";
+            const msgVisual = getAgentVisual(isAssistant ? message.agent : "lead", t);
 
+            if (isAssistant) {
               return (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "flex",
-                    isAssistant ? "justify-start" : "justify-end",
-                  )}
-                >
-                  {/* Assistant avatar */}
-                  {isAssistant && (
-                    <div
-                      className={cn(
-                        "mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                        msgVisual.bgLight,
-                        msgVisual.text,
-                      )}
-                    >
-                      <MsgIcon className="h-4 w-4" />
-                    </div>
-                  )}
-
-                  <div
-                    className={cn(
-                      "max-w-[70%] space-y-1",
-                      !isAssistant && "flex flex-col items-end",
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "px-4 py-3 text-sm leading-relaxed text-on-surface",
-                        isAssistant
-                          ? "rounded-2xl rounded-tl-none bg-surface-container-lowest ghost-border"
-                          : "rounded-2xl rounded-tr-none bg-primary/8",
-                      )}
-                    >
-                      {/* Sender label */}
-                      {isAssistant && (
-                        <p
-                          className={cn(
-                            "mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider",
-                            msgVisual.text,
-                          )}
-                        >
-                          <MsgIcon className="h-2.5 w-2.5" />
-                          {msgVisual.label}
-                        </p>
-                      )}
-
+                <div className="flex items-start gap-3" key={message.id} style={{ maxWidth: "70%" }}>
+                  {/* Bot icon */}
+                  <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm", msgVisual.bg, msgVisual.text)}>
+                    <Bot className="h-4 w-4" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="rounded-2xl rounded-tl-none border border-surface-container-high bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface shadow-sm">
                       <p className="whitespace-pre-wrap">{message.content}</p>
-
-                      {/* Appointment badge */}
-                      {message.appointmentId && (
-                        <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-success/10 px-2.5 py-1.5">
-                          <Calendar className="h-3 w-3 text-success" />
-                          <span className="text-[11px] font-medium text-success">
-                            {t("appointmentCreated")}
-                          </span>
-                        </div>
-                      )}
                     </div>
-
-                    {/* Timestamp */}
-                    <span className="text-[10px] text-on-surface-variant/60">
-                      {formatTime(message.createdAt, "en-US")}
+                    {/* Appointment badge */}
+                    {message.appointmentId && (
+                      <div className="flex justify-center py-2">
+                        <div className="flex items-center gap-2 rounded-full bg-secondary-container/20 px-4 py-2 text-xs font-medium text-on-secondary-container">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {t("appointmentCreated")}
+                        </div>
+                      </div>
+                    )}
+                    <span className="ml-1 text-[10px] text-on-surface-variant">
+                      {formatTime(message.createdAt, "pt-BR")} • {msgVisual.label}
                     </span>
                   </div>
                 </div>
               );
-            })}
-          </div>
-        </div>
-      </div>
+            }
 
-      {/* Input bar */}
+            // Lead message
+            return (
+              <div className="ml-auto flex flex-row-reverse items-start gap-3" key={message.id} style={{ maxWidth: "70%" }}>
+                {/* Lead avatar */}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-primary-container bg-surface-container-high shadow-sm">
+                  <UserRound className="h-4 w-4 text-on-surface-variant" />
+                </div>
+                <div className="flex flex-col items-end space-y-1">
+                  <div className="rounded-2xl rounded-tr-none bg-primary-container/40 p-4 text-sm leading-relaxed text-on-surface">
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                  <span className="mr-1 text-[10px] text-on-surface-variant">
+                    {formatTime(message.createdAt, "pt-BR")}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Input ─────────────────────────────────────────── */}
       <ChatInput
         sessionId={sessionId}
         agent={agent}

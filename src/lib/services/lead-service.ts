@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   BoardColumnCount,
   CreateLeadPayload,
@@ -21,7 +22,10 @@ class LeadService implements ILeadService {
    * @throws Error if the request fails
    */
   async getBoard(): Promise<BoardColumnCount[]> {
-    const response = await authFetch("/leads/board");
+    const response = await authFetch("/leads/board", {
+      revalidate: CACHE_TIMES.crm,
+      tags: [CACHE_TAGS.leadsBoard],
+    });
     return unwrapEnvelope<BoardColumnCount[]>(response);
   }
 

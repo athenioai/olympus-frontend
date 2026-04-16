@@ -91,7 +91,8 @@ export type {
 } from "./interfaces/channel-account-service";
 
 export type {
-  BusinessHour,
+  TimeRange,
+  BusinessHourEntry,
   CalendarConfig,
   UpdateCalendarConfigParams,
   ICalendarConfigService,

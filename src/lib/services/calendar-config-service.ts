@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   CalendarConfig,
   ICalendarConfigService,
@@ -13,7 +14,10 @@ class CalendarConfigService implements ICalendarConfigService {
    * @throws Error if the request fails
    */
   async get(): Promise<CalendarConfig> {
-    const response = await authFetch("/calendar-config");
+    const response = await authFetch("/calendar-config", {
+      revalidate: CACHE_TIMES.settings,
+      tags: [CACHE_TAGS.calendarConfig],
+    });
     return unwrapEnvelope<CalendarConfig>(response);
   }
 

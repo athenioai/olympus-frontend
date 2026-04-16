@@ -19,16 +19,21 @@ interface ActionResult<T = undefined> {
 // Calendar config
 // ---------------------------------------------------------------------------
 
+const timeRangeSchema = z.object({
+  start: z.string().min(1),
+  end: z.string().min(1),
+});
+
 const businessHourSchema = z.object({
   day: z.string().min(1),
-  schedule: z.string().min(1),
+  ranges: z.array(timeRangeSchema),
 });
 
 const calendarConfigSchema = z.object({
   businessHours: z.array(businessHourSchema).optional(),
-  slotDurationMinutes: z.coerce.number().int().min(5).max(480).optional(),
-  minAdvanceHours: z.coerce.number().int().min(0).max(720).optional(),
-  minCancelAdvanceHours: z.coerce.number().int().min(0).max(720).optional(),
+  slotDurationMinutes: z.coerce.number().int().min(10).max(240).optional(),
+  minAdvanceMinutes: z.coerce.number().int().min(0).max(10080).optional(),
+  minCancelAdvanceMinutes: z.coerce.number().int().min(0).max(10080).optional(),
 });
 
 /**

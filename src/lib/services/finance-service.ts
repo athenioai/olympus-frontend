@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   FinanceDashboard,
   IFinanceService,
@@ -39,7 +40,10 @@ class FinanceService implements IFinanceService {
     const query = buildSearchQuery(params);
     const path = query ? `/services?${query}` : "/services";
 
-    const response = await authFetch(path);
+    const response = await authFetch(path, {
+      revalidate: CACHE_TIMES.services,
+      tags: [CACHE_TAGS.services],
+    });
     return unwrapEnvelope<PaginatedResponse<Service>>(response);
   }
 
@@ -99,7 +103,10 @@ class FinanceService implements IFinanceService {
     const query = buildSearchQuery(params);
     const path = query ? `/products?${query}` : "/products";
 
-    const response = await authFetch(path);
+    const response = await authFetch(path, {
+      revalidate: CACHE_TIMES.products,
+      tags: [CACHE_TAGS.products],
+    });
     return unwrapEnvelope<PaginatedResponse<Product>>(response);
   }
 
@@ -153,7 +160,10 @@ class FinanceService implements IFinanceService {
    * @throws Error if the request fails
    */
   async getFinanceDashboard(): Promise<FinanceDashboard> {
-    const response = await authFetch("/dashboard");
+    const response = await authFetch("/dashboard", {
+      revalidate: CACHE_TIMES.dashboard,
+      tags: [CACHE_TAGS.dashboard],
+    });
     return unwrapEnvelope<FinanceDashboard>(response);
   }
 
@@ -163,7 +173,10 @@ class FinanceService implements IFinanceService {
    * @throws Error if the request fails
    */
   async getPrepaymentSetting(): Promise<PrepaymentSetting> {
-    const response = await authFetch("/settings/prepayment");
+    const response = await authFetch("/settings/prepayment", {
+      revalidate: CACHE_TIMES.settings,
+      tags: [CACHE_TAGS.prepayment],
+    });
     return unwrapEnvelope<PrepaymentSetting>(response);
   }
 

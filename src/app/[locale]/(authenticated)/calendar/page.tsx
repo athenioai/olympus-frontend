@@ -60,7 +60,7 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
 
     return (
       <CalendarView
-        appointments={result.data}
+        appointments={result.items}
         currentDate={dateStr}
         currentStatus={status}
         currentView={view}

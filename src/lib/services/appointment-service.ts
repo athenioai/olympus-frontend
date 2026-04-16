@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   Appointment,
   IAppointmentService,
@@ -27,7 +28,10 @@ class AppointmentService implements IAppointmentService {
     const query = searchParams.toString();
     const path = query ? `/appointments?${query}` : "/appointments";
 
-    const response = await authFetch(path);
+    const response = await authFetch(path, {
+      revalidate: CACHE_TIMES.calendar,
+      tags: [CACHE_TAGS.appointments],
+    });
     return unwrapEnvelope<PaginatedAppointments>(response);
   }
 
