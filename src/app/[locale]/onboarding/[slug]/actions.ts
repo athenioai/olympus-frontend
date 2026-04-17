@@ -1,13 +1,17 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import {
   businessProfileService,
+  businessVerticalService,
   onboardingService,
   userService,
   type BusinessProfileView,
+  type BusinessVertical,
   type SetPasswordResponse,
   type WorkType,
 } from "@/lib/services";
@@ -143,4 +147,53 @@ function mapAuthedError(err: unknown): StepErrorCode {
     return "INVALID_INPUT";
   }
   return "GENERIC";
+}
+
+export interface ListVerticalsResult {
+  readonly success: boolean;
+  readonly verticals?: readonly BusinessVertical[];
+  readonly error?: StepErrorCode;
+}
+
+export async function listVerticalsAction(): Promise<ListVerticalsResult> {
+  try {
+    const verticals = await businessVerticalService.list();
+    return { success: true, verticals };
+  } catch (err) {
+    return { success: false, error: mapAuthedError(err) };
+  }
+}
+
+export interface SetVerticalResult {
+  readonly success: boolean;
+  readonly error?: StepErrorCode;
+  readonly profileView?: BusinessProfileView;
+  readonly vertical?: BusinessVertical;
+}
+
+/**
+ * Step 3 action: assign the selected business vertical and refresh the
+ * profile view (PUT /business-profile seeds tags/fields/FAQs server-side,
+ * so we need a fresh GET to show the new score and confirm state).
+ */
+export async function setVerticalAction(
+  verticalId: string,
+): Promise<SetVerticalResult> {
+  if (typeof verticalId !== "string" || verticalId.trim() === "") {
+    return { success: false, error: "INVALID_INPUT" };
+  }
+
+  try {
+    await businessProfileService.updateProfile({ businessVertical: verticalId });
+    updateTag(CACHE_TAGS.businessProfile);
+    updateTag(CACHE_TAGS.businessScore);
+    const [profileView, verticals] = await Promise.all([
+      businessProfileService.getProfile(),
+      businessVerticalService.list(),
+    ]);
+    const vertical = verticals.find((v) => v.id === verticalId);
+    return { success: true, profileView, vertical };
+  } catch (err) {
+    return { success: false, error: mapAuthedError(err) };
+  }
 }

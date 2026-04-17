@@ -9,6 +9,7 @@ import type {
 } from "../_lib/types";
 import { Step1Password } from "./steps/step-1-password";
 import { Step2WorkType } from "./steps/step-2-work-type";
+import { Step3Vertical } from "./steps/step-3-vertical";
 import { WizardShell } from "./wizard-shell";
 
 export interface StepProps {
@@ -72,7 +73,7 @@ function StepContent(props: StepProps) {
     case 2:
       return <Step2WorkType {...props} />;
     case 3:
-      return <StubStep step={3} {...props} />;
+      return <Step3Vertical {...props} />;
     case 4:
       return <StubStep step={4} {...props} />;
     case 5:
