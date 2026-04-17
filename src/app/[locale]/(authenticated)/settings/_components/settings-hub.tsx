@@ -7,6 +7,8 @@ import { WhatsAppIcon, TelegramIcon, InstagramIcon, SmsIcon } from "@/components
 import { toast } from "sonner";
 import { TelegramWizard } from "./telegram-wizard";
 import { BusinessProfileSettings } from "./business-profile-settings";
+import { BusinessFaqSettings } from "./business-faq-settings";
+import { BusinessExceptionSettings } from "./business-exception-settings";
 import { cn } from "@/lib/utils";
 import { updateCalendarConfig, updatePrepaymentSetting, listChannels, disconnectChannel } from "../actions";
 import { updateAgentConfig } from "../agent-actions";
@@ -1010,34 +1012,10 @@ export function SettingsHub({
             <CalendarSettings config={calendarConfig} prepayment={prepaymentSetting} />
           )}
           {activeTab === "faqs" && (
-            <div className="space-y-10">
-              <div>
-                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
-                  {t("faqs.title")}
-                </h2>
-                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
-                  {t("faqs.subtitle")}
-                </p>
-              </div>
-              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
-                <p className="text-sm text-on-surface-variant">Carregando FAQs...</p>
-              </div>
-            </div>
+            <BusinessFaqSettings />
           )}
           {activeTab === "exceptions" && (
-            <div className="space-y-10">
-              <div>
-                <h2 className="font-display text-xl font-extrabold tracking-tight text-on-surface">
-                  {t("exceptions.title")}
-                </h2>
-                <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-on-surface-variant">
-                  {t("exceptions.subtitle")}
-                </p>
-              </div>
-              <div className="flex min-h-[200px] items-center justify-center rounded-xl bg-surface-container-low/40 p-8">
-                <p className="text-sm text-on-surface-variant">Carregando datas especiais...</p>
-              </div>
-            </div>
+            <BusinessExceptionSettings />
           )}
           {activeTab === "channels" && (
             <ChannelsSettings userId={userId} />
