@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import type {
   StepUpdate,
   WizardInitialState,
@@ -13,6 +12,8 @@ import { Step3Vertical } from "./steps/step-3-vertical";
 import { Step4Business } from "./steps/step-4-business";
 import { Step5Modality } from "./steps/step-5-modality";
 import { Step6Policies } from "./steps/step-6-policies";
+import { Step7Extras } from "./steps/step-7-extras";
+import { Step8Success } from "./steps/step-8-success";
 import { WizardShell } from "./wizard-shell";
 
 export interface StepProps {
@@ -84,50 +85,9 @@ function StepContent(props: StepProps) {
     case 6:
       return <Step6Policies {...props} />;
     case 7:
-      return <StubStep step={7} {...props} />;
+      return <Step7Extras {...props} />;
     case 8:
-      return <StubStep step={8} {...props} />;
+      return <Step8Success {...props} />;
   }
 }
 
-function StubStep({
-  step,
-  onBack,
-  onAdvance,
-}: StepProps & { readonly step: WizardStep }) {
-  const t = useTranslations("onboarding");
-  const canAdvance = step < 8;
-
-  function handleNext() {
-    if (canAdvance) {
-      onAdvance({}, (step + 1) as WizardStep);
-    }
-  }
-
-  return (
-    <div className="space-y-6">
-      <h2 className="font-display text-xl font-bold text-on-surface">
-        Step {step} (stub)
-      </h2>
-      <div className="flex items-center justify-between">
-        <button
-          className="text-sm font-medium text-on-surface-variant hover:text-on-surface disabled:opacity-40"
-          disabled={step <= 1}
-          onClick={onBack}
-          type="button"
-        >
-          {t("back")}
-        </button>
-        {canAdvance && (
-          <button
-            className="rounded-xl bg-primary px-6 py-3 font-display font-bold text-on-primary"
-            onClick={handleNext}
-            type="button"
-          >
-            {t("next")}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}

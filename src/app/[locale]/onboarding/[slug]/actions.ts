@@ -275,3 +275,102 @@ async function persistProfile(
     return { success: false, error: mapAuthedError(err) };
   }
 }
+
+const brazilianStateSchema = z
+  .string()
+  .trim()
+  .length(2)
+  .regex(/^[A-Za-z]{2}$/);
+
+const addressSchema = z.object({
+  street: z.string().trim().min(1).max(200),
+  neighborhood: z.string().trim().max(100).optional(),
+  city: z.string().trim().min(1).max(100),
+  state: brazilianStateSchema,
+});
+
+const socialLinkSchema = z.object({
+  platform: z.enum([
+    "website",
+    "instagram",
+    "google_reviews",
+    "facebook",
+    "linkedin",
+    "youtube",
+    "tiktok",
+  ]),
+  url: z.string().trim().url().max(500),
+});
+
+const serviceAreaSchema = z.object({ name: z.string().trim().min(1).max(100) });
+
+const companySchema = z.object({
+  cnpj: z.string().trim().max(32).nullish(),
+  legalName: z.string().trim().max(200).nullish(),
+  foundedYear: z
+    .number()
+    .int()
+    .min(1800)
+    .max(new Date().getFullYear())
+    .nullish(),
+  differentials: z.string().trim().max(2000).nullish(),
+});
+
+const extrasSchema = z.object({
+  address: addressSchema.optional(),
+  socialLinks: z.array(socialLinkSchema).optional(),
+  serviceAreas: z.array(serviceAreaSchema).optional(),
+  company: companySchema.optional(),
+});
+
+export type SaveExtrasInput = z.infer<typeof extrasSchema>;
+
+/**
+ * Step 7 action: persists any combination of address, social links,
+ * service areas and company fields. All sub-writes are best-effort —
+ * one failing section does not abort the others, but any failure
+ * degrades the result to success=false so the UI can warn the user.
+ */
+export async function saveExtrasAction(
+  input: SaveExtrasInput,
+): Promise<UpdateProfileResult> {
+  const parsed = extrasSchema.safeParse(input);
+  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+
+  const { address, socialLinks, serviceAreas, company } = parsed.data;
+  let hadError = false;
+
+  try {
+    if (address) {
+      await businessProfileService.updateAddress(address);
+    }
+    if (socialLinks?.length) {
+      await Promise.all(
+        socialLinks.map((link) => businessProfileService.addSocialLink(link)),
+      );
+    }
+    if (serviceAreas?.length) {
+      await Promise.all(
+        serviceAreas.map((area) => businessProfileService.addServiceArea(area)),
+      );
+    }
+    if (company && Object.values(company).some((v) => v !== null && v !== undefined)) {
+      await businessProfileService.updateProfile(company);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
+      return { success: false, error: "NOT_AUTHENTICATED" };
+    }
+    hadError = true;
+  }
+
+  updateTag(CACHE_TAGS.businessProfile);
+  updateTag(CACHE_TAGS.businessScore);
+
+  try {
+    const profileView = await businessProfileService.getProfile();
+    return { success: !hadError, profileView, error: hadError ? "GENERIC" : undefined };
+  } catch (err) {
+    return { success: false, error: mapAuthedError(err) };
+  }
+}
