@@ -11,6 +11,10 @@ export { channelAccountService } from "./channel-account-service";
 export { businessProfileService } from "./business-profile-service";
 export { businessFaqService } from "./business-faq-service";
 export { businessExceptionService } from "./business-exception-service";
+export { signupService } from "./signup-service";
+export { onboardingService } from "./onboarding-service";
+export { userService } from "./user-service";
+export { businessVerticalService } from "./business-vertical-service";
 
 // Auth types
 export type {
@@ -35,8 +39,13 @@ export type {
   LeadStatus,
   LeadTemperature,
   LeadChannel,
+  LeadCustomFieldType,
   TimelineEntryType,
   LeadPublic,
+  LeadBoardItem,
+  LeadTag,
+  LeadLastMessage,
+  LeadCustomFieldValue,
   BoardColumnCount,
   PaginatedColumnResponse,
   CreateLeadPayload,
@@ -44,7 +53,6 @@ export type {
   ListLeadsParams,
   PaginatedLeadResponse,
   TimelineMessage,
-  TimelineAppointment,
   TimelineStatusChange,
   TimelineEntry,
   TimelineParams,
@@ -136,3 +144,31 @@ export type {
   UpdateExceptionPayload,
   IBusinessExceptionService,
 } from "./interfaces/business-exception-service";
+
+// Signup types
+export type {
+  SignupBeginPayload,
+  SignupBeginResponse,
+  ISignupService,
+} from "./interfaces/signup-service";
+
+// Onboarding types
+export type {
+  OnboardingInfo,
+  SetPasswordPayload,
+  SetPasswordResponse,
+  IOnboardingService,
+} from "./interfaces/onboarding-service";
+
+// User types
+export type {
+  WorkType,
+  UpdateUserPayload,
+  IUserService,
+} from "./interfaces/user-service";
+
+// Business vertical types
+export type {
+  BusinessVertical,
+  IBusinessVerticalService,
+} from "./interfaces/business-vertical-service";
