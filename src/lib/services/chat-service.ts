@@ -58,6 +58,7 @@ class ChatService implements IChatService {
   async activateHandoff(sessionId: string): Promise<void> {
     const response = await authFetch(`/chats/${sessionId}/handoff`, {
       method: "POST",
+      body: JSON.stringify({}),
     });
     await unwrapEnvelope<unknown>(response);
   }

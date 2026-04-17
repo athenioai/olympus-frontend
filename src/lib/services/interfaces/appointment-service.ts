@@ -9,7 +9,7 @@ export interface Appointment {
 }
 
 export interface PaginatedAppointments {
-  readonly items: Appointment[];
+  readonly data: Appointment[];
   readonly total: number;
   readonly page: number;
   readonly limit: number;
