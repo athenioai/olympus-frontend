@@ -7,6 +7,7 @@ import type {
   WizardInitialState,
   WizardStep,
 } from "../_lib/types";
+import { Step1Password } from "./steps/step-1-password";
 import { WizardShell } from "./wizard-shell";
 
 export interface StepProps {
@@ -66,7 +67,7 @@ export function Wizard({ initial }: { readonly initial: WizardInitialState }) {
 function StepContent(props: StepProps) {
   switch (props.state.currentStep) {
     case 1:
-      return <StubStep step={1} {...props} />;
+      return <Step1Password {...props} />;
     case 2:
       return <StubStep step={2} {...props} />;
     case 3:
