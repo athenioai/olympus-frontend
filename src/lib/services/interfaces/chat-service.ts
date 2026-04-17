@@ -1,10 +1,25 @@
+export interface ChatSessionLead {
+  readonly id: string;
+  readonly name: string;
+  readonly phone: string | null;
+  readonly channel: string | null;
+  readonly status: string;
+  readonly temperature: string;
+}
+
+export interface ChatSessionLastMessage {
+  readonly content: string;
+  readonly sender: string;
+  readonly createdAt: string;
+}
+
 export interface ChatSession {
   readonly id: string;
-  readonly userId: string;
-  readonly leadId: string;
   readonly handoff: boolean;
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly lead: ChatSessionLead;
+  readonly lastMessage: ChatSessionLastMessage | null;
 }
 
 export interface ChatMessage {

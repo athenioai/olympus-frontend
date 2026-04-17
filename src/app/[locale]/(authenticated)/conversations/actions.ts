@@ -55,7 +55,7 @@ export async function loadMoreMessages(
     const result = await chatService.getMessages(sessionId, { page });
     return {
       success: true,
-      data: result.data,
+      data: [...result.data].reverse(),
       page: result.page,
       total: result.total,
     };

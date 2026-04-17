@@ -41,6 +41,7 @@ interface AgentVisual {
   readonly icon: typeof Clock;
   readonly badgeBg: string;
   readonly badgeText: string;
+  readonly bubbleBg: string;
 }
 
 function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): AgentVisual {
@@ -53,6 +54,7 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
         icon: Clock,
         badgeBg: "bg-secondary-container",
         badgeText: "text-on-secondary-container",
+        bubbleBg: "bg-teal/8",
       };
     case "kairos":
       return {
@@ -62,6 +64,7 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
         icon: Zap,
         badgeBg: "bg-primary-container",
         badgeText: "text-primary",
+        bubbleBg: "bg-primary/8",
       };
     case "human":
       return {
@@ -71,6 +74,7 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
         icon: UserRound,
         badgeBg: "bg-[#E9D5FF]",
         badgeText: "text-[#6B21A8]",
+        bubbleBg: "bg-[#8b5cf6]/8",
       };
     default:
       return {
@@ -80,6 +84,7 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
         icon: Flame,
         badgeBg: "bg-surface-container-high",
         badgeText: "text-on-surface-variant",
+        bubbleBg: "bg-surface-container-high/50",
       };
   }
 }
@@ -301,6 +306,12 @@ export function MessageThread({
             const isAssistant = message.sender !== "lead";
             const msgVisual = getAgentVisual(isAssistant ? message.sender : "lead", t);
 
+            // Split on [BREAK] for multi-bubble messages
+            const parts = message.content
+              .split(/\[BREAK\]/i)
+              .map((p) => p.trim())
+              .filter(Boolean);
+
             if (!isAssistant) {
               // Lead message — LEFT side
               return (
@@ -308,10 +319,18 @@ export function MessageThread({
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-surface-container-high bg-surface-container-lowest shadow-sm">
                     <UserRound className="h-4 w-4 text-on-surface-variant" />
                   </div>
-                  <div className="space-y-1">
-                    <div className="rounded-2xl rounded-tl-none border border-surface-container-high bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface shadow-sm">
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    </div>
+                  <div className="space-y-1.5">
+                    {parts.map((part, i) => (
+                      <div
+                        className={cn(
+                          "rounded-2xl border border-surface-container-high bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface shadow-sm",
+                          i === 0 && "rounded-tl-none",
+                        )}
+                        key={i}
+                      >
+                        <p className="whitespace-pre-wrap">{part}</p>
+                      </div>
+                    ))}
                     <span className="ml-1 text-[10px] text-on-surface-variant">
                       {formatTime(message.createdAt, "pt-BR")}
                     </span>
@@ -326,10 +345,19 @@ export function MessageThread({
                 <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm", msgVisual.bg, msgVisual.text)}>
                   <Bot className="h-4 w-4" />
                 </div>
-                <div className="flex flex-col items-end space-y-1">
-                  <div className="rounded-2xl rounded-tr-none bg-primary-container/40 p-4 text-sm leading-relaxed text-on-surface">
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  </div>
+                <div className="flex flex-col items-end space-y-1.5">
+                  {parts.map((part, i) => (
+                    <div
+                      className={cn(
+                        "rounded-2xl p-4 text-sm leading-relaxed text-on-surface",
+                        msgVisual.bubbleBg,
+                        i === 0 && "rounded-tr-none",
+                      )}
+                      key={i}
+                    >
+                      <p className="whitespace-pre-wrap">{part}</p>
+                    </div>
+                  ))}
                   <span className="mr-1 text-[10px] text-on-surface-variant">
                     {formatTime(message.createdAt, "pt-BR")} • {msgVisual.label}
                   </span>

@@ -24,7 +24,7 @@ async function fetchMessages(sessionId: string): Promise<{
 
     if (lastPage <= 1) {
       return {
-        messages: probe.data,
+        messages: [...probe.data].reverse(),
         page: probe.page,
         total: probe.total,
         notFoundError: false,
@@ -37,7 +37,7 @@ async function fetchMessages(sessionId: string): Promise<{
     });
 
     return {
-      messages: latest.data,
+      messages: [...latest.data].reverse(),
       page: latest.page,
       total: latest.total,
       notFoundError: false,
@@ -76,7 +76,7 @@ export default async function ChatDetailPage({
   return (
     <MessageThread
       sessionId={sessionId}
-      leadName={session?.leadId ?? null}
+      leadName={session?.lead.name ?? null}
       agent="horos"
       initialMessages={messages}
       initialPagination={{ page, limit: 50, total }}

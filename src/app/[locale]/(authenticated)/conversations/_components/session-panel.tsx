@@ -48,7 +48,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
     if (searchQuery.trim()) {
       const term = searchQuery.toLowerCase();
       result = result.filter((s) =>
-        s.leadId?.toLowerCase().includes(term),
+        s.lead.name.toLowerCase().includes(term),
       );
     }
 
@@ -158,6 +158,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
           <div className="space-y-1">
             {filtered.map((session) => {
               const isActive = session.id === activeSessionId;
+              const isHot = session.lead.temperature === "hot";
 
               return (
                 <Link
@@ -171,22 +172,27 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                   )}
                 >
                   {/* Avatar */}
-                  <div className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                    session.handoff ? "bg-[#8b5cf6]/15 text-[#8b5cf6]" : "bg-teal/15 text-teal",
-                  )}>
-                    {session.handoff ? <UserRound className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+                  <div className="relative">
+                    <div className={cn(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                      session.handoff ? "bg-[#8b5cf6]/15 text-[#8b5cf6]" : "bg-teal/15 text-teal",
+                    )}>
+                      {session.handoff ? <UserRound className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+                    </div>
+                    {isHot && (
+                      <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-surface-container-low bg-warning" />
+                    )}
                   </div>
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <span className={cn("truncate text-sm font-semibold", isActive ? "text-primary" : "text-on-surface")}>
-                        {session.leadId.slice(0, 8)}...
+                        {session.lead.name}
                       </span>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="text-[10px] text-on-surface-variant">
-                          {formatRelativeTime(session.updatedAt)}
+                          {formatRelativeTime(session.lastMessage?.createdAt ?? session.updatedAt)}
                         </span>
                         <button
                           onClick={(e) => {
@@ -202,12 +208,26 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       </div>
                     </div>
 
-                    {/* Handoff badge */}
-                    {session.handoff && (
-                      <div className="mt-0.5">
+                    {/* Agent badge + handoff */}
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      {session.handoff ? (
                         <span className="inline-flex items-center gap-1 rounded-md bg-[#8b5cf6]/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#8b5cf6]">
                           {t("status.handoff")}
                         </span>
+                      ) : session.lead.channel && (
+                        <span className="rounded-md bg-surface-container-high px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
+                          {session.lead.channel}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Last message preview */}
+                    {session.lastMessage && (
+                      <div className="mt-1 flex items-center gap-1.5 text-on-surface-variant">
+                        <MessageSquare className="h-3 w-3 shrink-0" />
+                        <p className="truncate text-xs">
+                          {session.lastMessage.content}
+                        </p>
                       </div>
                     )}
                   </div>
