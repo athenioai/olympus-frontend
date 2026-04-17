@@ -1008,7 +1008,7 @@ export function SettingsHub({
   const [activeTab, setActiveTab] = useState<Tab>("profile");
 
   return (
-    <div className="-m-6 -mt-16 flex p-6 pt-6 lg:-m-8 lg:p-8" style={{ height: "100vh" }}>
+    <div className="-m-6 -mt-16 flex p-2 pt-6 lg:-m-8 lg:p-2 lg:pt-6" style={{ height: "100vh" }}>
       {/* Left nav — fixed sidebar */}
       <nav className="flex w-56 shrink-0 flex-col rounded-xl bg-surface px-4 pt-8">
         <div className="mb-8 flex items-center gap-3 px-2">
@@ -1045,7 +1045,7 @@ export function SettingsHub({
 
       {/* Content — scrollable */}
       <div className="min-w-0 flex-1 overflow-y-auto rounded-xl bg-surface-container-lowest">
-        <div className="mx-auto max-w-5xl p-8 lg:p-12">
+        <div className="mx-auto max-w-5xl p-6 lg:p-8">
           {activeTab === "profile" && (
             <BusinessProfileSettings />
           )}
