@@ -28,6 +28,143 @@
     "welcomeSubtitle": "Tu empresa 100% autónoma.",
     "needHelp": "¿Necesitas ayuda?"
   },
+  "signup": {
+    "title": "Empieza gratis en 2 minutos",
+    "subtitle": "Tu asistente IA 24/7",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "submit": "Empezar",
+    "submitting": "Enviando...",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "signIn": "Iniciar sesión",
+    "errors": {
+      "emailRequired": "Ingresa tu email.",
+      "emailInvalid": "Email inválido.",
+      "emailExists": "Ya existe una cuenta con este email.",
+      "generic": "No pudimos completar el registro. Intenta de nuevo."
+    },
+    "success": {
+      "title": "Enviamos un enlace a {email}",
+      "description": "Abre tu email y haz clic en el enlace para continuar. Puede tardar hasta 2 minutos.",
+      "resend": "Reenviar email",
+      "resendCooldown": "Espera {seconds}s",
+      "resent": "Email reenviado.",
+      "noEmail": "No hay registro pendiente. Vuelve al inicio.",
+      "backToSignup": "Volver"
+    }
+  },
+  "onboarding": {
+    "headerTitle": "Completando registro de {email}",
+    "stepLabel": "Paso {current} de {total}",
+    "scoreLabel": "Perfil {percent}% completo",
+    "next": "Continuar",
+    "back": "Volver",
+    "skip": "Omitir",
+    "submitting": "Guardando...",
+    "genericError": "No pudimos guardar. Intenta de nuevo.",
+    "error": {
+      "invalidTitle": "Enlace inválido",
+      "invalidDescription": "El enlace que usaste no es válido o expiró.",
+      "invalidAction": "Volver al inicio",
+      "completedTitle": "Enlace ya utilizado",
+      "completedDescription": "Este enlace de registro ya fue usado. Si tienes una cuenta, inicia sesión.",
+      "completedAction": "Ir al login"
+    },
+    "step1": {
+      "title": "¡Bienvenido a Athenio!",
+      "subtitle": "Tu email: {email}",
+      "nameLabel": "Nombre completo",
+      "namePlaceholder": "Juan Pérez",
+      "passwordLabel": "Crear contraseña",
+      "passwordPlaceholder": "Mín. 8 caracteres, 1 letra y 1 número",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "strengthWeak": "Débil",
+      "strengthMedium": "Media",
+      "strengthStrong": "Fuerte",
+      "errorNameShort": "El nombre debe tener entre 2 y 120 caracteres.",
+      "errorPasswordWeak": "La contraseña requiere al menos 8 caracteres, 1 letra y 1 número.",
+      "errorPasswordMismatch": "Las contraseñas no coinciden."
+    },
+    "step2": {
+      "title": "¿Cómo trabajas?",
+      "subtitle": "Esto nos ayuda a personalizar tu agente.",
+      "servicesTitle": "Servicios",
+      "servicesHint": "Agendamientos",
+      "salesTitle": "Ventas",
+      "salesHint": "Productos",
+      "hybridTitle": "Ambos",
+      "hybridHint": "Ventas y servicios"
+    },
+    "step3": {
+      "title": "¿Cuál es el segmento de tu negocio?",
+      "subtitle": "Elige una opción y configuraremos tags, campos y FAQs para tu sector.",
+      "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
+      "confirm": "Confirmar",
+      "seeded": "Creamos {tags} tags, {fields} campos y {faqs} FAQs para ti. Edita en Configuración."
+    },
+    "step4": {
+      "title": "Sobre tu negocio",
+      "nameLabel": "Nombre del negocio",
+      "namePlaceholder": "Barbería de Juan",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe en pocas líneas lo que hace tu negocio.",
+      "errorNameShort": "El nombre debe tener entre 2 y 120 caracteres.",
+      "errorDescriptionShort": "La descripción debe tener entre 10 y 2000 caracteres."
+    },
+    "step5": {
+      "title": "¿Cómo atiendes a los clientes?",
+      "presencial": "Presencial",
+      "presencialHint": "Los clientes van a ti",
+      "remoto": "Remoto",
+      "remotoHint": "Atención 100% online",
+      "domicilio": "A domicilio",
+      "domicilioHint": "Tú vas al cliente",
+      "hibrido": "Híbrido",
+      "hibridoHint": "Mezcla de los anteriores"
+    },
+    "step6": {
+      "title": "Políticas de atención",
+      "paymentLabel": "Forma de pago",
+      "paymentPlaceholder": "Ej: Aceptamos Pix y tarjeta en hasta 3x sin intereses.",
+      "cancellationLabel": "Política de cancelación",
+      "cancellationPlaceholder": "Ej: Cancelación gratis hasta 24h antes."
+    },
+    "step7": {
+      "title": "Detalles extra",
+      "subtitle": "Opcional — puedes completarlos después en configuración.",
+      "addressSection": "Dirección",
+      "socialSection": "Redes sociales",
+      "areasSection": "Áreas de atención",
+      "companySection": "Datos de la empresa",
+      "streetLabel": "Calle y número",
+      "neighborhoodLabel": "Barrio",
+      "cityLabel": "Ciudad",
+      "stateLabel": "Estado",
+      "socialPlatformLabel": "Plataforma",
+      "socialUrlLabel": "URL",
+      "addSocial": "Añadir enlace",
+      "areaNameLabel": "Ciudad/barrio",
+      "addArea": "Añadir área",
+      "cnpjLabel": "ID fiscal",
+      "legalNameLabel": "Razón social",
+      "foundedYearLabel": "Año de fundación",
+      "differentialsLabel": "Diferenciales"
+    },
+    "step8": {
+      "title": "¡Felicidades! Tu cuenta está configurada.",
+      "scoreTitle": "Tu perfil",
+      "tierNone": "Inicial",
+      "tierBronze": "Bronce",
+      "tierSilver": "Plata",
+      "tierGold": "Oro",
+      "tierDiamond": "Diamante",
+      "nextTitle": "Próximos pasos",
+      "nextAgent": "Personalizar agente",
+      "nextChannel": "Conectar WhatsApp",
+      "nextContacts": "Importar contactos",
+      "enter": "Entrar en la plataforma"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "greeting": {

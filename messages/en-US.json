@@ -28,6 +28,143 @@
     "welcomeSubtitle": "Your 100% autonomous business.",
     "needHelp": "Need help?"
   },
+  "signup": {
+    "title": "Start free in 2 minutes",
+    "subtitle": "Your 24/7 AI assistant",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Start",
+    "submitting": "Sending...",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "errors": {
+      "emailRequired": "Please enter your email.",
+      "emailInvalid": "Invalid email.",
+      "emailExists": "An account already exists with this email.",
+      "generic": "Could not complete signup. Please try again."
+    },
+    "success": {
+      "title": "We sent a link to {email}",
+      "description": "Open your email and click the link to continue signup. It may take up to 2 minutes to arrive.",
+      "resend": "Resend email",
+      "resendCooldown": "Wait {seconds}s",
+      "resent": "Email resent.",
+      "noEmail": "No pending signup. Go back to the start.",
+      "backToSignup": "Back"
+    }
+  },
+  "onboarding": {
+    "headerTitle": "Completing signup for {email}",
+    "stepLabel": "Step {current} of {total}",
+    "scoreLabel": "Profile {percent}% complete",
+    "next": "Continue",
+    "back": "Back",
+    "skip": "Skip",
+    "submitting": "Saving...",
+    "genericError": "Could not save. Please try again.",
+    "error": {
+      "invalidTitle": "Invalid link",
+      "invalidDescription": "The link you used is not valid or has expired.",
+      "invalidAction": "Back to start",
+      "completedTitle": "Link already used",
+      "completedDescription": "This signup link was already used. If you have an account, please sign in.",
+      "completedAction": "Go to login"
+    },
+    "step1": {
+      "title": "Welcome to Athenio!",
+      "subtitle": "Your email: {email}",
+      "nameLabel": "Full name",
+      "namePlaceholder": "John Doe",
+      "passwordLabel": "Create password",
+      "passwordPlaceholder": "Min. 8 chars, 1 letter and 1 number",
+      "confirmPasswordLabel": "Confirm password",
+      "strengthWeak": "Weak",
+      "strengthMedium": "Medium",
+      "strengthStrong": "Strong",
+      "errorNameShort": "Name must be between 2 and 120 characters.",
+      "errorPasswordWeak": "Password requires at least 8 characters, 1 letter and 1 number.",
+      "errorPasswordMismatch": "Passwords do not match."
+    },
+    "step2": {
+      "title": "How do you work?",
+      "subtitle": "This helps us tailor your agent.",
+      "servicesTitle": "Services",
+      "servicesHint": "Appointments",
+      "salesTitle": "Sales",
+      "salesHint": "Products",
+      "hybridTitle": "Both",
+      "hybridHint": "Sales and services"
+    },
+    "step3": {
+      "title": "What's your business segment?",
+      "subtitle": "Pick one and we'll set up tags, fields and FAQs for your industry.",
+      "counters": "{tags} tags · {fields} fields · {faqs} FAQs",
+      "confirm": "Confirm",
+      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings."
+    },
+    "step4": {
+      "title": "About your business",
+      "nameLabel": "Business name",
+      "namePlaceholder": "John's Barbershop",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe in a few lines what your business does.",
+      "errorNameShort": "Name must be between 2 and 120 characters.",
+      "errorDescriptionShort": "Description must be between 10 and 2000 characters."
+    },
+    "step5": {
+      "title": "How do you serve customers?",
+      "presencial": "In person",
+      "presencialHint": "Customers come to you",
+      "remoto": "Remote",
+      "remotoHint": "100% online service",
+      "domicilio": "At customer's location",
+      "domicilioHint": "You go to the customer",
+      "hibrido": "Hybrid",
+      "hibridoHint": "A mix of the above"
+    },
+    "step6": {
+      "title": "Service policies",
+      "paymentLabel": "Payment methods",
+      "paymentPlaceholder": "E.g. We accept Pix and card up to 3x interest-free.",
+      "cancellationLabel": "Cancellation policy",
+      "cancellationPlaceholder": "E.g. Free cancellation up to 24h in advance."
+    },
+    "step7": {
+      "title": "Extra details",
+      "subtitle": "Optional — you can fill these in later in settings.",
+      "addressSection": "Address",
+      "socialSection": "Social links",
+      "areasSection": "Service areas",
+      "companySection": "Company details",
+      "streetLabel": "Street and number",
+      "neighborhoodLabel": "Neighborhood",
+      "cityLabel": "City",
+      "stateLabel": "State",
+      "socialPlatformLabel": "Platform",
+      "socialUrlLabel": "URL",
+      "addSocial": "Add link",
+      "areaNameLabel": "City/neighborhood",
+      "addArea": "Add area",
+      "cnpjLabel": "Tax ID",
+      "legalNameLabel": "Legal name",
+      "foundedYearLabel": "Founded year",
+      "differentialsLabel": "Differentials"
+    },
+    "step8": {
+      "title": "Congrats! Your account is set up.",
+      "scoreTitle": "Your profile",
+      "tierNone": "Starter",
+      "tierBronze": "Bronze",
+      "tierSilver": "Silver",
+      "tierGold": "Gold",
+      "tierDiamond": "Diamond",
+      "nextTitle": "Next steps",
+      "nextAgent": "Customize agent",
+      "nextChannel": "Connect WhatsApp",
+      "nextContacts": "Import contacts",
+      "enter": "Enter the platform"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "greeting": {
