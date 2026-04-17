@@ -6,8 +6,10 @@ import { ApiError } from "@/lib/api-envelope";
 import {
   businessProfileService,
   onboardingService,
+  userService,
   type BusinessProfileView,
   type SetPasswordResponse,
+  type WorkType,
 } from "@/lib/services";
 
 const ACCESS_TOKEN_MAX_AGE = 60 * 60;
@@ -102,6 +104,43 @@ function mapSetPasswordError(err: unknown): StepErrorCode {
     if (err.status === 404) return "INVALID_SLUG";
     if (err.status === 410) return "SLUG_CONSUMED";
     if (err.status === 400) return "PASSWORD_WEAK";
+  }
+  return "GENERIC";
+}
+
+const workTypeSchema = z.enum(["services", "sales", "hybrid"]);
+
+export interface SetWorkTypeResult {
+  readonly success: boolean;
+  readonly error?: StepErrorCode;
+  readonly workType?: WorkType;
+}
+
+/**
+ * Step 2 action: set the user's work mode via PATCH /users/me.
+ */
+export async function setWorkTypeAction(
+  rawWorkType: string,
+): Promise<SetWorkTypeResult> {
+  const parsed = workTypeSchema.safeParse(rawWorkType);
+  if (!parsed.success) {
+    return { success: false, error: "INVALID_INPUT" };
+  }
+
+  try {
+    const updated = await userService.updateMe({ workType: parsed.data });
+    return { success: true, workType: updated.workType };
+  } catch (err) {
+    return { success: false, error: mapAuthedError(err) };
+  }
+}
+
+function mapAuthedError(err: unknown): StepErrorCode {
+  if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
+    return "NOT_AUTHENTICATED";
+  }
+  if (err instanceof ApiError && err.status === 400) {
+    return "INVALID_INPUT";
   }
   return "GENERIC";
 }
