@@ -388,6 +388,9 @@
     "channels": {
       "title": "Canais de atendimento",
       "subtitle": "Conecte os canais por onde seus clientes entram em contato.",
+      "blocked": "Complete seu perfil para desbloquear",
+      "blockedDesc": "Preencha os campos obrigatórios do perfil do negócio para conectar canais.",
+      "goToProfile": "Ir para Perfil",
       "whatsapp": {
         "name": "WhatsApp",
         "description": "Conecte sua conta do WhatsApp Business para receber e responder mensagens automaticamente.",

@@ -11,6 +11,7 @@ import { BusinessFaqSettings } from "./business-faq-settings";
 import { BusinessExceptionSettings } from "./business-exception-settings";
 import { cn } from "@/lib/utils";
 import { updateCalendarConfig, updatePrepaymentSetting, listChannels, disconnectChannel } from "../actions";
+import { fetchBusinessProfile } from "../business-profile-actions";
 import { updateAgentConfig } from "../agent-actions";
 import type { ChannelAccount } from "@/lib/services";
 import type {
@@ -778,13 +779,22 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
   const t = useTranslations("settings");
   const [telegramWizardOpen, setTelegramWizardOpen] = useState(false);
   const [channels, setChannels] = useState<ChannelAccount[]>([]);
+  const [canConnect, setCanConnect] = useState<boolean | null>(null);
+  const [missingCount, setMissingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
   const loadChannels = useCallback(async () => {
-    const result = await listChannels();
-    if (result.success && result.data) {
-      setChannels(result.data);
+    const [channelsResult, profileResult] = await Promise.all([
+      listChannels(),
+      fetchBusinessProfile(),
+    ]);
+    if (channelsResult.success && channelsResult.data) {
+      setChannels(channelsResult.data);
+    }
+    if (profileResult.success && profileResult.data) {
+      setCanConnect(profileResult.data.score.canConnectChannel);
+      setMissingCount(profileResult.data.score.missingRequired.length);
     }
     setLoading(false);
   }, []);
@@ -860,6 +870,29 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
         </p>
       </div>
 
+      {/* Blocked banner */}
+      {canConnect === false && (
+        <div className="flex items-center gap-4 rounded-xl border-l-4 border-warning bg-warning/6 p-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning/12">
+            <Building2 className="h-5 w-5 text-warning" />
+          </div>
+          <div className="flex-1">
+            <span className="block text-[14px] font-bold text-on-surface">{t("channels.blocked")}</span>
+            <span className="text-[12px] text-on-surface-variant">{t("channels.blockedDesc")}</span>
+          </div>
+          <button
+            className="flex h-9 items-center gap-1.5 rounded-xl bg-warning/10 px-4 text-[13px] font-bold text-warning transition-colors hover:bg-warning/15"
+            onClick={() => {
+              const hub = document.querySelector("[data-tab-profile]") as HTMLButtonElement | null;
+              hub?.click();
+            }}
+            type="button"
+          >
+            {t("channels.goToProfile")}
+          </button>
+        </div>
+      )}
+
       <div className="space-y-3">
         <ChannelCard
           icon={WhatsAppIcon}
@@ -869,7 +902,11 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
           description={t("channels.whatsapp.description")}
           action={renderAction(
             whatsappAccount,
-            META_APP_ID ? (
+            canConnect === false ? (
+              <span className="rounded-lg bg-surface-container-high px-3 py-1.5 text-[11px] font-medium text-on-surface-variant" title={t("channels.blocked")}>
+                {t("channels.blocked")}
+              </span>
+            ) : META_APP_ID ? (
               <button
                 className="flex h-9 items-center gap-2 rounded-xl bg-[#25D366] px-4 text-[13px] font-bold text-white transition-opacity hover:opacity-90"
                 onClick={handleConnectWhatsApp}
@@ -895,13 +932,19 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
           description={t("channels.telegram.description")}
           action={renderAction(
             telegramAccount,
-            <button
-              className="flex h-9 items-center gap-2 rounded-xl bg-[#0088cc] px-4 text-[13px] font-bold text-white transition-opacity hover:opacity-90"
-              onClick={() => setTelegramWizardOpen(true)}
-              type="button"
-            >
-              {t("channels.telegram.connect")}
-            </button>,
+            canConnect === false ? (
+              <span className="rounded-lg bg-surface-container-high px-3 py-1.5 text-[11px] font-medium text-on-surface-variant" title={t("channels.blocked")}>
+                {t("channels.blocked")}
+              </span>
+            ) : (
+              <button
+                className="flex h-9 items-center gap-2 rounded-xl bg-[#0088cc] px-4 text-[13px] font-bold text-white transition-opacity hover:opacity-90"
+                onClick={() => setTelegramWizardOpen(true)}
+                type="button"
+              >
+                {t("channels.telegram.connect")}
+              </button>
+            ),
             t("channels.telegram.connected"),
           )}
         />
@@ -987,6 +1030,7 @@ export function SettingsHub({
                     ? "bg-primary/8 text-primary"
                     : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface",
                 )}
+                data-tab-profile={tab.key === "profile" ? "" : undefined}
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 type="button"

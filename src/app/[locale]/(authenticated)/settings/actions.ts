@@ -117,6 +117,9 @@ export async function connectChannel(
     if (msg.includes("já está conectado") || msg.includes("CONFLICT")) {
       return { success: false, error: "CONFLICT" };
     }
+    if (msg.includes("INCOMPLETE") || msg.includes("BUSINESS_PROFILE")) {
+      return { success: false, error: "PROFILE_INCOMPLETE" };
+    }
     return { success: false, error: msg };
   }
 }

@@ -61,6 +61,8 @@ export function TelegramWizard({ open, onClose, onConnected }: TelegramWizardPro
         const msg = result.error ?? "";
         if (msg.includes("CONFLICT")) {
           setError(t("conflict"));
+        } else if (msg.includes("PROFILE_INCOMPLETE")) {
+          setError("Complete seu perfil do negócio antes de conectar um canal.");
         } else {
           setError(t("error"));
         }
