@@ -12,7 +12,9 @@ import {
   userService,
   type BusinessProfileView,
   type BusinessVertical,
+  type ServiceModality,
   type SetPasswordResponse,
+  type UpdateBusinessProfilePayload,
   type WorkType,
 } from "@/lib/services";
 
@@ -193,6 +195,82 @@ export async function setVerticalAction(
     ]);
     const vertical = verticals.find((v) => v.id === verticalId);
     return { success: true, profileView, vertical };
+  } catch (err) {
+    return { success: false, error: mapAuthedError(err) };
+  }
+}
+
+export interface UpdateProfileResult {
+  readonly success: boolean;
+  readonly error?: StepErrorCode;
+  readonly profileView?: BusinessProfileView;
+}
+
+const businessInfoSchema = z.object({
+  businessName: z.string().trim().min(2).max(120),
+  businessDescription: z.string().trim().min(10).max(2000),
+});
+
+const modalitySchema = z.enum([
+  "presencial",
+  "remoto",
+  "domicilio",
+  "hibrido",
+]) satisfies z.ZodType<ServiceModality>;
+
+const policiesSchema = z.object({
+  paymentPolicy: z.string().trim().min(1).max(2000),
+  cancellationPolicy: z.string().trim().min(1).max(2000),
+});
+
+/**
+ * Step 4 action: persist business name + description.
+ */
+export async function updateBusinessInfoAction(
+  formData: FormData,
+): Promise<UpdateProfileResult> {
+  const parsed = businessInfoSchema.safeParse({
+    businessName: formData.get("businessName"),
+    businessDescription: formData.get("businessDescription"),
+  });
+  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+  return persistProfile(parsed.data);
+}
+
+/**
+ * Step 5 action: persist service modality.
+ */
+export async function updateServiceModalityAction(
+  rawModality: string,
+): Promise<UpdateProfileResult> {
+  const parsed = modalitySchema.safeParse(rawModality);
+  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+  return persistProfile({ serviceModality: parsed.data });
+}
+
+/**
+ * Step 6 action: persist payment + cancellation policies.
+ */
+export async function updatePoliciesAction(
+  formData: FormData,
+): Promise<UpdateProfileResult> {
+  const parsed = policiesSchema.safeParse({
+    paymentPolicy: formData.get("paymentPolicy"),
+    cancellationPolicy: formData.get("cancellationPolicy"),
+  });
+  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+  return persistProfile(parsed.data);
+}
+
+async function persistProfile(
+  payload: UpdateBusinessProfilePayload,
+): Promise<UpdateProfileResult> {
+  try {
+    await businessProfileService.updateProfile(payload);
+    updateTag(CACHE_TAGS.businessProfile);
+    updateTag(CACHE_TAGS.businessScore);
+    const profileView = await businessProfileService.getProfile();
+    return { success: true, profileView };
   } catch (err) {
     return { success: false, error: mapAuthedError(err) };
   }
