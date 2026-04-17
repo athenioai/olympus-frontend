@@ -97,12 +97,11 @@ export function ChatInput({
 
     const optimisticMessage: ChatMessage = {
       id: crypto.randomUUID(),
-      sessionId,
-      agent: "human",
-      role: "assistant",
+      chatId: sessionId,
+      sender: "human",
       content,
-      appointmentId: null,
       createdAt: new Date().toISOString(),
+      deletedAt: null,
     };
 
     setInputValue("");

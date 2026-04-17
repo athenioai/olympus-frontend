@@ -9,12 +9,11 @@ export interface ChatSession {
 
 export interface ChatMessage {
   readonly id: string;
-  readonly sessionId: string;
-  readonly agent: string;
-  readonly role: "lead" | "assistant";
+  readonly chatId: string;
+  readonly sender: string;
   readonly content: string;
-  readonly appointmentId: string | null;
   readonly createdAt: string;
+  readonly deletedAt: string | null;
 }
 
 export interface PaginatedSessions {

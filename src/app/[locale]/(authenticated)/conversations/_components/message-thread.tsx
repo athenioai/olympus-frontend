@@ -11,7 +11,6 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   ArrowLeft,
-  Calendar,
   ChevronUp,
   Clock,
   Flame,
@@ -150,7 +149,7 @@ export function MessageThread({
         url: wsUrl,
         token,
         onMessage: (message) => {
-          if (message.sessionId === sessionId) {
+          if (message.chatId === sessionId) {
             setMessages((prev) => {
               if (prev.some((m) => m.id === message.id)) return prev;
               return [...prev, message];
@@ -299,50 +298,40 @@ export function MessageThread({
 
           {/* Bubbles */}
           {messages.map((message) => {
-            const isAssistant = message.role === "assistant";
-            const msgVisual = getAgentVisual(isAssistant ? message.agent : "lead", t);
+            const isAssistant = message.sender !== "lead";
+            const msgVisual = getAgentVisual(isAssistant ? message.sender : "lead", t);
 
-            if (isAssistant) {
+            if (!isAssistant) {
+              // Lead message — LEFT side
               return (
                 <div className="flex items-start gap-3" key={message.id} style={{ maxWidth: "70%" }}>
-                  {/* Bot icon */}
-                  <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm", msgVisual.bg, msgVisual.text)}>
-                    <Bot className="h-4 w-4" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-surface-container-high bg-surface-container-lowest shadow-sm">
+                    <UserRound className="h-4 w-4 text-on-surface-variant" />
                   </div>
                   <div className="space-y-1">
                     <div className="rounded-2xl rounded-tl-none border border-surface-container-high bg-surface-container-lowest p-4 text-sm leading-relaxed text-on-surface shadow-sm">
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
-                    {/* Appointment badge */}
-                    {message.appointmentId && (
-                      <div className="flex justify-center py-2">
-                        <div className="flex items-center gap-2 rounded-full bg-secondary-container/20 px-4 py-2 text-xs font-medium text-on-secondary-container">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {t("appointmentCreated")}
-                        </div>
-                      </div>
-                    )}
                     <span className="ml-1 text-[10px] text-on-surface-variant">
-                      {formatTime(message.createdAt, "pt-BR")} • {msgVisual.label}
+                      {formatTime(message.createdAt, "pt-BR")}
                     </span>
                   </div>
                 </div>
               );
             }
 
-            // Lead message
+            // Assistant/Agent message — RIGHT side
             return (
               <div className="ml-auto flex flex-row-reverse items-start gap-3" key={message.id} style={{ maxWidth: "70%" }}>
-                {/* Lead avatar */}
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-primary-container bg-surface-container-high shadow-sm">
-                  <UserRound className="h-4 w-4 text-on-surface-variant" />
+                <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm", msgVisual.bg, msgVisual.text)}>
+                  <Bot className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col items-end space-y-1">
                   <div className="rounded-2xl rounded-tr-none bg-primary-container/40 p-4 text-sm leading-relaxed text-on-surface">
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
                   <span className="mr-1 text-[10px] text-on-surface-variant">
-                    {formatTime(message.createdAt, "pt-BR")}
+                    {formatTime(message.createdAt, "pt-BR")} • {msgVisual.label}
                   </span>
                 </div>
               </div>
