@@ -23,8 +23,8 @@ export type {
 export type {
   ChatSession,
   ChatMessage,
-  Pagination as ChatPagination,
-  PaginatedResponse as ChatPaginatedResponse,
+  PaginatedSessions,
+  PaginatedMessages,
   ListSessionsParams,
   ListMessagesParams,
   IChatService,

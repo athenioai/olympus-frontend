@@ -1,14 +1,10 @@
 export interface ChatSession {
-  readonly sessionId: string;
-  readonly agent: string;
-  readonly channel: string | null;
-  readonly leadName: string | null;
+  readonly id: string;
+  readonly userId: string;
+  readonly leadId: string;
   readonly handoff: boolean;
-  readonly lastMessage: string;
-  readonly lastRole: "lead" | "assistant";
-  readonly messageCount: number;
-  readonly startedAt: string;
-  readonly lastMessageAt: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
 }
 
 export interface ChatMessage {
@@ -21,21 +17,23 @@ export interface ChatMessage {
   readonly createdAt: string;
 }
 
-export interface Pagination {
+export interface PaginatedSessions {
+  readonly data: ChatSession[];
+  readonly total: number;
   readonly page: number;
   readonly limit: number;
-  readonly total: number;
 }
 
-export interface PaginatedResponse<T> {
-  readonly data: T[];
-  readonly pagination: Pagination;
+export interface PaginatedMessages {
+  readonly data: ChatMessage[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
 }
 
 export interface ListSessionsParams {
   readonly page?: number;
   readonly limit?: number;
-  readonly agent?: string;
 }
 
 export interface ListMessagesParams {
@@ -46,11 +44,11 @@ export interface ListMessagesParams {
 export interface IChatService {
   listSessions(
     params?: ListSessionsParams,
-  ): Promise<PaginatedResponse<ChatSession>>;
+  ): Promise<PaginatedSessions>;
   getMessages(
     sessionId: string,
     params?: ListMessagesParams,
-  ): Promise<PaginatedResponse<ChatMessage>>;
+  ): Promise<PaginatedMessages>;
   deleteSession(sessionId: string): Promise<void>;
   sendMessage(sessionId: string, message: string): Promise<void>;
   activateHandoff(sessionId: string): Promise<void>;

@@ -1,10 +1,7 @@
 import { notFound } from "next/navigation";
 import { chatService } from "@/lib/services";
 import { MessageThread } from "../_components/message-thread";
-import type {
-  ChatMessage,
-  Pagination,
-} from "@/lib/services/interfaces/chat-service";
+import type { ChatMessage } from "@/lib/services/interfaces/chat-service";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -14,7 +11,8 @@ const UUID_RE =
  */
 async function fetchMessages(sessionId: string): Promise<{
   messages: ChatMessage[];
-  pagination: Pagination;
+  page: number;
+  total: number;
   notFoundError: boolean;
 }> {
   try {
@@ -22,13 +20,13 @@ async function fetchMessages(sessionId: string): Promise<{
       limit: 50,
       page: 1,
     });
-    const lastPage =
-      Math.ceil(probe.pagination.total / probe.pagination.limit) || 1;
+    const lastPage = Math.ceil(probe.total / probe.limit) || 1;
 
     if (lastPage <= 1) {
       return {
         messages: probe.data,
-        pagination: probe.pagination,
+        page: probe.page,
+        total: probe.total,
         notFoundError: false,
       };
     }
@@ -40,22 +38,15 @@ async function fetchMessages(sessionId: string): Promise<{
 
     return {
       messages: latest.data,
-      pagination: latest.pagination,
+      page: latest.page,
+      total: latest.total,
       notFoundError: false,
     };
   } catch (error) {
     if (error instanceof Error && error.message === "NOT_FOUND") {
-      return {
-        messages: [],
-        pagination: { page: 1, limit: 50, total: 0 },
-        notFoundError: true,
-      };
+      return { messages: [], page: 1, total: 0, notFoundError: true };
     }
-    return {
-      messages: [],
-      pagination: { page: 1, limit: 50, total: 0 },
-      notFoundError: false,
-    };
+    return { messages: [], page: 1, total: 0, notFoundError: false };
   }
 }
 
@@ -70,7 +61,7 @@ export default async function ChatDetailPage({
     notFound();
   }
 
-  const [{ messages, pagination, notFoundError }, sessionsResult] =
+  const [{ messages, page, total, notFoundError }, sessionsResult] =
     await Promise.all([
       fetchMessages(sessionId),
       chatService.listSessions({ limit: 100 }).catch(() => ({ data: [] })),
@@ -80,17 +71,15 @@ export default async function ChatDetailPage({
     notFound();
   }
 
-  const session = sessionsResult.data.find(
-    (s) => s.sessionId === sessionId,
-  );
+  const session = sessionsResult.data.find((s) => s.id === sessionId);
 
   return (
     <MessageThread
       sessionId={sessionId}
-      leadName={session?.leadName ?? null}
-      agent={session?.agent ?? "horos"}
+      leadName={session?.leadId ?? null}
+      agent="horos"
       initialMessages={messages}
-      initialPagination={pagination}
+      initialPagination={{ page, limit: 50, total }}
       initialHandoff={session?.handoff ?? false}
     />
   );

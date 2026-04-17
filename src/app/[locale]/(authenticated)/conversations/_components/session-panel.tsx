@@ -5,70 +5,18 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
-  Clock,
-  Flame,
   MessageSquare,
   MessagesSquare,
   Search,
   Trash2,
   UserRound,
   X,
-  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
 import { deleteChatSession } from "../actions";
 import { DeleteDialog } from "./delete-dialog";
 import type { ChatSession } from "@/lib/services/interfaces/chat-service";
-
-/* ---------- Agent visual config ---------- */
-
-type AgentKey = "horos" | "kairos" | "human";
-
-interface AgentVisual {
-  readonly bg: string;
-  readonly text: string;
-  readonly icon: typeof Clock;
-}
-
-const AGENT_VISUALS: Record<AgentKey, AgentVisual> = {
-  horos: {
-    bg: "bg-teal/15",
-    text: "text-teal",
-    icon: Clock,
-  },
-  kairos: {
-    bg: "bg-primary/15",
-    text: "text-primary",
-    icon: Zap,
-  },
-  human: {
-    bg: "bg-[#8b5cf6]/15",
-    text: "text-[#8b5cf6]",
-    icon: UserRound,
-  },
-};
-
-const FALLBACK_VISUAL: AgentVisual = {
-  bg: "bg-on-surface-variant/10",
-  text: "text-on-surface-variant",
-  icon: Flame,
-};
-
-function getAgentVisual(agent: string): AgentVisual {
-  return AGENT_VISUALS[agent as AgentKey] ?? FALLBACK_VISUAL;
-}
-
-/* ---------- Channel badge config ---------- */
-
-const CHANNEL_VALUES = ["", "whatsapp", "telegram", "instagram", "sms"] as const;
-const CHANNEL_DISPLAY: Record<string, string> = {
-  "": "",
-  whatsapp: "WhatsApp",
-  telegram: "Telegram",
-  instagram: "Instagram",
-  sms: "SMS",
-};
 
 /* ---------- Component ---------- */
 
@@ -84,8 +32,6 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
 
   const [sessions, setSessions] = useState(initialSessions);
   const [searchQuery, setSearchQuery] = useState("");
-  const [agentFilter, setAgentFilter] = useState("");
-  const [channelFilter, setChannelFilter] = useState("");
   const [handoffOnly, setHandoffOnly] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleting, startDelete] = useTransition();
@@ -99,25 +45,15 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
       result = result.filter((s) => s.handoff);
     }
 
-    if (agentFilter) {
-      result = result.filter((s) =>
-        agentFilter === "human" ? s.handoff : s.agent === agentFilter,
-      );
-    }
-
-    if (channelFilter) {
-      result = result.filter((s) => s.channel === channelFilter);
-    }
-
     if (searchQuery.trim()) {
       const term = searchQuery.toLowerCase();
       result = result.filter((s) =>
-        s.leadName?.toLowerCase().includes(term),
+        s.leadId?.toLowerCase().includes(term),
       );
     }
 
     return result;
-  }, [sessions, handoffOnly, agentFilter, channelFilter, searchQuery]);
+  }, [sessions, handoffOnly, searchQuery]);
 
   const logicalPath = pathname.replace(/^\/(pt-BR|en-US|es)/, "");
   const activeSessionId = logicalPath.startsWith("/conversations/")
@@ -129,7 +65,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
       const result = await deleteChatSession(sessionId);
       if (result.success) {
         setSessions((prev) =>
-          prev.filter((s) => s.sessionId !== sessionId),
+          prev.filter((s) => s.id !== sessionId),
         );
         setDeleteTarget(null);
         if (activeSessionId === sessionId) {
@@ -139,7 +75,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
     });
   }
 
-  const hasFilters = agentFilter || channelFilter || searchQuery || handoffOnly;
+  const hasFilters = searchQuery || handoffOnly;
 
   return (
     <div className="flex h-full flex-col">
@@ -193,37 +129,10 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
           )}
         </button>
 
-        {/* Filters */}
-        <div className="flex items-center gap-2">
-          <select
-            value={agentFilter}
-            onChange={(e) => setAgentFilter(e.target.value)}
-            className="h-8 flex-1 rounded-lg bg-surface-container-high px-2 text-xs text-on-surface outline-none transition-colors hover:bg-surface-container-highest focus:ring-1 focus:ring-primary/30"
-          >
-            <option value="">{t("allAgents")}</option>
-            <option value="horos">{t("agents.horos")}</option>
-            <option value="kairos">{t("agents.kairos")}</option>
-            <option value="human">{t("agents.human")}</option>
-          </select>
-          <select
-            value={channelFilter}
-            onChange={(e) => setChannelFilter(e.target.value)}
-            className="h-8 flex-1 rounded-lg bg-surface-container-high px-2 text-xs text-on-surface outline-none transition-colors hover:bg-surface-container-highest focus:ring-1 focus:ring-primary/30"
-          >
-            {CHANNEL_VALUES.map((v) => (
-              <option key={v} value={v}>
-                {v === "" ? t("allChannels") : CHANNEL_DISPLAY[v] || v}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {hasFilters && (
           <button
             onClick={() => {
               setHandoffOnly(false);
-              setAgentFilter("");
-              setChannelFilter("");
               setSearchQuery("");
             }}
             className="text-[11px] font-medium text-primary hover:underline"
@@ -248,16 +157,12 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
         ) : (
           <div className="space-y-1">
             {filtered.map((session) => {
-              const isActive = session.sessionId === activeSessionId;
-              const activeAgent = session.handoff ? "human" : session.agent;
-              const visual = getAgentVisual(activeAgent);
-              const AgentIcon = visual.icon;
-              const displayName = session.leadName ?? t("unknown");
+              const isActive = session.id === activeSessionId;
 
               return (
                 <Link
-                  key={session.sessionId}
-                  href={`/conversations/${session.sessionId}`}
+                  key={session.id}
+                  href={`/conversations/${session.id}`}
                   className={cn(
                     "group relative flex items-start gap-3 rounded-xl px-4 py-3.5 transition-all duration-150",
                     isActive
@@ -265,39 +170,29 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       : "hover:bg-surface-container-high",
                   )}
                 >
-                  {/* Agent avatar */}
-                  <div
-                    className={cn(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                      visual.bg,
-                      visual.text,
-                    )}
-                  >
-                    <AgentIcon className="h-5 w-5" />
+                  {/* Avatar */}
+                  <div className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                    session.handoff ? "bg-[#8b5cf6]/15 text-[#8b5cf6]" : "bg-teal/15 text-teal",
+                  )}>
+                    {session.handoff ? <UserRound className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
                   </div>
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span
-                        className={cn(
-                          "truncate text-sm font-semibold",
-                          isActive
-                            ? "text-primary"
-                            : "text-on-surface",
-                        )}
-                      >
-                        {displayName}
+                      <span className={cn("truncate text-sm font-semibold", isActive ? "text-primary" : "text-on-surface")}>
+                        {session.leadId.slice(0, 8)}...
                       </span>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="text-[10px] text-on-surface-variant">
-                          {formatRelativeTime(session.lastMessageAt)}
+                          {formatRelativeTime(session.updatedAt)}
                         </span>
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setDeleteTarget(session.sessionId);
+                            setDeleteTarget(session.id);
                           }}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-on-surface-variant opacity-0 transition-all group-hover:opacity-100 hover:bg-danger/10 hover:text-danger"
                           type="button"
@@ -307,31 +202,14 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       </div>
                     </div>
 
-                    {/* Agent badge */}
-                    <div className="mt-0.5 flex items-center gap-1.5">
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider",
-                          visual.bg,
-                          visual.text,
-                        )}
-                      >
-                        {t(`agents.${activeAgent as AgentKey}`)}
-                      </span>
-                      {session.handoff && (
-                        <span className="text-[10px] font-medium text-[#8b5cf6]">
+                    {/* Handoff badge */}
+                    {session.handoff && (
+                      <div className="mt-0.5">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#8b5cf6]/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#8b5cf6]">
                           {t("status.handoff")}
                         </span>
-                      )}
-                    </div>
-
-                    {/* Last message preview */}
-                    <div className="mt-1 flex items-center gap-1.5 text-on-surface-variant">
-                      <MessageSquare className="h-3 w-3 shrink-0" />
-                      <p className="truncate text-xs">
-                        {session.lastMessage}
-                      </p>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </Link>
               );

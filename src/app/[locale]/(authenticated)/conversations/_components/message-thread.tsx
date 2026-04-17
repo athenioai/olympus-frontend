@@ -29,7 +29,7 @@ import {
   getWsToken,
 } from "../actions";
 import { ChatInput } from "./chat-input";
-import type { ChatMessage, Pagination } from "@/lib/services/interfaces/chat-service";
+import type { ChatMessage } from "@/lib/services/interfaces/chat-service";
 
 /* ---------- Agent visual config ---------- */
 
@@ -92,7 +92,7 @@ interface MessageThreadProps {
   readonly leadName: string | null;
   readonly agent: string;
   readonly initialMessages: ChatMessage[];
-  readonly initialPagination: Pagination;
+  readonly initialPagination: { page: number; limit: number; total: number };
   readonly initialHandoff: boolean;
 }
 
