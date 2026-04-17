@@ -5,13 +5,18 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
+  Bot,
+  Flame,
   MessageSquare,
   MessagesSquare,
   Search,
+  Snowflake,
+  Thermometer,
   Trash2,
   UserRound,
   X,
 } from "lucide-react";
+import { WhatsAppIcon, TelegramIcon } from "@/components/icons/channel-icons";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
 import { deleteChatSession } from "../actions";
@@ -173,11 +178,8 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                 >
                   {/* Avatar */}
                   <div className="relative">
-                    <div className={cn(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
-                      session.handoff ? "bg-[#8b5cf6]/15 text-[#8b5cf6]" : "bg-teal/15 text-teal",
-                    )}>
-                      {session.handoff ? <UserRound className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant">
+                      <UserRound className="h-6 w-6" />
                     </div>
                     {isHot && (
                       <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-surface-container-low bg-warning" />
@@ -186,50 +188,70 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className={cn("truncate text-sm font-semibold", isActive ? "text-primary" : "text-on-surface")}>
-                        {session.lead.name}
+                    {/* Row 1: Name + icons + time */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className={cn("truncate text-[14px] font-semibold", isActive ? "text-primary" : "text-on-surface")}>
+                          {session.lead.name}
+                        </span>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {session.lead.channel === "whatsapp" && (
+                            <WhatsAppIcon className="h-3.5 w-3.5 text-[#25D366]" />
+                          )}
+                          {session.lead.channel === "telegram" && (
+                            <TelegramIcon className="h-3.5 w-3.5 text-[#0088cc]" />
+                          )}
+                          {session.lead.temperature === "hot" && (
+                            <Flame className="h-3.5 w-3.5 text-danger" />
+                          )}
+                          {session.lead.temperature === "warm" && (
+                            <Thermometer className="h-3.5 w-3.5 text-warning" />
+                          )}
+                          {session.lead.temperature === "cold" && (
+                            <Snowflake className="h-3.5 w-3.5" style={{ color: "#7DD3FC" }} />
+                          )}
+                          {session.handoff && (
+                            <span className="rounded bg-[#8b5cf6]/10 px-1 py-0.5 text-[9px] font-bold uppercase text-[#8b5cf6]">
+                              H
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="shrink-0 text-[11px] text-on-surface-variant">
+                        {formatRelativeTime(session.lastMessage?.createdAt ?? session.updatedAt)}
                       </span>
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        <span className="text-[10px] text-on-surface-variant">
-                          {formatRelativeTime(session.lastMessage?.createdAt ?? session.updatedAt)}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setDeleteTarget(session.id);
-                          }}
-                          className="flex h-5 w-5 items-center justify-center rounded-md text-on-surface-variant opacity-0 transition-all group-hover:opacity-100 hover:bg-danger/10 hover:text-danger"
-                          type="button"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      </div>
                     </div>
 
-                    {/* Agent badge + handoff */}
-                    <div className="mt-0.5 flex items-center gap-1.5">
-                      {session.handoff ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-[#8b5cf6]/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#8b5cf6]">
-                          {t("status.handoff")}
-                        </span>
-                      ) : session.lead.channel && (
-                        <span className="rounded-md bg-surface-container-high px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
-                          {session.lead.channel}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Last message preview */}
-                    {session.lastMessage && (
-                      <div className="mt-1 flex items-center gap-1.5 text-on-surface-variant">
-                        <MessageSquare className="h-3 w-3 shrink-0" />
-                        <p className="truncate text-xs">
-                          {session.lastMessage.content}
-                        </p>
+                    {/* Row 2: Last message preview */}
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-1.5 text-on-surface-variant">
+                        {session.lastMessage ? (
+                          <>
+                            {session.lastMessage.sender === "lead" ? (
+                              <UserRound className="h-3.5 w-3.5 shrink-0 text-on-surface-variant/50" />
+                            ) : (
+                              <Bot className="h-3.5 w-3.5 shrink-0 text-teal" />
+                            )}
+                            <p className="truncate text-[13px]">
+                              {session.lastMessage.content}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-[13px] text-on-surface-variant/40">...</p>
+                        )}
                       </div>
-                    )}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeleteTarget(session.id);
+                        }}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-on-surface-variant opacity-0 transition-all group-hover:opacity-100 hover:bg-danger/10 hover:text-danger"
+                        type="button"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 </Link>
               );
