@@ -51,7 +51,7 @@ export interface DailyDataPoint {
 
 export interface TodayAppointment {
   readonly id: string;
-  readonly leadName: string;
+  readonly lead: { readonly id: string; readonly name: string };
   readonly serviceName: string;
   readonly startTime: string;
   readonly endTime: string;

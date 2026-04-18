@@ -105,7 +105,7 @@ export async function authFetch(
       secure: TOKEN_CONFIG.secure,
     });
   } catch {
-    // Cookie setting fails in Server Component context — middleware handles on next request
+    // Cookie setting fails in Server Component context — proxy handles on next request
   }
 
   // Retry original request with new token
