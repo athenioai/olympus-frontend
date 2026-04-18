@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useTransition } from "react";
+import { useState, useCallback, useMemo, useTransition } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -25,11 +25,13 @@ import { fadeInUp, staggerContainer } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import type {
   BoardColumnCount,
-  LeadPublic,
+  LeadBoardItem,
   LeadStatus,
 } from "@/lib/services/interfaces/lead-service";
+import type { CrmFilters, InitialColumns } from "../page";
 import { LeadCard } from "./lead-card";
 import { CreateLeadDialog } from "./create-lead-dialog";
+import { FilterBar } from "./filter-bar";
 import { updateLeadStatus, fetchColumnLeads } from "../actions";
 
 interface ColumnConfig {
@@ -49,7 +51,7 @@ const COLUMNS: ColumnConfig[] = [
 const PAGE_SIZE = 20;
 
 interface ColumnState {
-  leads: LeadPublic[];
+  leads: LeadBoardItem[];
   total: number;
   page: number;
   loading: boolean;
@@ -57,14 +59,18 @@ interface ColumnState {
 
 type BoardState = Record<LeadStatus, ColumnState>;
 
-function buildInitialBoardState(counters: BoardColumnCount[]): BoardState {
+function buildInitialBoardState(
+  counters: BoardColumnCount[],
+  initialColumns: InitialColumns,
+): BoardState {
   const state: Partial<BoardState> = {};
   for (const col of COLUMNS) {
     const counter = counters.find((c) => c.status === col.id);
+    const column = initialColumns[col.id];
     state[col.id] = {
-      leads: [],
-      total: counter?.count ?? 0,
-      page: 0,
+      leads: column?.data ?? [],
+      total: column?.total ?? counter?.count ?? 0,
+      page: column?.page ?? 1,
       loading: false,
     };
   }
@@ -73,15 +79,20 @@ function buildInitialBoardState(counters: BoardColumnCount[]): BoardState {
 
 interface CrmBoardProps {
   readonly initialCounters: BoardColumnCount[];
+  readonly initialColumns: InitialColumns;
+  readonly filters: CrmFilters;
 }
 
 /**
  * CRM Kanban board with drag-and-drop, optimistic updates, and lazy column loading.
+ * First page of every column is fetched server-side in parallel and received as initial state.
  */
-export function CrmBoard({ initialCounters }: CrmBoardProps) {
+export function CrmBoard({ initialCounters, initialColumns, filters }: CrmBoardProps) {
   const t = useTranslations("crm");
-  const [board, setBoard] = useState<BoardState>(() => buildInitialBoardState(initialCounters));
-  const [activeLead, setActiveLead] = useState<LeadPublic | null>(null);
+  const [board, setBoard] = useState<BoardState>(() =>
+    buildInitialBoardState(initialCounters, initialColumns),
+  );
+  const [activeLead, setActiveLead] = useState<LeadBoardItem | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -94,43 +105,43 @@ export function CrmBoard({ initialCounters }: CrmBoardProps) {
     [board],
   );
 
-  const loadColumn = useCallback(async (status: LeadStatus, page: number) => {
-    setBoard((prev) => ({
-      ...prev,
-      [status]: { ...prev[status], loading: true },
-    }));
-
-    const result = await fetchColumnLeads(status, page, PAGE_SIZE);
-
-    if (result.success && result.data) {
+  const loadColumn = useCallback(
+    async (status: LeadStatus, page: number) => {
       setBoard((prev) => ({
         ...prev,
-        [status]: {
-          leads: page === 1
-            ? result.data!.data
-            : [...prev[status].leads, ...result.data!.data],
-          total: result.data!.total,
-          page,
-          loading: false,
-        },
+        [status]: { ...prev[status], loading: true },
       }));
-    } else {
-      setBoard((prev) => ({
-        ...prev,
-        [status]: { ...prev[status], loading: false },
-      }));
-    }
-  }, []);
 
-  // Load first page of each column on mount
-  useEffect(() => {
-    for (const col of COLUMNS) {
-      loadColumn(col.id, 1);
-    }
-  }, [loadColumn]);
+      const result = await fetchColumnLeads(status, page, PAGE_SIZE, {
+        search: filters.search,
+        temperature: filters.temperature,
+      });
+
+      if (result.success && result.data) {
+        setBoard((prev) => ({
+          ...prev,
+          [status]: {
+            leads:
+              page === 1
+                ? result.data!.data
+                : [...prev[status].leads, ...result.data!.data],
+            total: result.data!.total,
+            page,
+            loading: false,
+          },
+        }));
+      } else {
+        setBoard((prev) => ({
+          ...prev,
+          [status]: { ...prev[status], loading: false },
+        }));
+      }
+    },
+    [filters.search, filters.temperature],
+  );
 
   function handleDragStart(event: DragStartEvent) {
-    const lead = event.active.data.current?.lead as LeadPublic | undefined;
+    const lead = event.active.data.current?.lead as LeadBoardItem | undefined;
     if (lead) setActiveLead(lead);
   }
 
@@ -139,7 +150,7 @@ export function CrmBoard({ initialCounters }: CrmBoardProps) {
     const { active, over } = event;
     if (!over) return;
 
-    const lead = active.data.current?.lead as LeadPublic | undefined;
+    const lead = active.data.current?.lead as LeadBoardItem | undefined;
     if (!lead) return;
 
     const targetColumn = over.id as LeadStatus;
@@ -191,9 +202,9 @@ export function CrmBoard({ initialCounters }: CrmBoardProps) {
   return (
     <div className="-m-6 -mt-16 flex flex-col p-4 pt-6 lg:-m-8 lg:p-5 lg:pt-6" style={{ height: "100vh" }}>
       {/* Header */}
-      <div className="flex items-center justify-between pb-6">
+      <div className="flex items-center justify-between pb-4">
         <div>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-on-surface">
+          <h1 className="font-display text-[2rem] font-extrabold leading-tight tracking-tight text-on-surface">
             {t("title")}
           </h1>
           <p className="mt-1 text-[13px] text-on-surface-variant">
@@ -204,6 +215,11 @@ export function CrmBoard({ initialCounters }: CrmBoardProps) {
           <Plus className="h-4 w-4" />
           {t("newLead")}
         </Button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="pb-4">
+        <FilterBar filters={filters} />
       </div>
 
       {/* Board */}
@@ -266,7 +282,6 @@ function KanbanColumn({
   readonly onLoadMore: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
-  const tc = useTranslations("common");
 
   const hasMore = state.page * PAGE_SIZE < state.total;
 
@@ -285,7 +300,7 @@ function KanbanColumn({
         <span className="text-xs font-extrabold uppercase tracking-widest text-on-surface">
           {label}
         </span>
-        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-surface-container-high px-1.5 text-[11px] font-extrabold text-on-surface-variant">
+        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-surface-container-high px-1.5 text-[11px] font-extrabold tabular-nums text-on-surface-variant">
           {state.total}
         </span>
       </div>
@@ -301,9 +316,17 @@ function KanbanColumn({
               <Loader2 className="h-5 w-5 animate-spin text-on-surface-variant/40" />
             </div>
           ) : state.leads.length === 0 ? (
-            <div className="flex h-full items-center justify-center rounded-xl bg-surface-container-high/30">
-              <p className="text-[12px] text-on-surface-variant">
-                {tc("noResults")}
+            <div className="flex h-full flex-col items-center justify-center rounded-xl px-4 py-8 text-center">
+              <div className={cn(
+                "mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container-high",
+              )}>
+                <column.icon className="h-4 w-4 text-on-surface-variant/50" />
+              </div>
+              <p className="text-[12px] font-semibold text-on-surface-variant">
+                Nenhum {label.toLowerCase()}
+              </p>
+              <p className="mt-1 text-[11px] text-on-surface-variant/70">
+                Arraste leads pra esta etapa
               </p>
             </div>
           ) : (

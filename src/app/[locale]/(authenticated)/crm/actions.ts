@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { leadService } from "@/lib/services";
 import type {
   BoardColumnCount,
+  LeadBoardItem,
   LeadPublic,
   LeadStatus,
+  LeadTemperature,
   PaginatedColumnResponse,
   TimelineEntry,
   TimelineEntryType,
@@ -26,9 +28,10 @@ const VALID_STATUSES: LeadStatus[] = [
   "lost",
 ];
 
+const VALID_TEMPERATURES: LeadTemperature[] = ["cold", "warm", "hot"];
+
 const VALID_TIMELINE_TYPES: TimelineEntryType[] = [
   "message",
-  "appointment",
   "status_change",
 ];
 
@@ -38,6 +41,25 @@ function isValidId(id: unknown): id is string {
 
 function isValidStatus(s: unknown): s is LeadStatus {
   return typeof s === "string" && VALID_STATUSES.includes(s as LeadStatus);
+}
+
+function isValidTemperature(v: unknown): v is LeadTemperature {
+  return typeof v === "string" && VALID_TEMPERATURES.includes(v as LeadTemperature);
+}
+
+/**
+ * Upgrade a bare LeadPublic (returned by GET /leads when filters are applied)
+ * into a LeadBoardItem with null/empty enrichment. The board card renders
+ * gracefully when enrichment is absent.
+ */
+function toBoardItem(lead: LeadPublic): LeadBoardItem {
+  return {
+    ...lead,
+    avatarUrl: null,
+    lastMessage: null,
+    tags: [],
+    customFields: [],
+  };
 }
 
 function isValidTimelineType(t: unknown): t is TimelineEntryType {
@@ -81,16 +103,19 @@ export async function fetchBoard(): Promise<{
 }
 
 /**
- * Fetch paginated leads for a specific board column.
+ * Fetch paginated leads for a specific board column, optionally applying
+ * global filters (search, temperature).
  * @param status - The column status
  * @param page - Page number (default 1)
  * @param limit - Items per page (default 20)
+ * @param filters - Optional global filters
  * @returns Paginated leads or error
  */
 export async function fetchColumnLeads(
   status: LeadStatus,
   page = 1,
   limit = 20,
+  filters?: { search?: string; temperature?: string },
 ): Promise<{
   success: boolean;
   data?: PaginatedColumnResponse;
@@ -100,7 +125,29 @@ export async function fetchColumnLeads(
     return { success: false, error: "Status invalido." };
   }
 
+  const search = filters?.search?.trim() || undefined;
+  const temperature = isValidTemperature(filters?.temperature) ? filters.temperature : undefined;
+  const hasFilters = Boolean(search || temperature);
+
   try {
+    if (hasFilters) {
+      const r = await leadService.listLeads({
+        status,
+        search,
+        temperature,
+        page,
+        limit,
+      });
+      return {
+        success: true,
+        data: {
+          data: r.data.map(toBoardItem),
+          total: r.total,
+          page: r.page,
+          limit: r.limit,
+        },
+      };
+    }
     const data = await leadService.getColumnLeads(status, { page, limit });
     return { success: true, data };
   } catch (error) {
@@ -222,6 +269,34 @@ export async function deleteLead(
 }
 
 /**
+ * Quick search used by the global command palette.
+ * Trimmed query; returns up to `limit` leads matching the search string.
+ * @param query - Free-form search string (name/email/phone)
+ * @param limit - Max results (default 8)
+ */
+export async function searchLeadsQuick(
+  query: string,
+  limit = 8,
+): Promise<{ success: boolean; data?: LeadPublic[]; error?: string }> {
+  const q = typeof query === "string" ? query.trim() : "";
+  if (q.length === 0) return { success: true, data: [] };
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
+    return { success: false, error: "Limite invalido." };
+  }
+
+  try {
+    const r = await leadService.listLeads({ search: q, limit });
+    return { success: true, data: r.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: safeError(error, "Erro ao buscar leads."),
+    };
+  }
+}
+
+/**
  * Fetch the timeline entries for a lead.
  * @param id - UUID of the lead
  * @param limit - Max entries to return (1-200)
@@ -249,8 +324,8 @@ export async function fetchTimeline(
   }
 
   try {
-    const result = await leadService.getTimeline(id, { limit, type });
-    return { success: true, data: result.data };
+    const data = await leadService.getTimeline(id, { limit, type });
+    return { success: true, data };
   } catch (error) {
     return {
       success: false,

@@ -51,6 +51,42 @@ export function formatTime(dateStr: string, locale: string): string {
 }
 
 /**
+ * Format a date string as smart day + time, relative to today.
+ * Today → "Hoje, 14:30"; yesterday → "Ontem, 14:30";
+ * otherwise → "17 abr, 14:30".
+ * @param dateStr - ISO 8601 date string
+ * @param locale - BCP 47 locale string
+ * @returns Formatted date+time string
+ */
+export function formatDateTime(dateStr: string, locale: string): string {
+  const date = new Date(dateStr);
+  const time = date.toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const compare = new Date(date);
+  compare.setHours(0, 0, 0, 0);
+
+  const isPortuguese = locale.toLowerCase().startsWith("pt");
+
+  if (compare.getTime() === today.getTime()) {
+    return `${isPortuguese ? "Hoje" : "Today"}, ${time}`;
+  }
+  if (compare.getTime() === yesterday.getTime()) {
+    return `${isPortuguese ? "Ontem" : "Yesterday"}, ${time}`;
+  }
+
+  const day = date.toLocaleDateString(locale, { day: "numeric", month: "short" });
+  return `${day}, ${time}`;
+}
+
+/**
  * Get Monday of the week for a given date.
  * @param date - Reference date
  * @returns Date object representing Monday of that week

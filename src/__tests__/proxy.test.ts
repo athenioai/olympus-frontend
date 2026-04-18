@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-describe("Middleware — Token Expiry Check", () => {
+describe("Proxy — Token Expiry Check", () => {
   // Test the JWT expiry detection logic in isolation
   function isTokenExpired(token: string, bufferMs: number): boolean {
     try {

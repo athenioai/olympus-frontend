@@ -3,23 +3,54 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { Mail, Phone, Flame, Thermometer, Snowflake } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatRelativeTime } from "@/lib/format";
-import type { LeadPublic } from "@/lib/services/interfaces/lead-service";
+import { Avatar } from "@/components/ui/avatar";
+import { Tooltip } from "@/components/ui/tooltip";
+import type {
+  LeadBoardItem,
+  LeadStatus,
+  LeadTemperature,
+} from "@/lib/services/interfaces/lead-service";
+import { ChannelBadge } from "./channel-badge";
+import { LeadCustomFieldsInline } from "./lead-custom-fields-inline";
+import { LeadMessagePreview } from "./lead-message-preview";
+import { TagChips } from "./tag-chips";
 
 interface LeadCardProps {
-  readonly lead: LeadPublic;
+  readonly lead: LeadBoardItem;
 }
 
-const TEMP_CONFIG = {
-  hot: { icon: Flame, color: "text-danger", bg: "bg-danger/10" },
-  warm: { icon: Thermometer, color: "text-warning", bg: "bg-warning/10" },
-  cold: { icon: Snowflake, color: "text-on-surface-variant", bg: "bg-surface-container-high" },
-} as const;
+const STALE_THRESHOLD_DAYS = 7;
+const TERMINAL_STATUSES: readonly LeadStatus[] = ["converted", "lost"];
+
+const TEMP_BORDER: Record<LeadTemperature, string> = {
+  hot: "before:bg-danger",
+  warm: "before:bg-warning",
+  cold: "before:bg-[#3b82f6]",
+};
+
+function daysSince(iso: string): number {
+  const diff = Date.now() - new Date(iso).getTime();
+  return Math.floor(diff / 86_400_000);
+}
+
+function isStale(lead: LeadBoardItem): boolean {
+  if (TERMINAL_STATUSES.includes(lead.status)) return false;
+  return daysSince(lead.updatedAt) >= STALE_THRESHOLD_DAYS;
+}
 
 /**
- * Compact draggable card for a lead in the Kanban board.
+ * Rich draggable card for a lead on the Kanban board.
+ *
+ * Layout (top → bottom):
+ * 1. Avatar + name + channel icon
+ * 2. Last message preview (truncated + relative timestamp)
+ * 3. Tag chips (up to 3 + overflow counter)
+ * 4. Inline custom fields (up to 2, formatted per type)
+ *
+ * A colored left border encodes temperature. A floating danger badge marks
+ * stale leads (no activity > 7 days, non-terminal statuses only).
  */
 export function LeadCard({ lead }: LeadCardProps) {
   const {
@@ -36,14 +67,13 @@ export function LeadCard({ lead }: LeadCardProps) {
     transition,
   };
 
-  const temp = TEMP_CONFIG[lead.temperature];
-  const TempIcon = temp.icon;
+  const stale = isStale(lead);
 
   return (
     <Link
       ref={setNodeRef}
       style={style}
-      href={`/crm/${lead.id}`}
+      href={`/leads/${lead.id}`}
       {...attributes}
       {...listeners}
       onClick={(e) => {
@@ -51,49 +81,57 @@ export function LeadCard({ lead }: LeadCardProps) {
       }}
       draggable={false}
       className={cn(
-        "group block rounded-xl bg-surface-container-lowest p-3.5 transition-all duration-150",
-        "hover:shadow-ambient cursor-grab active:cursor-grabbing",
+        "group relative block overflow-hidden rounded-xl bg-surface-container-lowest p-3.5 pl-4 transition-all duration-200",
+        "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px]",
+        TEMP_BORDER[lead.temperature],
+        "cursor-grab hover:bg-surface-container-low active:cursor-grabbing",
+        stale && "ring-1 ring-danger/30",
         isDragging &&
           "z-50 rotate-[2deg] scale-[1.02] shadow-ambient-strong opacity-90",
       )}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="min-w-0 flex-1 truncate text-[13px] font-semibold text-on-surface">
-          {lead.name}
-        </p>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <div className={cn("flex h-5 w-5 items-center justify-center rounded-full", temp.bg)}>
-            <TempIcon className={cn("h-3 w-3", temp.color)} />
-          </div>
-          <span className="text-[11px] text-on-surface-variant">
-            {formatRelativeTime(lead.updatedAt)}
+      {stale && (
+        <Tooltip content={`Sem atividade há ${daysSince(lead.updatedAt)} dias`}>
+          <span
+            aria-label={`Parado há ${daysSince(lead.updatedAt)} dias`}
+            className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger text-white shadow-ambient"
+          >
+            <AlertCircle className="h-2.5 w-2.5" />
           </span>
+        </Tooltip>
+      )}
+
+      <div className="flex items-start gap-2.5">
+        <Avatar
+          className="sm:h-10 sm:w-10"
+          id={lead.id}
+          name={lead.name}
+          size={36}
+          src={lead.avatarUrl}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <p className="min-w-0 flex-1 truncate text-[13px] font-semibold text-on-surface">
+              {lead.name}
+            </p>
+            {lead.channel && <ChannelBadge channel={lead.channel} />}
+          </div>
+          {lead.lastMessage && (
+            <div className="mt-0.5">
+              <LeadMessagePreview message={lead.lastMessage} />
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="mt-2 space-y-1">
-        {lead.email && (
-          <div className="flex items-center gap-1.5">
-            <Mail className="h-3 w-3 shrink-0 text-on-surface-variant" />
-            <span className="truncate text-[12px] text-on-surface-variant">
-              {lead.email}
-            </span>
-          </div>
-        )}
-        {lead.phone && (
-          <div className="flex items-center gap-1.5">
-            <Phone className="h-3 w-3 shrink-0 text-on-surface-variant" />
-            <span className="truncate text-[12px] text-on-surface-variant">
-              {lead.phone}
-            </span>
-          </div>
-        )}
-        {lead.channel && (
-          <span className="inline-block rounded-md bg-surface-container-high px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
-            {lead.channel}
-          </span>
-        )}
-      </div>
+      {(lead.tags.length > 0 || lead.customFields.length > 0) && (
+        <div className="mt-2.5 space-y-1.5">
+          {lead.tags.length > 0 && <TagChips tags={lead.tags} />}
+          {lead.customFields.length > 0 && (
+            <LeadCustomFieldsInline fields={lead.customFields} />
+          )}
+        </div>
+      )}
     </Link>
   );
 }

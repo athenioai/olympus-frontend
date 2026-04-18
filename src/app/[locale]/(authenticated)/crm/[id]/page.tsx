@@ -1,31 +1,14 @@
-import { notFound } from "next/navigation";
-import { leadService } from "@/lib/services";
-import { LeadDetailView } from "./_components/lead-detail-view";
+import { permanentRedirect } from "next/navigation";
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-interface LeadPageProps {
+interface LegacyLeadPageProps {
   readonly params: Promise<{ id: string }>;
 }
 
 /**
- * Lead detail page with timeline.
- * Validates the UUID param, fetches lead and timeline in parallel.
+ * Legacy route — the canonical lead detail page is now /leads/[id].
+ * Permanently redirects (308) so bookmarks and cached links keep working.
  */
-export default async function LeadPage({ params }: LeadPageProps) {
+export default async function LegacyLeadPage({ params }: LegacyLeadPageProps) {
   const { id } = await params;
-
-  if (!UUID_RE.test(id)) notFound();
-
-  try {
-    const [lead, timelineResult] = await Promise.all([
-      leadService.getLead(id),
-      leadService.getTimeline(id, { limit: 50 }),
-    ]);
-
-    return <LeadDetailView lead={lead} timeline={timelineResult.data} />;
-  } catch {
-    notFound();
-  }
+  permanentRedirect(`/leads/${id}`);
 }

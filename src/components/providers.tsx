@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface ProvidersProps {
   readonly children: ReactNode;
@@ -9,7 +10,7 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <>
+    <TooltipProvider delayDuration={150} skipDelayDuration={300}>
       {children}
       <Toaster
         position="top-right"
@@ -22,6 +23,6 @@ export function Providers({ children }: ProvidersProps) {
           },
         }}
       />
-    </>
+    </TooltipProvider>
   );
 }

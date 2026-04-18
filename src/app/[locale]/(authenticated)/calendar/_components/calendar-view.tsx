@@ -430,7 +430,7 @@ export function CalendarView({
               className={cn(
                 "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                 currentView === view
-                  ? "bg-surface-container-lowest text-on-surface shadow-ambient"
+                  ? "bg-surface-container-lowest text-on-surface ring-1 ring-black/5"
                   : "text-on-surface-variant hover:text-on-surface",
               )}
               key={view}
@@ -449,7 +449,7 @@ export function CalendarView({
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                 (currentStatus ?? "all") === status
-                  ? "bg-surface-container-lowest text-on-surface shadow-ambient"
+                  ? "bg-surface-container-lowest text-on-surface ring-1 ring-black/5"
                   : "text-on-surface-variant hover:text-on-surface",
               )}
               key={status}

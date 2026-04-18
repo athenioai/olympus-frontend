@@ -20,24 +20,13 @@ import { DURATION, EASING } from "@/lib/motion";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TimelineView } from "../../_components/timeline-view";
-import { deleteLead } from "../../actions";
+import { stageCurrentClass } from "@/lib/stage-palette";
+import { TimelineView } from "./timeline-view";
+import { deleteLead } from "@/app/[locale]/(authenticated)/crm/actions";
 import type {
   LeadPublic,
-  LeadStatus,
   TimelineEntry,
 } from "@/lib/services/interfaces/lead-service";
-
-const STATUS_CONFIG: Record<
-  LeadStatus,
-  { color: string; bg: string }
-> = {
-  new: { color: "text-teal", bg: "bg-teal/10" },
-  contacted: { color: "text-primary", bg: "bg-primary/10" },
-  qualified: { color: "text-[#8b5cf6]", bg: "bg-[#8b5cf6]/10" },
-  converted: { color: "text-success", bg: "bg-success/10" },
-  lost: { color: "text-danger", bg: "bg-danger/10" },
-};
 
 interface LeadDetailViewProps {
   readonly lead: LeadPublic;
@@ -57,7 +46,7 @@ export function LeadDetailView({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const statusCfg = STATUS_CONFIG[lead.status];
+  const statusPillClass = stageCurrentClass(lead.status);
 
   function handleDelete() {
     startTransition(async () => {
@@ -77,7 +66,7 @@ export function LeadDetailView({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: DURATION.normal, ease: EASING.out }}
-      className="flex flex-col gap-6"
+      className="-m-6 -mt-16 flex h-screen flex-col gap-6 p-6 pt-16 lg:-m-8 lg:p-8"
     >
       {/* Back link */}
       <Link
@@ -129,9 +118,8 @@ export function LeadDetailView({
         <div className="mt-4 flex flex-wrap items-center gap-3 pt-4">
           <span
             className={cn(
-              "rounded-full px-3 py-1 text-[12px] font-medium",
-              statusCfg.bg,
-              statusCfg.color,
+              "rounded-full px-3 py-1 text-[12px] font-bold",
+              statusPillClass,
             )}
           >
             {t(`stages.${lead.status}`)}
@@ -174,12 +162,12 @@ export function LeadDetailView({
         </motion.div>
       )}
 
-      {/* Timeline */}
-      <div>
-        <h2 className="mb-4 font-display text-lg font-extrabold text-on-surface">
+      {/* Timeline — scrolls internally */}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <h2 className="mb-4 shrink-0 font-display text-lg font-extrabold text-on-surface">
           {t("timeline")}
         </h2>
-        <TimelineView entries={timeline} />
+        <TimelineView entries={timeline} leadName={lead.name} />
       </div>
     </motion.div>
   );

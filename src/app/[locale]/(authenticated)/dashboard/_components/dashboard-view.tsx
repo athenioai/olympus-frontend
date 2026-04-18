@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
@@ -52,6 +53,18 @@ function fmtChartDate(d: string): string {
   const p = d.split("-");
   return `${p[2]}/${p[1]}`;
 }
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+}
+
+const APPOINTMENT_STATUS_DOT: Record<string, string> = {
+  confirmed: "bg-success",
+  cancelled: "bg-danger",
+};
 
 function dueLabel(dueDate: string, isOverdue: boolean, t: ReturnType<typeof useTranslations>): string {
   const now = new Date();
@@ -128,7 +141,7 @@ function RadialProgress({ value, size = 96, stroke = 8, label }: {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-lg font-extrabold tracking-tighter text-on-surface">{value.toFixed(0)}%</span>
+          <span className="font-display text-lg font-extrabold tabular-nums tracking-tighter text-on-surface">{value.toFixed(0)}%</span>
         </div>
       </div>
       <span className="mt-1 text-[11px] font-medium text-on-surface-variant">{label}</span>
@@ -263,7 +276,7 @@ export function DashboardView({ data }: Props) {
             </div>
             <motion.p
               animate={{ opacity: 1, y: 0 }}
-              className="mt-2 font-display text-5xl font-extrabold tracking-tighter lg:text-6xl"
+              className="mt-2 font-display text-5xl font-extrabold tabular-nums tracking-tighter lg:text-6xl"
               initial={{ opacity: 0, y: 20 }}
               transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
@@ -274,7 +287,7 @@ export function DashboardView({ data }: Props) {
             ) : data.revenueGrowth !== 0 ? (
               <div className="mt-3 flex items-center gap-2">
                 <span className={cn(
-                  "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold",
+                  "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold tabular-nums",
                   data.revenueGrowth > 0 ? "bg-on-primary/15 text-on-primary" : "bg-danger/30 text-on-primary",
                 )}>
                   {data.revenueGrowth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
@@ -287,11 +300,11 @@ export function DashboardView({ data }: Props) {
 
           <div className="text-center">
             <span className="block text-[11px] font-semibold uppercase tracking-wider text-on-primary/50">{t("momentum.conversion")}</span>
-            <span className="mt-1 block font-display text-3xl font-extrabold tracking-tight">{data.conversionRate.toFixed(0)}%</span>
+            <span className="mt-1 block font-display text-3xl font-extrabold tabular-nums tracking-tight">{data.conversionRate.toFixed(0)}%</span>
           </div>
           <div className="text-center">
             <span className="block text-[11px] font-semibold uppercase tracking-wider text-on-primary/50">{t("momentum.avgTicket")}</span>
-            <span className="mt-1 block font-display text-3xl font-extrabold tracking-tight">{BRL.format(data.averageTicket)}</span>
+            <span className="mt-1 block font-display text-3xl font-extrabold tabular-nums tracking-tight">{BRL.format(data.averageTicket)}</span>
           </div>
         </div>
       </motion.section>
@@ -363,15 +376,44 @@ export function DashboardView({ data }: Props) {
               </div>
             ) : (
               <div className="space-y-2">
-                {data.todayAppointments.slice(0, 4).map((a) => (
-                  <div className="flex items-center gap-3 rounded-lg bg-surface-container-low/40 p-3" key={a.id}>
-                    <span className="w-12 shrink-0 text-center font-display text-[13px] font-bold text-primary">{a.startTime}</span>
-                    <div className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] font-semibold text-on-surface">{a.leadName}</span>
-                      <span className="text-[11px] text-on-surface-variant">{a.serviceName}</span>
-                    </div>
-                  </div>
-                ))}
+                {data.todayAppointments.slice(0, 4).map((a) => {
+                  const isCancelled = a.status === "cancelled";
+                  const dotColor = APPOINTMENT_STATUS_DOT[a.status] ?? "bg-on-surface-variant/40";
+                  return (
+                    <Link
+                      className="group flex items-center gap-3 rounded-lg bg-surface-container-low/40 p-3 transition hover:bg-surface-container-low"
+                      href={`/leads/${a.lead.id}`}
+                      key={a.id}
+                    >
+                      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                        <span className="font-display text-[11px] font-bold text-primary">{initials(a.lead.name)}</span>
+                        <span
+                          aria-label={a.status}
+                          className={cn(
+                            "absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-surface-container-lowest",
+                            dotColor,
+                          )}
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className={cn(
+                          "block truncate text-[13px] font-semibold text-on-surface group-hover:text-primary",
+                          isCancelled && "text-on-surface/50 line-through group-hover:text-on-surface/60",
+                        )}>
+                          {a.lead.name}
+                        </span>
+                        <span className="text-[11px] text-on-surface-variant">{a.serviceName}</span>
+                      </div>
+                      <span className={cn(
+                        "shrink-0 font-display text-[12px] font-bold tabular-nums text-primary",
+                        isCancelled && "text-on-surface-variant/60",
+                      )}
+                      >
+                        {a.startTime.slice(0, 5)}<span className="text-on-surface-variant/50">–</span>{a.endTime.slice(0, 5)}
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </motion.div>
@@ -507,7 +549,7 @@ export function DashboardView({ data }: Props) {
               <span className="text-[11px] font-bold uppercase tracking-wider text-teal">{t("projection.label")}</span>
               <motion.p
                 animate={{ opacity: 1 }}
-                className="mt-2 font-display text-3xl font-extrabold tracking-tighter text-on-surface"
+                className="mt-2 font-display text-3xl font-extrabold tabular-nums tracking-tighter text-on-surface"
                 initial={{ opacity: 0 }}
                 transition={{ delay: 0.5 }}
               >
@@ -533,7 +575,7 @@ export function DashboardView({ data }: Props) {
           <motion.section className="rounded-xl bg-surface-container-lowest p-6" variants={fadeInUp}>
             <div className="mb-1 flex items-center justify-between">
               <h2 className="font-display text-base font-bold tracking-tight text-on-surface">{t("funnel.title")}</h2>
-              <span className="font-display text-lg font-extrabold tracking-tight text-on-surface">{data.totalLeads}</span>
+              <span className="font-display text-lg font-extrabold tabular-nums tracking-tight text-on-surface">{data.totalLeads}</span>
             </div>
             {data.newLeadsThisMonth > 0 && (
               <p className="mb-4 text-[12px] font-semibold text-success">{t("funnel.thisMonth", { count: data.newLeadsThisMonth })}</p>
@@ -547,12 +589,12 @@ export function DashboardView({ data }: Props) {
             <RadialProgress label={t("kpis.collection")} value={data.collectionRate} />
             <div className="h-12 w-px bg-surface-container-high" />
             <div className="flex flex-col items-center">
-              <span className="font-display text-2xl font-extrabold tracking-tighter text-on-surface">{data.invoiceCount}</span>
+              <span className="font-display text-2xl font-extrabold tabular-nums tracking-tighter text-on-surface">{data.invoiceCount}</span>
               <span className="text-[11px] text-on-surface-variant">{t("kpis.invoices")}</span>
             </div>
             <div className="h-12 w-px bg-surface-container-high" />
             <div className="flex flex-col items-center">
-              <span className="font-display text-2xl font-extrabold tracking-tighter text-on-surface">
+              <span className="font-display text-2xl font-extrabold tabular-nums tracking-tighter text-on-surface">
                 {data.roi > 0 ? `${data.roi.toFixed(1)}x` : "—"}
               </span>
               <span className="text-[11px] text-on-surface-variant">{t("kpis.roi")}</span>
