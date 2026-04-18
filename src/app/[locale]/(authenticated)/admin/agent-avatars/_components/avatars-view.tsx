@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
+import { ImageOff, Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
+import { safeUrl } from "@/lib/safe-url";
 import type { AgentAvatarAdmin } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
@@ -90,12 +91,24 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
               key={avatar.id}
             >
               <div className="relative aspect-square bg-surface-container-high">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt={avatar.name}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  src={avatar.imageUrl}
-                />
+                {(() => {
+                  const src = safeUrl(avatar.imageUrl);
+                  if (!src) {
+                    return (
+                      <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant">
+                        <ImageOff className="h-8 w-8" />
+                      </div>
+                    );
+                  }
+                  return (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      alt={avatar.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      src={src}
+                    />
+                  );
+                })()}
               </div>
               <div className="space-y-2 p-3">
                 <div>
