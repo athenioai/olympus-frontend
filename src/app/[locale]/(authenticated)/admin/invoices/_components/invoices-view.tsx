@@ -15,6 +15,7 @@ import type {
 } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
+import { endOfDayIsoInSaoPaulo } from "../../_lib/date";
 import { formatBRL, formatDate } from "../../_lib/format";
 import {
   cancelInvoiceAction,
@@ -113,7 +114,7 @@ export function InvoicesView({
       ...(subscriptionId ? { subscriptionId } : {}),
       amount: amountParsed,
       ...(description.trim() ? { description: description.trim() } : {}),
-      dueDate: new Date(dueDate).toISOString(),
+      dueDate: endOfDayIsoInSaoPaulo(dueDate),
       lateFeePercent: Number.parseFloat(lateFeePercent),
       lateInterestType,
       lateInterestPercent: Number.parseFloat(lateInterestPercent),
