@@ -189,6 +189,8 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
   );
 }
 
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
 function UploadForm({
   onSubmit,
   onCancel,
@@ -199,11 +201,18 @@ function UploadForm({
   readonly isPending: boolean;
 }) {
   const t = useTranslations("admin.avatars.form");
+  const tAvatars = useTranslations("admin.avatars");
   const tc = useTranslations("common");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    const file = formData.get("file");
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) {
+      toast.error(tAvatars("fileTooLarge"));
+      return;
+    }
+    onSubmit(formData);
   }
 
   return (

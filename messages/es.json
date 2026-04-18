@@ -28,6 +28,11 @@
     "welcomeSubtitle": "Tu empresa 100% autónoma.",
     "needHelp": "¿Necesitas ayuda?"
   },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que intentaste visitar no existe o fue eliminada.",
+    "backToDashboard": "Volver"
+  },
   "signup": {
     "title": "Empieza gratis en 2 minutos",
     "subtitle": "Tu asistente IA 24/7",
@@ -561,7 +566,8 @@
       "updated": "Avatar actualizado.",
       "deleted": "Avatar eliminado.",
       "deleteConfirm": "¿Eliminar este avatar?",
-      "inactive": "Inactivo"
+      "inactive": "Inactivo",
+      "fileTooLarge": "La imagen supera el límite de 5 MB."
     },
     "common": {
       "edit": "Editar",
