@@ -62,6 +62,11 @@
     "skip": "Skip",
     "submitting": "Saving...",
     "genericError": "Could not save. Please try again.",
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "retry": "Try again",
+      "backToSignup": "Back"
+    },
     "error": {
       "invalidTitle": "Invalid link",
       "invalidDescription": "The link you used is not valid or has expired.",
@@ -565,6 +570,11 @@
       "noSelection": "—",
       "saving": "Saving...",
       "loadError": "Could not load data."
+    },
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "retry": "Try again",
+      "backToAdmin": "Back to panel"
     }
   }
 }

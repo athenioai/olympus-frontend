@@ -62,6 +62,11 @@
     "skip": "Omitir",
     "submitting": "Guardando...",
     "genericError": "No pudimos guardar. Intenta de nuevo.",
+    "errorBoundary": {
+      "title": "Algo salió mal",
+      "retry": "Intentar de nuevo",
+      "backToSignup": "Volver"
+    },
     "error": {
       "invalidTitle": "Enlace inválido",
       "invalidDescription": "El enlace que usaste no es válido o expiró.",
@@ -565,6 +570,11 @@
       "noSelection": "—",
       "saving": "Guardando...",
       "loadError": "No se pudieron cargar los datos."
+    },
+    "errorBoundary": {
+      "title": "Algo salió mal",
+      "retry": "Intentar de nuevo",
+      "backToAdmin": "Volver al panel"
     }
   }
 }
