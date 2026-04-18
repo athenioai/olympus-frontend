@@ -70,6 +70,32 @@ function getVisibleUserNav(workType: AuthUser["workType"]): NavItem[] {
   });
 }
 
+function renderNavLink(
+  item: NavItem,
+  isActive: (href: string) => boolean,
+  collapsed: boolean,
+  t: (key: string) => string,
+) {
+  const active = isActive(item.href);
+  return (
+    <Link
+      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+        active
+          ? "bg-primary/8 text-primary"
+          : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+      }`}
+      href={item.href}
+      key={item.key}
+    >
+      {active && (
+        <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
+      )}
+      <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
+      {!collapsed && <span>{t(item.labelKey)}</span>}
+    </Link>
+  );
+}
+
 export function Sidebar({ user }: SidebarProps) {
   const t = useTranslations();
   const pathname = usePathname();
@@ -127,59 +153,21 @@ export function Sidebar({ user }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {visibleNav.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-primary/8 text-primary"
-                  : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-              }`}
-              href={item.href}
-              key={item.key}
-            >
-              {active && (
-                <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
-              )}
-              <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
-              {!collapsed && <span>{t(item.labelKey)}</span>}
-            </Link>
-          );
-        })}
-
-        {/* Admin section — rendered only for admins */}
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        {/* Admin section — rendered above user nav for quick access */}
         {isAdmin && (
           <>
-            <div className="my-4 h-px bg-surface-container-high" />
             {!collapsed && (
               <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
                 {t("sidebar.admin.title")}
               </p>
             )}
-            {ADMIN_NAV.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                    active
-                      ? "bg-primary/8 text-primary"
-                      : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-                  }`}
-                  href={item.href}
-                  key={item.key}
-                >
-                  {active && (
-                    <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
-                  )}
-                  <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
-                  {!collapsed && <span>{t(item.labelKey)}</span>}
-                </Link>
-              );
-            })}
+            {ADMIN_NAV.map((item) => renderNavLink(item, isActive, collapsed, t))}
+            <div className="my-4 h-px bg-surface-container-high" />
           </>
         )}
+
+        {visibleNav.map((item) => renderNavLink(item, isActive, collapsed, t))}
       </nav>
 
       {/* Footer */}
