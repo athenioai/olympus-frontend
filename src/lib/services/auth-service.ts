@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { API_URL, IS_PRODUCTION } from "@/lib/env";
 import { authFetch } from "./auth-fetch";
 import type {
   AuthUser,
@@ -7,10 +9,6 @@ import type {
   LoginResponse,
   WhatsAppOAuthInit,
 } from "./interfaces/auth-service";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 const TOKEN_CONFIG = {
   accessMaxAge: 60 * 60,
@@ -21,13 +19,31 @@ const TOKEN_CONFIG = {
   secure: IS_PRODUCTION,
 } as const;
 
+/**
+ * Request-scoped cache: React.cache() dedupes calls within a single
+ * server render pass. Layouts that both call getCachedSession() share
+ * one /auth/me round-trip per request.
+ */
+const getCachedSession = cache(async (): Promise<AuthUser | null> => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  if (!accessToken) return null;
+
+  try {
+    const response = await fetch(`${API_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!response.ok) return null;
+    return unwrapEnvelope<AuthUser>(response);
+  } catch {
+    return null;
+  }
+});
+
 class AuthService implements IAuthService {
   /**
    * Authenticate user with email and password.
    * Returns tokens and user data without setting cookies.
-   * @param email - User email
-   * @param password - User password
-   * @returns Login response with tokens and user data
    * @throws Error if credentials are invalid
    */
   async login(email: string, password: string): Promise<LoginResponse> {
@@ -47,11 +63,6 @@ class AuthService implements IAuthService {
     return unwrapEnvelope<LoginResponse>(response);
   }
 
-  /**
-   * Set JWT tokens in httpOnly cookies.
-   * @param accessToken - JWT access token
-   * @param refreshToken - JWT refresh token
-   */
   async setTokenCookies(
     accessToken: string,
     refreshToken: string,
@@ -73,9 +84,6 @@ class AuthService implements IAuthService {
     });
   }
 
-  /**
-   * Clear auth cookies and end the session.
-   */
   async logout(): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.delete("access_token");
@@ -83,23 +91,11 @@ class AuthService implements IAuthService {
   }
 
   /**
-   * Get current user session from the access token cookie.
-   * @returns AuthUser if authenticated, null otherwise
+   * Get current user session. Shared across nested layouts in the same
+   * request thanks to React.cache(). Returns null when unauthenticated.
    */
   async getSession(): Promise<AuthUser | null> {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    if (!accessToken) return null;
-
-    try {
-      const response = await fetch(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      if (!response.ok) return null;
-      return unwrapEnvelope<AuthUser>(response);
-    } catch {
-      return null;
-    }
+    return getCachedSession();
   }
 
   /**

@@ -19,6 +19,7 @@ import {
 } from "../actions";
 import { fetchBusinessProfile } from "../business-profile-actions";
 import { updateAgentConfig } from "../agent-actions";
+import { API_URL as API_URL_CHANNELS } from "@/lib/env";
 import type { ChannelAccount } from "@/lib/services";
 import type {
   CalendarConfig,
@@ -747,8 +748,7 @@ function AgentSettings({ config }: { readonly config: AgentConfig }) {
 // ---------------------------------------------------------------------------
 
 const META_APP_ID = process.env.NEXT_PUBLIC_META_APP_ID ?? "";
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const WHATSAPP_REDIRECT_URI = `${BACKEND_URL}/auth/whatsapp/callback`;
+const WHATSAPP_REDIRECT_URI = `${API_URL_CHANNELS}/auth/whatsapp/callback`;
 const WHATSAPP_SCOPES = [
   "public_profile",
   "business_management",

@@ -1,9 +1,6 @@
 import { cookies } from "next/headers";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
+import { API_URL, IS_PRODUCTION } from "@/lib/env";
 
 const TOKEN_CONFIG = {
   accessMaxAge: 60 * 60,
@@ -21,13 +18,50 @@ interface AuthFetchOptions extends RequestInit {
   tags?: string[];
 }
 
+interface TokenPair {
+  readonly accessToken: string;
+  readonly refreshToken: string;
+}
+
+/**
+ * In-flight refresh promise shared across concurrent authFetch calls.
+ * Prevents the race where N parallel requests each hit 401, each call
+ * /auth/refresh, and the backend rotates the refresh token for the first
+ * one — rejecting the rest.
+ *
+ * Module-level state is per-process (Node.js worker). Requests landing
+ * on the same worker share it.
+ */
+let refreshInFlight: Promise<TokenPair> | null = null;
+
+async function refreshTokens(currentRefreshToken: string): Promise<TokenPair> {
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = (async () => {
+    try {
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken: currentRefreshToken }),
+      });
+      if (!response.ok) {
+        throw new Error("NOT_AUTHENTICATED");
+      }
+      return unwrapEnvelope<TokenPair>(response);
+    } finally {
+      // Release the slot so the next expiry cycle can start a fresh refresh.
+      refreshInFlight = null;
+    }
+  })();
+
+  return refreshInFlight;
+}
+
 /**
  * Authenticated fetch wrapper. Injects JWT Bearer token from cookies.
- * On 401, attempts a single token refresh and retries the original request.
- * Supports Next.js cache via revalidate and tags options (GET only).
- * @param path - API path (e.g., "/leads")
- * @param options - Standard RequestInit options + revalidate/tags
- * @returns Fetch Response
+ * On 401, attempts a single token refresh (deduplicated across concurrent
+ * callers) and retries the original request. Supports Next.js cache via
+ * revalidate and tags options (GET only).
  * @throws Error with "NOT_AUTHENTICATED" if no token available or refresh fails
  */
 export async function authFetch(
@@ -51,12 +85,10 @@ export async function authFetch(
     Authorization: `Bearer ${accessToken}`,
   };
 
-  // If not FormData, default to JSON content type
   if (!(fetchOptions.body instanceof FormData) && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
 
-  // Apply Next.js cache options for GET requests
   const isGet = !fetchOptions.method || fetchOptions.method === "GET";
   const nextConfig = isGet && (revalidate !== undefined || tags)
     ? { next: { revalidate, tags } }
@@ -68,27 +100,18 @@ export async function authFetch(
     return response;
   }
 
-  // Attempt token refresh
   const refreshToken = cookieStore.get("refresh_token")?.value;
   if (!refreshToken) {
     throw new Error("NOT_AUTHENTICATED");
   }
 
-  const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!refreshResponse.ok) {
+  let tokens: TokenPair;
+  try {
+    tokens = await refreshTokens(refreshToken);
+  } catch {
     throw new Error("NOT_AUTHENTICATED");
   }
 
-  const tokens = await unwrapEnvelope<{ accessToken: string; refreshToken: string }>(
-    refreshResponse,
-  );
-
-  // Update cookies (may silently fail in Server Component context)
   try {
     cookieStore.set("access_token", tokens.accessToken, {
       maxAge: TOKEN_CONFIG.accessMaxAge,
@@ -108,7 +131,6 @@ export async function authFetch(
     // Cookie setting fails in Server Component context — proxy handles on next request
   }
 
-  // Retry original request with new token
   headers.Authorization = `Bearer ${tokens.accessToken}`;
   return fetch(url, { ...fetchOptions, ...nextConfig, headers });
 }

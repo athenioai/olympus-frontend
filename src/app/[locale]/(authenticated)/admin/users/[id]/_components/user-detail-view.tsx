@@ -22,6 +22,7 @@ import type {
   UpdateCalendarConfigPayload,
   UserDashboardSummary,
 } from "@/lib/services";
+import { safeUrl } from "@/lib/safe-url";
 import { formatDate, formatDateTime } from "../../../_lib/format";
 import {
   loadChatMessagesAction,
@@ -193,21 +194,24 @@ function OverviewPanel({
           )}
         </InfoRow>
         <InfoRow label={t("detail.contractUrl")}>
-          {user.contractUrl ? (
-            <a
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-              href={user.contractUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              {t("detail.openContract")}
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          ) : (
-            <span className="text-xs text-on-surface-variant">
-              {t("detail.noContract")}
-            </span>
-          )}
+          {(() => {
+            const contractUrl = safeUrl(user.contractUrl);
+            return contractUrl ? (
+              <a
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                href={contractUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t("detail.openContract")}
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            ) : (
+              <span className="text-xs text-on-surface-variant">
+                {t("detail.noContract")}
+              </span>
+            );
+          })()}
         </InfoRow>
       </div>
     </div>

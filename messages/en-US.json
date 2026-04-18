@@ -28,6 +28,11 @@
     "welcomeSubtitle": "Your 100% autonomous business.",
     "needHelp": "Need help?"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you tried to visit does not exist or was removed.",
+    "backToDashboard": "Back"
+  },
   "signup": {
     "title": "Start free in 2 minutes",
     "subtitle": "Your 24/7 AI assistant",
@@ -62,6 +67,11 @@
     "skip": "Skip",
     "submitting": "Saving...",
     "genericError": "Could not save. Please try again.",
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "retry": "Try again",
+      "backToSignup": "Back"
+    },
     "error": {
       "invalidTitle": "Invalid link",
       "invalidDescription": "The link you used is not valid or has expired.",
@@ -556,7 +566,8 @@
       "updated": "Avatar updated.",
       "deleted": "Avatar removed.",
       "deleteConfirm": "Remove this avatar?",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "fileTooLarge": "Image exceeds the 5 MB limit."
     },
     "common": {
       "edit": "Edit",
@@ -565,6 +576,11 @@
       "noSelection": "—",
       "saving": "Saving...",
       "loadError": "Could not load data."
+    },
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "retry": "Try again",
+      "backToAdmin": "Back to panel"
     }
   }
 }

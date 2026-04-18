@@ -25,6 +25,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { Tooltip } from "@/components/ui/tooltip";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { logoutAction } from "@/app/[locale]/(authenticated)/actions";
 import type { AuthUser } from "@/lib/services/interfaces/auth-service";
@@ -77,7 +78,8 @@ function renderNavLink(
   t: (key: string) => string,
 ) {
   const active = isActive(item.href);
-  return (
+  const label = t(item.labelKey);
+  const link = (
     <Link
       className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
         active
@@ -85,14 +87,25 @@ function renderNavLink(
           : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
       }`}
       href={item.href}
-      key={item.key}
     >
       {active && (
         <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
       )}
       <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
-      {!collapsed && <span>{t(item.labelKey)}</span>}
+      {!collapsed && <span>{label}</span>}
     </Link>
+  );
+
+  if (!collapsed) {
+    return <div key={item.key}>{link}</div>;
+  }
+
+  return (
+    <div key={item.key}>
+      <Tooltip content={label} side="right">
+        {link}
+      </Tooltip>
+    </div>
   );
 }
 
@@ -181,14 +194,25 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
         )}
         <LanguageSwitcher />
-        <button
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-danger"
-          onClick={handleLogout}
-          type="button"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>{t("auth.logout")}</span>}
-        </button>
+        {(() => {
+          const logoutButton = (
+            <button
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-danger"
+              onClick={handleLogout}
+              type="button"
+            >
+              <LogOut className="h-5 w-5 shrink-0" />
+              {!collapsed && <span>{t("auth.logout")}</span>}
+            </button>
+          );
+          return collapsed ? (
+            <Tooltip content={t("auth.logout")} side="right">
+              {logoutButton}
+            </Tooltip>
+          ) : (
+            logoutButton
+          );
+        })()}
       </div>
     </div>
   );

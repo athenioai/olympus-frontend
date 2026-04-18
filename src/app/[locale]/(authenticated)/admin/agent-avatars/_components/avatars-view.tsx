@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
+import { ImageOff, Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { safeUrl } from "@/lib/safe-url";
 import type { AgentAvatarAdmin } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
@@ -26,6 +28,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
   const [avatars, setAvatars] =
     useState<readonly AgentAvatarAdmin[]>(initialAvatars);
   const [editing, setEditing] = useState<AgentAvatarAdmin | null>(null);
+  const [toDelete, setToDelete] = useState<AgentAvatarAdmin | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -42,8 +45,9 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
     });
   }
 
-  function handleDelete(avatar: AgentAvatarAdmin) {
-    if (!window.confirm(t("deleteConfirm"))) return;
+  function confirmDelete() {
+    if (!toDelete) return;
+    const avatar = toDelete;
     startTransition(async () => {
       const result = await deleteAgentAvatarAction(avatar.id);
       if (!result.success) {
@@ -51,6 +55,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
         return;
       }
       setAvatars((prev) => prev.filter((a) => a.id !== avatar.id));
+      setToDelete(null);
       toast.success(t("deleted"));
     });
   }
@@ -90,12 +95,24 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
               key={avatar.id}
             >
               <div className="relative aspect-square bg-surface-container-high">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt={avatar.name}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  src={avatar.imageUrl}
-                />
+                {(() => {
+                  const src = safeUrl(avatar.imageUrl);
+                  if (!src) {
+                    return (
+                      <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant">
+                        <ImageOff className="h-8 w-8" />
+                      </div>
+                    );
+                  }
+                  return (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      alt={avatar.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      src={src}
+                    />
+                  );
+                })()}
               </div>
               <div className="space-y-2 p-3">
                 <div>
@@ -118,7 +135,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
                   <button
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant hover:text-danger"
                     disabled={isPending}
-                    onClick={() => handleDelete(avatar)}
+                    onClick={() => setToDelete(avatar)}
                     type="button"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -156,9 +173,23 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
           tc={tc}
         />
       )}
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setToDelete(null)}
+        onConfirm={confirmDelete}
+        open={toDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </div>
   );
 }
+
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 function UploadForm({
   onSubmit,
@@ -170,11 +201,18 @@ function UploadForm({
   readonly isPending: boolean;
 }) {
   const t = useTranslations("admin.avatars.form");
+  const tAvatars = useTranslations("admin.avatars");
   const tc = useTranslations("common");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    const file = formData.get("file");
+    if (file instanceof File && file.size > MAX_UPLOAD_BYTES) {
+      toast.error(tAvatars("fileTooLarge"));
+      return;
+    }
+    onSubmit(formData);
   }
 
   return (

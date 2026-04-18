@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Calendar, Plus, UserCog } from "lucide-react";
 import { toast } from "sonner";
+import { PromptDialog } from "@/components/ui/prompt-dialog";
 import type { AdminUserPublic, PlanPublic } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { formatDate } from "../../_lib/format";
@@ -28,6 +29,7 @@ export function UsersView({
 }: UsersViewProps) {
   const t = useTranslations("admin.users");
   const tc = useTranslations("admin.common");
+  const tCommon = useTranslations("common");
 
   const [users, setUsers] = useState<readonly AdminUserPublic[]>(initialUsers);
   const [formState, setFormState] = useState<
@@ -35,6 +37,7 @@ export function UsersView({
     | { mode: "edit"; user: AdminUserPublic }
     | null
   >(null);
+  const [seedPromptOpen, setSeedPromptOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleCreateSubmit(values: UserFormValues) {
@@ -66,8 +69,8 @@ export function UsersView({
     });
   }
 
-  function handleSeedHolidays() {
-    const years = window.prompt(t("seedHolidaysPrompt"), "") ?? "";
+  function handleSeedHolidays(years: string) {
+    setSeedPromptOpen(false);
     startTransition(async () => {
       const result = await seedHolidaysAction(years);
       if (!result.success) {
@@ -86,7 +89,7 @@ export function UsersView({
             <button
               className="flex h-10 items-center gap-2 rounded-xl bg-surface-container-high px-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest disabled:opacity-60"
               disabled={isPending}
-              onClick={handleSeedHolidays}
+              onClick={() => setSeedPromptOpen(true)}
               type="button"
             >
               <Calendar className="h-4 w-4" />
@@ -187,6 +190,18 @@ export function UsersView({
         }
         open={formState !== null}
         plans={initialPlans}
+      />
+
+      <PromptDialog
+        cancelLabel={tCommon("cancel")}
+        confirmLabel={t("seedHolidays")}
+        description={t("seedHolidaysPrompt")}
+        isPending={isPending}
+        onCancel={() => setSeedPromptOpen(false)}
+        onConfirm={handleSeedHolidays}
+        open={seedPromptOpen}
+        placeholder="2026,2027"
+        title={t("seedHolidays")}
       />
     </div>
   );

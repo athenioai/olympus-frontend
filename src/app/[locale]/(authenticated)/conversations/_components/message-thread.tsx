@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/env";
 import { formatTime } from "@/lib/format";
 import { WsManager } from "@/lib/ws-manager";
 import type { WsState } from "@/lib/ws-manager";
@@ -146,9 +147,7 @@ export function MessageThread({
       const token = await getWsToken();
       if (!token || canceled) return;
 
-      const apiUrl =
-        process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-      const wsUrl = apiUrl.replace(/^http/, "ws") + "/ws";
+      const wsUrl = API_URL.replace(/^http/, "ws") + "/ws";
 
       const manager = new WsManager({
         url: wsUrl,

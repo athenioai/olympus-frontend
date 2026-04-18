@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
 import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
+import { API_URL } from "@/lib/env";
 import { authFetch } from "./auth-fetch";
 import type { AgentAvatarAdmin } from "./interfaces/admin-types";
 import type {
@@ -8,9 +9,6 @@ import type {
   IAdminAgentAvatarService,
   UpdateAgentAvatarPayload,
 } from "./interfaces/admin-agent-avatar-service";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 class AdminAgentAvatarService implements IAdminAgentAvatarService {
   /**

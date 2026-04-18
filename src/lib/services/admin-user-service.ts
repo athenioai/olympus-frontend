@@ -1,5 +1,5 @@
 import { authFetch } from "./auth-fetch";
-import { unwrapEnvelope } from "@/lib/api-envelope";
+import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
 import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type {
   AdminAppointment,
@@ -146,7 +146,11 @@ async function unwrapNullable<T>(response: Response): Promise<T | null> {
     error: { code: string; message: string } | null;
   } = await response.json();
   if (!envelope.success) {
-    throw new Error(envelope.error?.message ?? "UNKNOWN_ERROR");
+    throw new ApiError(
+      envelope.error?.message ?? "UNKNOWN_ERROR",
+      envelope.error?.code ?? "UNKNOWN_ERROR",
+      response.status,
+    );
   }
   return envelope.data;
 }

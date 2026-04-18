@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Plus, X as XIcon } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type {
   AdminInvoicePublic,
   AdminInvoiceStatus,
@@ -64,6 +65,9 @@ export function InvoicesView({
     useState<LateInterestType>("simple");
   const [lateInterestPercent, setLateInterestPercent] = useState("1");
 
+  const [pendingAction, setPendingAction] = useState<
+    { kind: "markPaid" | "cancel"; invoice: AdminInvoicePublic } | null
+  >(null);
   const [isPending, startTransition] = useTransition();
 
   const userMap = useMemo(
@@ -127,10 +131,14 @@ export function InvoicesView({
     });
   }
 
-  function handleMarkPaid(invoice: AdminInvoicePublic) {
-    if (!window.confirm(t("markPaidConfirm"))) return;
+  function confirmPendingAction() {
+    if (!pendingAction) return;
+    const { kind, invoice } = pendingAction;
     startTransition(async () => {
-      const result = await markInvoicePaidAction(invoice.id);
+      const result =
+        kind === "markPaid"
+          ? await markInvoicePaidAction(invoice.id)
+          : await cancelInvoiceAction(invoice.id);
       if (!result.success || !result.data) {
         toast.error(result.error ?? tCommon("loadError"));
         return;
@@ -139,23 +147,8 @@ export function InvoicesView({
       setInvoices((prev) =>
         prev.map((i) => (i.id === updated.id ? updated : i)),
       );
-      toast.success(t("marked"));
-    });
-  }
-
-  function handleCancel(invoice: AdminInvoicePublic) {
-    if (!window.confirm(t("cancelConfirm"))) return;
-    startTransition(async () => {
-      const result = await cancelInvoiceAction(invoice.id);
-      if (!result.success || !result.data) {
-        toast.error(result.error ?? tCommon("loadError"));
-        return;
-      }
-      const updated = result.data;
-      setInvoices((prev) =>
-        prev.map((i) => (i.id === updated.id ? updated : i)),
-      );
-      toast.success(t("cancelled"));
+      setPendingAction(null);
+      toast.success(kind === "markPaid" ? t("marked") : t("cancelled"));
     });
   }
 
@@ -271,7 +264,9 @@ export function InvoicesView({
                         <button
                           className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-40"
                           disabled={!canTransition || isPending}
-                          onClick={() => handleMarkPaid(invoice)}
+                          onClick={() =>
+                            setPendingAction({ kind: "markPaid", invoice })
+                          }
                           type="button"
                         >
                           <Check className="h-3.5 w-3.5" />
@@ -280,7 +275,9 @@ export function InvoicesView({
                         <button
                           className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-40"
                           disabled={!canTransition || isPending}
-                          onClick={() => handleCancel(invoice)}
+                          onClick={() =>
+                            setPendingAction({ kind: "cancel", invoice })
+                          }
                           type="button"
                         >
                           <XIcon className="h-3.5 w-3.5" />
@@ -410,6 +407,26 @@ export function InvoicesView({
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={
+          pendingAction?.kind === "markPaid"
+            ? t("markPaid")
+            : t("cancel")
+        }
+        description={
+          pendingAction?.kind === "markPaid"
+            ? t("markPaidConfirm")
+            : t("cancelConfirm")
+        }
+        isPending={isPending}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={confirmPendingAction}
+        open={pendingAction !== null}
+        title={tc("confirm")}
+        variant={pendingAction?.kind === "cancel" ? "danger" : "default"}
+      />
     </div>
   );
 }

@@ -28,6 +28,11 @@
     "welcomeSubtitle": "Tu empresa 100% autónoma.",
     "needHelp": "¿Necesitas ayuda?"
   },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que intentaste visitar no existe o fue eliminada.",
+    "backToDashboard": "Volver"
+  },
   "signup": {
     "title": "Empieza gratis en 2 minutos",
     "subtitle": "Tu asistente IA 24/7",
@@ -62,6 +67,11 @@
     "skip": "Omitir",
     "submitting": "Guardando...",
     "genericError": "No pudimos guardar. Intenta de nuevo.",
+    "errorBoundary": {
+      "title": "Algo salió mal",
+      "retry": "Intentar de nuevo",
+      "backToSignup": "Volver"
+    },
     "error": {
       "invalidTitle": "Enlace inválido",
       "invalidDescription": "El enlace que usaste no es válido o expiró.",
@@ -556,7 +566,8 @@
       "updated": "Avatar actualizado.",
       "deleted": "Avatar eliminado.",
       "deleteConfirm": "¿Eliminar este avatar?",
-      "inactive": "Inactivo"
+      "inactive": "Inactivo",
+      "fileTooLarge": "La imagen supera el límite de 5 MB."
     },
     "common": {
       "edit": "Editar",
@@ -565,6 +576,11 @@
       "noSelection": "—",
       "saving": "Guardando...",
       "loadError": "No se pudieron cargar los datos."
+    },
+    "errorBoundary": {
+      "title": "Algo salió mal",
+      "retry": "Intentar de nuevo",
+      "backToAdmin": "Volver al panel"
     }
   }
 }
