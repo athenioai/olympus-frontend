@@ -13,8 +13,13 @@ export interface LoginResponse {
   readonly user: AuthUser;
 }
 
+export interface WhatsAppOAuthInit {
+  readonly state: string;
+}
+
 export interface IAuthService {
   login(email: string, password: string): Promise<LoginResponse>;
   logout(): Promise<void>;
   getSession(): Promise<AuthUser | null>;
+  initWhatsAppOAuth(): Promise<WhatsAppOAuthInit>;
 }

@@ -182,14 +182,14 @@ export type {
 // Admin shared types
 export type {
   AdminAppointment,
+  AdminBusinessHourEntry,
   AdminCalendarConfig,
   AdminChat,
   AdminChatMessage,
-  AdminDaySchedule,
   AdminInvoicePublic,
   AdminInvoiceStatus,
   AdminInvoiceSummary,
-  AdminTimeSlot,
+  AdminTimeRange,
   AdminUserPublic,
   AgentAvatarAdmin,
   AppointmentStatus,

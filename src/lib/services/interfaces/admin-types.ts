@@ -105,37 +105,37 @@ export interface AdminChatMessage {
   readonly deletedAt: string | null;
 }
 
+export interface AdminTimeRange {
+  readonly start: string;
+  readonly end: string;
+}
+
+export interface AdminBusinessHourEntry {
+  readonly day: string;
+  readonly ranges: readonly AdminTimeRange[];
+}
+
 export interface AdminCalendarConfig {
   readonly id: string;
   readonly userId: string;
-  readonly businessHours: unknown;
+  readonly businessHours: readonly AdminBusinessHourEntry[];
   readonly slotDurationMinutes: number;
   readonly minAdvanceMinutes: number;
   readonly minCancelAdvanceMinutes: number;
   readonly updatedAt: string;
 }
 
-export interface AdminTimeSlot {
-  readonly start: string;
-  readonly end: string;
-}
-
-export interface AdminDaySchedule {
-  readonly enabled: boolean;
-  readonly slots: readonly AdminTimeSlot[];
-}
-
+/**
+ * Contract update (2026-04-18): PUT /admin/users/:id/calendar-config now
+ * mirrors the user-facing `UpdateCalendarConfigParams` shape. businessHours
+ * is an array of {day, ranges:[{start,end}]} instead of one property per
+ * weekday. slotDurationMinutes narrowed to 10..240 (was 5..480).
+ */
 export interface UpdateCalendarConfigPayload {
-  readonly monday?: AdminDaySchedule;
-  readonly tuesday?: AdminDaySchedule;
-  readonly wednesday?: AdminDaySchedule;
-  readonly thursday?: AdminDaySchedule;
-  readonly friday?: AdminDaySchedule;
-  readonly saturday?: AdminDaySchedule;
-  readonly sunday?: AdminDaySchedule;
+  readonly businessHours?: readonly AdminBusinessHourEntry[];
+  readonly slotDurationMinutes?: number;
   readonly minAdvanceMinutes?: number;
   readonly minCancelAdvanceMinutes?: number;
-  readonly slotDurationMinutes?: number;
 }
 
 export interface UserDashboardSummary {

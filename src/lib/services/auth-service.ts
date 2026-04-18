@@ -1,9 +1,11 @@
 import { cookies } from "next/headers";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { authFetch } from "./auth-fetch";
 import type {
   AuthUser,
   IAuthService,
   LoginResponse,
+  WhatsAppOAuthInit,
 } from "./interfaces/auth-service";
 
 const API_URL =
@@ -98,6 +100,19 @@ class AuthService implements IAuthService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Request a short-lived state token for the Meta (WhatsApp) OAuth popup.
+   * Must be called immediately before redirecting to the Facebook dialog;
+   * the backend later validates the returned `state` on /auth/whatsapp/callback.
+   * @returns The opaque state string to include in the Meta OAuth URL
+   */
+  async initWhatsAppOAuth(): Promise<WhatsAppOAuthInit> {
+    const response = await authFetch("/auth/whatsapp/init", {
+      method: "POST",
+    });
+    return unwrapEnvelope<WhatsAppOAuthInit>(response);
   }
 }
 

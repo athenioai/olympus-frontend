@@ -2,8 +2,8 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { calendarConfigService, financeService, channelAccountService } from "@/lib/services";
-import type { CalendarConfig, PrepaymentSetting, ChannelAccount } from "@/lib/services";
+import { authService, calendarConfigService, channelAccountService, financeService } from "@/lib/services";
+import type { CalendarConfig, ChannelAccount, PrepaymentSetting } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -152,6 +152,23 @@ export async function disconnectChannel(
     await channelAccountService.remove(id);
     revalidatePath("/settings");
     return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Start a Meta WhatsApp OAuth handshake. Fetches a signed `state` token
+ * from the backend so the callback on /auth/whatsapp/callback can
+ * validate the session that initiated the popup.
+ */
+export async function initWhatsAppOAuthAction(): Promise<
+  ActionResult<{ state: string }>
+> {
+  try {
+    const { state } = await authService.initWhatsAppOAuth();
+    return { success: true, data: { state } };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };

@@ -10,7 +10,13 @@ import { BusinessProfileSettings } from "./business-profile-settings";
 import { BusinessFaqSettings } from "./business-faq-settings";
 import { BusinessExceptionSettings } from "./business-exception-settings";
 import { cn } from "@/lib/utils";
-import { updateCalendarConfig, updatePrepaymentSetting, listChannels, disconnectChannel } from "../actions";
+import {
+  disconnectChannel,
+  initWhatsAppOAuthAction,
+  listChannels,
+  updateCalendarConfig,
+  updatePrepaymentSetting,
+} from "../actions";
 import { fetchBusinessProfile } from "../business-profile-actions";
 import { updateAgentConfig } from "../agent-actions";
 import type { ChannelAccount } from "@/lib/services";
@@ -777,6 +783,7 @@ function ChannelCard({ icon: Icon, iconBg, iconColor, name, description, action 
 
 function ChannelsSettings({ userId }: { readonly userId: string }) {
   const t = useTranslations("settings");
+  const tc = useTranslations("common");
   const [telegramWizardOpen, setTelegramWizardOpen] = useState(false);
   const [channels, setChannels] = useState<ChannelAccount[]>([]);
   const [canConnect, setCanConnect] = useState<boolean | null>(null);
@@ -806,14 +813,20 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
   const whatsappAccount = channels.find((c) => c.channel === "whatsapp");
   const telegramAccount = channels.find((c) => c.channel === "telegram");
 
-  function handleConnectWhatsApp() {
-    const state = btoa(JSON.stringify({ userId }));
+  async function handleConnectWhatsApp() {
+    // Backend issues a signed one-shot state token; the popup callback
+    // rejects any other value, so we must fetch it before redirecting.
+    const result = await initWhatsAppOAuthAction();
+    if (!result.success || !result.data) {
+      toast.error(result.error ?? tc("error"));
+      return;
+    }
     const url =
       `https://www.facebook.com/v21.0/dialog/oauth?` +
       `client_id=${META_APP_ID}` +
       `&redirect_uri=${encodeURIComponent(WHATSAPP_REDIRECT_URI)}` +
       `&scope=${WHATSAPP_SCOPES}` +
-      `&state=${state}`;
+      `&state=${encodeURIComponent(result.data.state)}`;
     window.location.href = url;
   }
 
