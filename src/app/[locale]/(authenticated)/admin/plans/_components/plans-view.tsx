@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { PlanPublic } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
@@ -28,6 +29,7 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
   const [formState, setFormState] = useState<
     { mode: "create" } | { mode: "edit"; plan: PlanPublic } | null
   >(null);
+  const [toDelete, setToDelete] = useState<PlanPublic | null>(null);
   const [name, setName] = useState("");
   const [cost, setCost] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -82,8 +84,9 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
     });
   }
 
-  function handleDelete(plan: PlanPublic) {
-    if (!window.confirm(t("deleteConfirm"))) return;
+  function confirmDelete() {
+    if (!toDelete) return;
+    const plan = toDelete;
     startTransition(async () => {
       const result = await deletePlanAction(plan.id);
       if (!result.success) {
@@ -91,6 +94,7 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
         return;
       }
       setPlans((prev) => prev.filter((p) => p.id !== plan.id));
+      setToDelete(null);
       toast.success(t("deleted"));
     });
   }
@@ -160,7 +164,7 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
                       <button
                         className="text-on-surface-variant hover:text-danger"
                         disabled={isPending}
-                        onClick={() => handleDelete(plan)}
+                        onClick={() => setToDelete(plan)}
                         type="button"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -225,6 +229,18 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setToDelete(null)}
+        onConfirm={confirmDelete}
+        open={toDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </div>
   );
 }

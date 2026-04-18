@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ImageOff, Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { safeUrl } from "@/lib/safe-url";
 import type { AgentAvatarAdmin } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
@@ -27,6 +28,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
   const [avatars, setAvatars] =
     useState<readonly AgentAvatarAdmin[]>(initialAvatars);
   const [editing, setEditing] = useState<AgentAvatarAdmin | null>(null);
+  const [toDelete, setToDelete] = useState<AgentAvatarAdmin | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -43,8 +45,9 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
     });
   }
 
-  function handleDelete(avatar: AgentAvatarAdmin) {
-    if (!window.confirm(t("deleteConfirm"))) return;
+  function confirmDelete() {
+    if (!toDelete) return;
+    const avatar = toDelete;
     startTransition(async () => {
       const result = await deleteAgentAvatarAction(avatar.id);
       if (!result.success) {
@@ -52,6 +55,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
         return;
       }
       setAvatars((prev) => prev.filter((a) => a.id !== avatar.id));
+      setToDelete(null);
       toast.success(t("deleted"));
     });
   }
@@ -131,7 +135,7 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
                   <button
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant hover:text-danger"
                     disabled={isPending}
-                    onClick={() => handleDelete(avatar)}
+                    onClick={() => setToDelete(avatar)}
                     type="button"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -169,6 +173,18 @@ export function AvatarsView({ initialAvatars, errorMessage }: AvatarsViewProps) 
           tc={tc}
         />
       )}
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setToDelete(null)}
+        onConfirm={confirmDelete}
+        open={toDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </div>
   );
 }
