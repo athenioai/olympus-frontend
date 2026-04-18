@@ -21,6 +21,8 @@ import {
   CreditCard,
   FileText,
   Receipt,
+  Filter,
+  Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -40,7 +42,8 @@ interface NavItem {
 
 const USER_NAV: NavItem[] = [
   { key: "dashboard", href: "/dashboard", icon: LayoutDashboard, labelKey: "sidebar.dashboard" },
-  { key: "crm", href: "/crm", icon: Users, labelKey: "sidebar.crm" },
+  { key: "crm", href: "/crm", icon: Filter, labelKey: "sidebar.crm" },
+  { key: "leads", href: "/leads", icon: Users, labelKey: "sidebar.leads" },
   { key: "conversations", href: "/conversations", icon: MessageSquare, labelKey: "sidebar.conversations" },
   { key: "calendar", href: "/calendar", icon: CalendarDays, labelKey: "sidebar.calendar" },
   { key: "services", href: "/services", icon: Package, labelKey: "sidebar.services" },
@@ -53,7 +56,8 @@ const ADMIN_NAV: NavItem[] = [
   { key: "admin-users", href: "/admin/users", icon: Users, labelKey: "sidebar.admin.users" },
   { key: "admin-plans", href: "/admin/plans", icon: CreditCard, labelKey: "sidebar.admin.plans" },
   { key: "admin-subscriptions", href: "/admin/subscriptions", icon: FileText, labelKey: "sidebar.admin.subscriptions" },
-  { key: "admin-invoices", href: "/admin/admin-invoices", icon: Receipt, labelKey: "sidebar.admin.invoices" },
+  { key: "admin-invoices", href: "/admin/invoices", icon: Receipt, labelKey: "sidebar.admin.invoices" },
+  { key: "admin-avatars", href: "/admin/agent-avatars", icon: Sparkles, labelKey: "sidebar.admin.avatars" },
 ];
 
 const STORAGE_KEY = "olympus-sidebar-collapsed";
@@ -145,8 +149,8 @@ export function Sidebar({ user }: SidebarProps) {
           );
         })}
 
-        {/* Admin section — hidden until admin routes are implemented (post-MVP) */}
-        {isAdmin && false && (
+        {/* Admin section — rendered only for admins */}
+        {isAdmin && (
           <>
             <div className="my-4 h-px bg-surface-container-high" />
             {!collapsed && (
@@ -180,6 +184,14 @@ export function Sidebar({ user }: SidebarProps) {
 
       {/* Footer */}
       <div className="space-y-2 px-3 pb-4">
+        {!collapsed && (
+          <div className="flex items-center justify-between px-3 py-2 text-[11px] text-on-surface-variant/70">
+            <span>Busca rápida</span>
+            <kbd className="inline-flex items-center gap-0.5 rounded-md bg-surface-container-high px-1.5 py-0.5 font-semibold">
+              ⌘K
+            </kbd>
+          </div>
+        )}
         <LanguageSwitcher />
         <button
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-danger"

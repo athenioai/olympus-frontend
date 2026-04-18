@@ -337,7 +337,234 @@
       "plans": "Planes",
       "subscriptions": "Suscripciones",
       "billing": "Facturación",
-      "invoices": "Cobros"
+      "invoices": "Cobros",
+      "avatars": "Avatares"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Panel de la plataforma",
+      "subtitle": "Vista consolidada de Olympus.",
+      "totalUsers": "Usuarios totales",
+      "activeUsers": "Suscriptores activos",
+      "mrr": "MRR",
+      "appointmentsMonth": "Citas del mes",
+      "totalLeads": "Leads totales",
+      "activeChats": "Chats activos"
+    },
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "Gestión de cuentas.",
+      "create": "Nuevo usuario",
+      "seedHolidays": "Sembrar feriados",
+      "empty": "Sin usuarios.",
+      "form": {
+        "createTitle": "Crear usuario",
+        "editTitle": "Editar usuario",
+        "name": "Nombre",
+        "email": "Email",
+        "plan": "Plan",
+        "noPlan": "Sin plan",
+        "workType": "Modo",
+        "workTypeServices": "Servicios",
+        "workTypeSales": "Ventas",
+        "workTypeHybrid": "Híbrido",
+        "role": "Rol",
+        "roleUser": "Usuario",
+        "roleAdmin": "Admin",
+        "submitCreate": "Crear",
+        "submitUpdate": "Guardar"
+      },
+      "seedHolidaysPrompt": "Años separados por coma (ej: 2026,2027). Vacío = año actual.",
+      "seedHolidaysDone": "Feriados sembrados.",
+      "created": "Usuario creado.",
+      "updated": "Usuario actualizado.",
+      "table": {
+        "name": "Nombre",
+        "email": "Email",
+        "role": "Rol",
+        "workType": "Modo",
+        "createdAt": "Creado",
+        "actions": "Acciones",
+        "view": "Abrir"
+      },
+      "detail": {
+        "backToList": "Volver a la lista",
+        "overview": "Resumen",
+        "appointments": "Citas",
+        "chats": "Chats",
+        "calendar": "Agenda",
+        "onboardingSlug": "Slug de onboarding",
+        "copySlug": "Copiar",
+        "slugCopied": "Slug copiado.",
+        "noOnboardingSlug": "Onboarding completado.",
+        "contractUrl": "Contrato",
+        "noContract": "Sin contrato",
+        "openContract": "Abrir contrato"
+      },
+      "metrics": {
+        "totalLeads": "Leads",
+        "totalAppointments": "Citas",
+        "totalChats": "Chats"
+      },
+      "appointments": {
+        "empty": "Sin citas.",
+        "status": {
+          "confirmed": "Confirmada",
+          "cancelled": "Cancelada",
+          "attended": "Atendida",
+          "no_show": "No asistió"
+        }
+      },
+      "chats": {
+        "empty": "Sin chats.",
+        "handoff": "Traspaso humano",
+        "lead": "Lead",
+        "openMessages": "Ver mensajes",
+        "messagesTitle": "Mensajes",
+        "noMessages": "Sin mensajes."
+      },
+      "calendar": {
+        "empty": "Sin configuración.",
+        "minAdvance": "Antelación mínima (min)",
+        "minCancelAdvance": "Antelación para cancelar (min)",
+        "slotDuration": "Duración del slot (min)",
+        "saveConfig": "Guardar configuración",
+        "saved": "Configuración actualizada."
+      }
+    },
+    "plans": {
+      "title": "Planes",
+      "subtitle": "Catálogo de planes.",
+      "create": "Nuevo plan",
+      "empty": "Sin planes.",
+      "form": {
+        "createTitle": "Crear plan",
+        "editTitle": "Editar plan",
+        "name": "Nombre",
+        "cost": "Precio mensual (BRL)"
+      },
+      "table": {
+        "name": "Nombre",
+        "cost": "Precio",
+        "createdAt": "Creado",
+        "actions": "Acciones"
+      },
+      "deleteConfirm": "¿Eliminar este plan? Los usuarios se desvincularán.",
+      "created": "Plan creado.",
+      "updated": "Plan actualizado.",
+      "deleted": "Plan eliminado."
+    },
+    "subscriptions": {
+      "title": "Suscripciones",
+      "subtitle": "Gestión de suscripciones activas.",
+      "create": "Nueva suscripción",
+      "empty": "Sin suscripciones.",
+      "form": {
+        "createTitle": "Crear suscripción",
+        "editTitle": "Editar suscripción",
+        "user": "Usuario",
+        "plan": "Plan",
+        "billingDay": "Día de cobro (1-28)",
+        "status": "Estado"
+      },
+      "status": {
+        "active": "Activa",
+        "suspended": "Suspendida",
+        "cancelled": "Cancelada"
+      },
+      "table": {
+        "user": "Usuario",
+        "plan": "Plan",
+        "status": "Estado",
+        "billingDay": "Día",
+        "cancelledAt": "Cancelada",
+        "createdAt": "Creada",
+        "actions": "Acciones"
+      },
+      "created": "Suscripción creada.",
+      "updated": "Suscripción actualizada."
+    },
+    "invoices": {
+      "title": "Facturas",
+      "subtitle": "Cobros recurrentes.",
+      "create": "Nueva factura",
+      "empty": "Sin facturas.",
+      "summary": {
+        "mrr": "MRR",
+        "total": "Total de facturas",
+        "pending": "Pendientes",
+        "paid": "Pagadas"
+      },
+      "form": {
+        "createTitle": "Crear factura",
+        "user": "Usuario",
+        "subscription": "Suscripción (opcional)",
+        "amount": "Importe (BRL)",
+        "description": "Descripción",
+        "dueDate": "Vencimiento",
+        "lateFeePercent": "Multa (%)",
+        "lateInterestType": "Intereses",
+        "lateInterestPercent": "Intereses mensuales (%)",
+        "simple": "Simples",
+        "compound": "Compuestos"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "paid": "Pagada",
+        "overdue": "Vencida",
+        "cancelled": "Cancelada"
+      },
+      "table": {
+        "user": "Usuario",
+        "amount": "Importe",
+        "status": "Estado",
+        "dueDate": "Vencimiento",
+        "actions": "Acciones"
+      },
+      "filter": {
+        "all": "Todas",
+        "pending": "Pendientes",
+        "paid": "Pagadas",
+        "overdue": "Vencidas",
+        "cancelled": "Canceladas"
+      },
+      "markPaid": "Marcar como pagada",
+      "cancel": "Cancelar",
+      "markPaidConfirm": "¿Confirmar pago de esta factura?",
+      "cancelConfirm": "¿Cancelar esta factura?",
+      "created": "Factura creada.",
+      "marked": "Factura marcada como pagada.",
+      "cancelled": "Factura cancelada."
+    },
+    "avatars": {
+      "title": "Galería de avatares",
+      "subtitle": "Imágenes disponibles para agentes.",
+      "upload": "Subir avatar",
+      "empty": "Sin avatares.",
+      "form": {
+        "createTitle": "Subir nuevo avatar",
+        "editTitle": "Editar avatar",
+        "file": "Imagen",
+        "name": "Nombre",
+        "sortOrder": "Orden",
+        "isActive": "Activo",
+        "submitUpload": "Subir",
+        "submitUpdate": "Guardar"
+      },
+      "uploaded": "Avatar subido.",
+      "updated": "Avatar actualizado.",
+      "deleted": "Avatar eliminado.",
+      "deleteConfirm": "¿Eliminar este avatar?",
+      "inactive": "Inactivo"
+    },
+    "common": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "loading": "Cargando...",
+      "noSelection": "—",
+      "saving": "Guardando...",
+      "loadError": "No se pudieron cargar los datos."
     }
   }
 }
