@@ -141,7 +141,7 @@ class LeadService implements ILeadService {
   async getTimeline(
     id: string,
     params?: TimelineParams,
-  ): Promise<{ data: TimelineEntry[] }> {
+  ): Promise<TimelineEntry[]> {
     const searchParams = new URLSearchParams();
     if (params?.limit) searchParams.set("limit", String(params.limit));
     if (params?.type) searchParams.set("type", params.type);
@@ -152,7 +152,7 @@ class LeadService implements ILeadService {
       : `/leads/${id}/timeline`;
 
     const response = await authFetch(path);
-    return unwrapEnvelope<{ data: TimelineEntry[] }>(response);
+    return unwrapEnvelope<TimelineEntry[]>(response);
   }
 }
 

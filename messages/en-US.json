@@ -337,7 +337,234 @@
       "plans": "Plans",
       "subscriptions": "Subscriptions",
       "billing": "Billing",
-      "invoices": "Invoices"
+      "invoices": "Invoices",
+      "avatars": "Avatars"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Platform dashboard",
+      "subtitle": "Consolidated view of Olympus.",
+      "totalUsers": "Total users",
+      "activeUsers": "Active subscribers",
+      "mrr": "MRR",
+      "appointmentsMonth": "Appointments this month",
+      "totalLeads": "Total leads",
+      "activeChats": "Active chats"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Platform account management.",
+      "create": "New user",
+      "seedHolidays": "Seed holidays",
+      "empty": "No users yet.",
+      "form": {
+        "createTitle": "Create user",
+        "editTitle": "Edit user",
+        "name": "Name",
+        "email": "Email",
+        "plan": "Plan",
+        "noPlan": "No plan",
+        "workType": "Work type",
+        "workTypeServices": "Services",
+        "workTypeSales": "Sales",
+        "workTypeHybrid": "Hybrid",
+        "role": "Role",
+        "roleUser": "User",
+        "roleAdmin": "Admin",
+        "submitCreate": "Create",
+        "submitUpdate": "Save"
+      },
+      "seedHolidaysPrompt": "Enter years comma-separated (e.g. 2026,2027). Empty = current year.",
+      "seedHolidaysDone": "Holidays seeded.",
+      "created": "User created.",
+      "updated": "User updated.",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "workType": "Mode",
+        "createdAt": "Created",
+        "actions": "Actions",
+        "view": "Open"
+      },
+      "detail": {
+        "backToList": "Back to list",
+        "overview": "Overview",
+        "appointments": "Appointments",
+        "chats": "Chats",
+        "calendar": "Calendar",
+        "onboardingSlug": "Onboarding slug",
+        "copySlug": "Copy",
+        "slugCopied": "Slug copied.",
+        "noOnboardingSlug": "Onboarding completed.",
+        "contractUrl": "Contract",
+        "noContract": "No contract",
+        "openContract": "Open contract"
+      },
+      "metrics": {
+        "totalLeads": "Leads",
+        "totalAppointments": "Appointments",
+        "totalChats": "Chats"
+      },
+      "appointments": {
+        "empty": "No appointments.",
+        "status": {
+          "confirmed": "Confirmed",
+          "cancelled": "Cancelled",
+          "attended": "Attended",
+          "no_show": "No-show"
+        }
+      },
+      "chats": {
+        "empty": "No chats.",
+        "handoff": "Human handoff",
+        "lead": "Lead",
+        "openMessages": "View messages",
+        "messagesTitle": "Messages",
+        "noMessages": "No messages."
+      },
+      "calendar": {
+        "empty": "No calendar config.",
+        "minAdvance": "Min advance (min)",
+        "minCancelAdvance": "Cancel advance (min)",
+        "slotDuration": "Slot duration (min)",
+        "saveConfig": "Save configuration",
+        "saved": "Configuration updated."
+      }
+    },
+    "plans": {
+      "title": "Plans",
+      "subtitle": "Plan catalog.",
+      "create": "New plan",
+      "empty": "No plans yet.",
+      "form": {
+        "createTitle": "Create plan",
+        "editTitle": "Edit plan",
+        "name": "Name",
+        "cost": "Monthly price (BRL)"
+      },
+      "table": {
+        "name": "Name",
+        "cost": "Price",
+        "createdAt": "Created",
+        "actions": "Actions"
+      },
+      "deleteConfirm": "Remove this plan? Users linked to it will be unlinked.",
+      "created": "Plan created.",
+      "updated": "Plan updated.",
+      "deleted": "Plan removed."
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Active subscription management.",
+      "create": "New subscription",
+      "empty": "No subscriptions.",
+      "form": {
+        "createTitle": "Create subscription",
+        "editTitle": "Edit subscription",
+        "user": "User",
+        "plan": "Plan",
+        "billingDay": "Billing day (1-28)",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Active",
+        "suspended": "Suspended",
+        "cancelled": "Cancelled"
+      },
+      "table": {
+        "user": "User",
+        "plan": "Plan",
+        "status": "Status",
+        "billingDay": "Day",
+        "cancelledAt": "Cancelled",
+        "createdAt": "Created",
+        "actions": "Actions"
+      },
+      "created": "Subscription created.",
+      "updated": "Subscription updated."
+    },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Recurring billing.",
+      "create": "New invoice",
+      "empty": "No invoices.",
+      "summary": {
+        "mrr": "MRR",
+        "total": "Total invoices",
+        "pending": "Pending",
+        "paid": "Paid"
+      },
+      "form": {
+        "createTitle": "Create invoice",
+        "user": "User",
+        "subscription": "Subscription (optional)",
+        "amount": "Amount (BRL)",
+        "description": "Description",
+        "dueDate": "Due date",
+        "lateFeePercent": "Late fee (%)",
+        "lateInterestType": "Interest type",
+        "lateInterestPercent": "Monthly interest (%)",
+        "simple": "Simple",
+        "compound": "Compound"
+      },
+      "status": {
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled"
+      },
+      "table": {
+        "user": "User",
+        "amount": "Amount",
+        "status": "Status",
+        "dueDate": "Due",
+        "actions": "Actions"
+      },
+      "filter": {
+        "all": "All",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled"
+      },
+      "markPaid": "Mark as paid",
+      "cancel": "Cancel",
+      "markPaidConfirm": "Confirm payment for this invoice?",
+      "cancelConfirm": "Cancel this invoice?",
+      "created": "Invoice created.",
+      "marked": "Invoice marked as paid.",
+      "cancelled": "Invoice cancelled."
+    },
+    "avatars": {
+      "title": "Avatar gallery",
+      "subtitle": "Images available for agents.",
+      "upload": "Upload avatar",
+      "empty": "No avatars yet.",
+      "form": {
+        "createTitle": "Upload new avatar",
+        "editTitle": "Edit avatar",
+        "file": "Image",
+        "name": "Name",
+        "sortOrder": "Order",
+        "isActive": "Active",
+        "submitUpload": "Upload",
+        "submitUpdate": "Save"
+      },
+      "uploaded": "Avatar uploaded.",
+      "updated": "Avatar updated.",
+      "deleted": "Avatar removed.",
+      "deleteConfirm": "Remove this avatar?",
+      "inactive": "Inactive"
+    },
+    "common": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading...",
+      "noSelection": "—",
+      "saving": "Saving...",
+      "loadError": "Could not load data."
     }
   }
 }

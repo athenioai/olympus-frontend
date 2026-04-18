@@ -9,7 +9,7 @@ export type LeadTemperature = "cold" | "warm" | "hot";
 
 export type LeadChannel = "whatsapp" | "telegram" | null;
 
-export type TimelineEntryType = "message" | "appointment" | "status_change";
+export type TimelineEntryType = "message" | "status_change";
 
 export interface LeadPublic {
   readonly id: string;
@@ -33,8 +33,48 @@ export interface BoardColumnCount {
   readonly count: number;
 }
 
+export type LeadCustomFieldType =
+  | "text"
+  | "number"
+  | "date"
+  | "select"
+  | "boolean";
+
+export interface LeadTag {
+  readonly id: string;
+  readonly name: string;
+  /** Hex color string like "#F59E0B". */
+  readonly color: string;
+}
+
+export interface LeadLastMessage {
+  readonly content: string;
+  /** Collapsed sender: branded agent name, "lead", "user" or "system". */
+  readonly sender: string;
+  readonly createdAt: string;
+}
+
+export interface LeadCustomFieldValue {
+  readonly fieldId: string;
+  readonly name: string;
+  readonly fieldType: LeadCustomFieldType;
+  /** Raw string value; null-valued entries are filtered out by the backend. */
+  readonly value: string | null;
+}
+
+/**
+ * Enriched lead item returned by GET /leads/board/:status.
+ * Extends LeadPublic with projection fields used exclusively by the Kanban board.
+ */
+export interface LeadBoardItem extends LeadPublic {
+  readonly avatarUrl: string | null;
+  readonly lastMessage: LeadLastMessage | null;
+  readonly tags: ReadonlyArray<LeadTag>;
+  readonly customFields: ReadonlyArray<LeadCustomFieldValue>;
+}
+
 export interface PaginatedColumnResponse {
-  readonly data: LeadPublic[];
+  readonly data: LeadBoardItem[];
   readonly total: number;
   readonly page: number;
   readonly limit: number;
@@ -74,37 +114,25 @@ export interface PaginatedLeadResponse {
 
 export interface TimelineMessage {
   readonly id: string;
-  readonly session_id: string;
-  readonly agent: "horos" | "kairos" | "human";
-  readonly role: "lead" | "assistant";
+  readonly chatId: string;
+  readonly sender: string;
   readonly content: string;
-  readonly appointment_id: string | null;
-  readonly created_at: string;
-}
-
-export interface TimelineAppointment {
-  readonly id: string;
-  readonly session_id: string;
-  readonly lead_name: string;
-  readonly service_type: string;
-  readonly date: string;
-  readonly start_time: string;
-  readonly end_time: string;
-  readonly status: "confirmed" | "cancelled";
-  readonly created_at: string;
+  readonly createdAt: string;
+  readonly deletedAt?: string | null;
 }
 
 export interface TimelineStatusChange {
   readonly id: string;
-  readonly old_status: string;
-  readonly new_status: string;
-  readonly changed_at: string;
+  readonly oldStatus: string | null;
+  readonly newStatus: string;
+  readonly changedBy: string | null;
+  readonly createdAt: string;
 }
 
 export interface TimelineEntry {
   readonly type: TimelineEntryType;
-  readonly timestamp: string;
-  readonly data: TimelineMessage | TimelineAppointment | TimelineStatusChange;
+  readonly createdAt: string;
+  readonly data: TimelineMessage | TimelineStatusChange;
 }
 
 export interface TimelineParams {
@@ -126,5 +154,5 @@ export interface ILeadService {
   getTimeline(
     id: string,
     params?: TimelineParams,
-  ): Promise<{ data: TimelineEntry[] }>;
+  ): Promise<TimelineEntry[]>;
 }

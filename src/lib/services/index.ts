@@ -15,6 +15,12 @@ export { signupService } from "./signup-service";
 export { onboardingService } from "./onboarding-service";
 export { userService } from "./user-service";
 export { businessVerticalService } from "./business-vertical-service";
+export { adminUserService } from "./admin-user-service";
+export { adminDashboardService } from "./admin-dashboard-service";
+export { adminPlanService } from "./admin-plan-service";
+export { adminSubscriptionService } from "./admin-subscription-service";
+export { adminInvoiceService } from "./admin-invoice-service";
+export { adminAgentAvatarService } from "./admin-agent-avatar-service";
 
 // Auth types
 export type {
@@ -172,3 +178,55 @@ export type {
   BusinessVertical,
   IBusinessVerticalService,
 } from "./interfaces/business-vertical-service";
+
+// Admin shared types
+export type {
+  AdminAppointment,
+  AdminCalendarConfig,
+  AdminChat,
+  AdminChatMessage,
+  AdminDaySchedule,
+  AdminInvoicePublic,
+  AdminInvoiceStatus,
+  AdminInvoiceSummary,
+  AdminTimeSlot,
+  AdminUserPublic,
+  AgentAvatarAdmin,
+  AppointmentStatus,
+  LateInterestType,
+  PlanPublic,
+  PlatformMetrics,
+  SubscriptionPublic,
+  SubscriptionStatus,
+  UpdateCalendarConfigPayload,
+  UserDashboardSummary,
+  UserRole,
+} from "./interfaces/admin-types";
+
+// Admin service interfaces
+export type {
+  CreateAdminUserPayload,
+  IAdminUserService,
+  SeedHolidaysPayload,
+  UpdateAdminUserPayload,
+} from "./interfaces/admin-user-service";
+export type { IAdminDashboardService } from "./interfaces/admin-dashboard-service";
+export type {
+  CreatePlanPayload,
+  IAdminPlanService,
+  UpdatePlanPayload,
+} from "./interfaces/admin-plan-service";
+export type {
+  CreateSubscriptionPayload,
+  IAdminSubscriptionService,
+  UpdateSubscriptionPayload,
+} from "./interfaces/admin-subscription-service";
+export type {
+  CreateInvoicePayload,
+  IAdminInvoiceService,
+} from "./interfaces/admin-invoice-service";
+export type {
+  CreateAgentAvatarPayload,
+  IAdminAgentAvatarService,
+  UpdateAgentAvatarPayload,
+} from "./interfaces/admin-agent-avatar-service";
