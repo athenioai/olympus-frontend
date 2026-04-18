@@ -23,8 +23,10 @@ import type {
   UserDashboardSummary,
 } from "@/lib/services";
 import { formatDate, formatDateTime } from "../../../_lib/format";
-import { updateCalendarConfigAction } from "../actions";
-import { adminUserService } from "@/lib/services";
+import {
+  loadChatMessagesAction,
+  updateCalendarConfigAction,
+} from "../actions";
 
 type TabKey = "overview" | "appointments" | "chats" | "calendar";
 
@@ -306,14 +308,13 @@ function ChatsPanel({
   async function loadMessages(chat: AdminChat) {
     setSelected(chat);
     setLoading(true);
-    try {
-      const data = await adminUserService.getChatMessages(userId, chat.id);
-      setMessages(data);
-    } catch {
+    const result = await loadChatMessagesAction(userId, chat.id);
+    if (result.success && result.data) {
+      setMessages(result.data);
+    } else {
       setMessages([]);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }
 
   if (chats.length === 0) {

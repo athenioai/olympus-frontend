@@ -11,8 +11,8 @@
 ## Current State
 
 - **Stage**: 5 — Finalization (release on main)
-- **Branch**: `feature/signup-onboarding` (awaiting merge to `main`)
-- **Build**: Passing — 19 routes, 53 tests (1 pre-existing failure), zero TS errors, 3 e2e smoke tests
+- **Branch**: `feature/admin-panel` (stacked on `feature/signup-onboarding`, both awaiting merge to `main`)
+- **Build**: Passing — 25 routes, 62 tests (1 pre-existing failure), zero TS errors, 5 e2e smoke tests
 - **Status**: Ready for manual QA against production backend, then merge
 
 ## What's Implemented (MVP — 7 features)
@@ -41,10 +41,10 @@ src/
 
 ## What's NOT Built (post-MVP)
 
-- Forgot password, Invoices (CRUD/PDF/QR), WhatsApp management
-- Admin panel (dashboard, users, plans, subscriptions, billing, invoices)
+- Forgot password, user-facing Invoices (PDF/QR)
+- WhatsApp channel management (connection UI)
 - Marketing page, not-found.tsx pages
-- Wizard step e2e coverage (depends on real backend; only public surfaces are e2e'd)
+- Wizard/admin step e2e coverage against real backend (offline smoke only)
 
 ## Known Issues (non-blocking)
 
@@ -59,6 +59,50 @@ src/
 2. Set `NEXT_PUBLIC_API_URL` in hosting env vars
 3. Deploy to hosting (Vercel/Railway)
 4. Smoke test in production
+
+## Recent Work — Admin panel (2026-04-17)
+
+Full `/admin/*` area matching the Admin API Contract document. 7 new routes, 6 admin services, per-route Zod-validated server actions. Feature branch: `feature/admin-panel` (stacked on `feature/signup-onboarding`).
+
+**New routes** (all gated by `authenticated/admin/layout.tsx` → role=`admin`):
+- `/admin` → redirect → `/admin/dashboard`
+- `/admin/dashboard` — 6 PlatformMetrics cards (totalUsers, activeUsers, MRR, appointmentsThisMonth, totalLeads, activeChats)
+- `/admin/users` — list + create/edit modal + seed-holidays prompt
+- `/admin/users/[id]` — 4 tabs: overview (per-user dashboard + onboarding slug copy + contract link), appointments, chats (two-pane with messages on demand), calendar (inline form editing minAdvance/minCancelAdvance/slotDuration)
+- `/admin/plans` — CRUD with soft-delete
+- `/admin/subscriptions` — CRUD joined with users/plans for labels
+- `/admin/invoices` — summary tiles + status filter pills + create modal + mark-paid/cancel (backend INVOICE_STATUS_001 gate enforced client-side via the `pending`-only disable)
+- `/admin/agent-avatars` — multipart upload + inline edit/delete gallery
+
+**New services/contracts** (`src/lib/services/interfaces/admin-*.ts` + `src/lib/services/admin-*.ts`):
+- `adminUserService` — covers CRUD, seed-holidays, user dashboard, appointments, chats + messages, calendar-config GET/PUT
+- `adminDashboardService`, `adminPlanService`, `adminSubscriptionService`, `adminInvoiceService`, `adminAgentAvatarService`
+- Shared `admin-types.ts` mirrors the contract verbatim (enums + response shapes).
+- Agent avatar service bypasses `authFetch` for multipart upload and reads `access_token` cookie directly.
+
+**Sidebar**: `ADMIN_NAV` enabled (was gated by `&& false`), `/admin/admin-invoices` typo fixed to `/admin/invoices`, added `/admin/agent-avatars` entry.
+
+**i18n**: `admin.*` block in pt-BR / en-US / es with keys for dashboard/users/plans/subscriptions/invoices/avatars/common.
+
+**Shared primitives** (scoped under `/admin/_components/`):
+- `Modal` — simple portal-less dialog with Escape + backdrop click.
+- `AdminHeader` — title + subtitle + actions.
+- `_lib/format.ts` — BRL / date / datetime helpers (Intl, America/Sao_Paulo).
+
+**Tests**:
+- 9 new unit tests on `admin-format` (BRL formatting, date/datetime edge cases).
+- Playwright `admin-access.spec.ts` verifying `/admin` and `/admin/dashboard` redirect to `/login` without auth.
+
+**Manual QA needed** (against real backend, using an admin JWT):
+1. `/admin/dashboard` loads 6 metric cards with real numbers.
+2. Create/edit user via modal; verify email arrives with onboarding link.
+3. Seed-holidays prompts for years and returns success toast.
+4. Open user detail → all 4 tabs render; messages load on chat select; calendar PUT persists.
+5. Plans CRUD including soft-delete (users unlinked).
+6. Subscriptions CRUD with user/plan picker; status toggle on edit.
+7. Invoices: summary tiles match dashboard, filter pills work, mark-paid/cancel disabled for non-pending, create with ISO dueDate.
+8. Agent avatars: upload PNG/JPEG → appears in gallery; toggle isActive; delete.
+9. Non-admin user sees no admin items in sidebar and `/admin` bounces to `/dashboard`.
 
 ## Recent Work — Signup + onboarding wizard (2026-04-17)
 
