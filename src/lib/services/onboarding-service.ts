@@ -1,13 +1,11 @@
 import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
+import { API_URL } from "@/lib/env";
 import type {
   IOnboardingService,
   OnboardingInfo,
   SetPasswordPayload,
   SetPasswordResponse,
 } from "./interfaces/onboarding-service";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 class OnboardingService implements IOnboardingService {
   /**

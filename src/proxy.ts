@@ -1,10 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
+import { API_URL, IS_PRODUCTION } from "@/lib/env";
 import { routing } from "@/i18n/routing";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const EXPIRY_BUFFER_MS = 30_000;
 
 // Paths where an already-authenticated user should be bounced to /dashboard.

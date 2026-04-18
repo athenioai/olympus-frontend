@@ -1,12 +1,10 @@
 import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
+import { API_URL } from "@/lib/env";
 import type {
   ISignupService,
   SignupBeginPayload,
   SignupBeginResponse,
 } from "./interfaces/signup-service";
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 class SignupService implements ISignupService {
   /**
