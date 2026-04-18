@@ -15,18 +15,39 @@ export interface ApiEnvelope<T> {
 }
 
 /**
+ * Error thrown when the backend envelope reports a failure.
+ * Carries the original error code and HTTP status so callers
+ * can branch on specific backend conditions (e.g. 409, 410, 404).
+ */
+export class ApiError extends Error {
+  readonly code: string;
+  readonly status: number;
+
+  constructor(message: string, code: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.code = code;
+    this.status = status;
+  }
+}
+
+/**
  * Unwrap an API envelope response, throwing on failure.
  * @param response - Fetch Response from the backend
  * @returns The unwrapped data of type T
- * @throws Error with the first error message from the envelope
+ * @throws ApiError with the code/status from the envelope
  */
 export async function unwrapEnvelope<T>(response: Response): Promise<T> {
   const envelope: ApiEnvelope<T> = await response.json();
 
-  if (!envelope.success || !envelope.data) {
+  if (!envelope.success || envelope.data === null || envelope.data === undefined) {
     const message = envelope.error?.message;
     const errorText = Array.isArray(message) ? message[0] : message;
-    throw new Error(errorText ?? "UNKNOWN_ERROR");
+    throw new ApiError(
+      errorText ?? "UNKNOWN_ERROR",
+      envelope.error?.code ?? "UNKNOWN_ERROR",
+      response.status,
+    );
   }
 
   return envelope.data;

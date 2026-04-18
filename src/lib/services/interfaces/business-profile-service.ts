@@ -14,6 +14,7 @@ export interface BusinessProfile {
   readonly cnpj: string | null;
   readonly legalName: string | null;
   readonly foundedYear: number | null;
+  readonly businessVertical: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
 }
@@ -64,6 +65,7 @@ export interface UpdateBusinessProfilePayload {
   readonly cnpj?: string | null;
   readonly legalName?: string | null;
   readonly foundedYear?: number | null;
+  readonly businessVertical?: string;
 }
 
 export interface UpdateAddressPayload {

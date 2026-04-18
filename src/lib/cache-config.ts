@@ -12,6 +12,7 @@ export const CACHE_TIMES = {
   products: 120,        // 2 min — catalog changes rarely
   settings: 300,        // 5 min — rarely changes, revalidated on save
   channels: 300,        // 5 min — rarely changes
+  businessVerticals: 60 * 60 * 24, // 24h — catalog is static
 } as const;
 
 export const CACHE_TAGS = {
@@ -30,4 +31,5 @@ export const CACHE_TAGS = {
   businessScore: "business-score",
   businessFaqs: "business-faqs",
   businessExceptions: "business-exceptions",
+  businessVerticals: "business-verticals",
 } as const;

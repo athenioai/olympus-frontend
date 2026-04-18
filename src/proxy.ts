@@ -7,7 +7,12 @@ const API_URL =
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const EXPIRY_BUFFER_MS = 30_000;
 
-const PUBLIC_PATHS = ["/login", "/forgot-password"];
+// Paths where an already-authenticated user should be bounced to /dashboard.
+const PUBLIC_REDIRECT_IF_AUTH = ["/login", "/forgot-password", "/signup"];
+
+// Paths that allow both anonymous and authenticated visitors without redirect
+// (the onboarding wizard authenticates the user mid-flow).
+const PUBLIC_ALLOW_BOTH = ["/onboarding"];
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -37,24 +42,29 @@ function getLogicalPath(pathname: string): string {
     : `/${segments.join("/")}`;
 }
 
-function isPublicPath(logicalPath: string): boolean {
-  return PUBLIC_PATHS.some(
+function matchesPrefix(logicalPath: string, prefixes: readonly string[]): boolean {
+  return prefixes.some(
     (p) => logicalPath === p || logicalPath.startsWith(`${p}/`),
   );
 }
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const logicalPath = getLogicalPath(pathname);
 
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  // Public paths — redirect to dashboard if already authenticated
-  if (isPublicPath(logicalPath)) {
+  // Public paths where auth'd users should bounce to /dashboard.
+  if (matchesPrefix(logicalPath, PUBLIC_REDIRECT_IF_AUTH)) {
     if (accessToken && !isTokenExpired(accessToken)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+    return intlMiddleware(request);
+  }
+
+  // Paths that allow both anonymous and authenticated (onboarding wizard).
+  if (matchesPrefix(logicalPath, PUBLIC_ALLOW_BOTH)) {
     return intlMiddleware(request);
   }
 

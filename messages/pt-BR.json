@@ -28,6 +28,143 @@
     "welcomeSubtitle": "Sua empresa 100% autônoma.",
     "needHelp": "Precisa de ajuda?"
   },
+  "signup": {
+    "title": "Comece grátis em 2 minutos",
+    "subtitle": "Seu atendente IA 24/7",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@exemplo.com",
+    "submit": "Começar",
+    "submitting": "Enviando...",
+    "hasAccount": "Já tem conta?",
+    "signIn": "Entrar",
+    "errors": {
+      "emailRequired": "Informe seu email.",
+      "emailInvalid": "Email inválido.",
+      "emailExists": "Já existe uma conta com esse email.",
+      "generic": "Não foi possível completar o cadastro. Tente novamente."
+    },
+    "success": {
+      "title": "Enviamos um link para {email}",
+      "description": "Abra seu email e clique no link pra continuar o cadastro. Pode demorar até 2 minutos pra chegar.",
+      "resend": "Reenviar email",
+      "resendCooldown": "Aguarde {seconds}s",
+      "resent": "Email reenviado.",
+      "noEmail": "Nenhum cadastro pendente. Volte para o início.",
+      "backToSignup": "Voltar"
+    }
+  },
+  "onboarding": {
+    "headerTitle": "Completando cadastro de {email}",
+    "stepLabel": "Passo {current} de {total}",
+    "scoreLabel": "Perfil {percent}% completo",
+    "next": "Continuar",
+    "back": "Voltar",
+    "skip": "Pular",
+    "submitting": "Salvando...",
+    "genericError": "Não foi possível salvar. Tente novamente.",
+    "error": {
+      "invalidTitle": "Link inválido",
+      "invalidDescription": "O link que você usou não é válido ou expirou.",
+      "invalidAction": "Voltar ao início",
+      "completedTitle": "Link já utilizado",
+      "completedDescription": "Este link de cadastro já foi usado. Se você tem uma conta, faça login.",
+      "completedAction": "Ir pro login"
+    },
+    "step1": {
+      "title": "Bem-vindo ao Athenio!",
+      "subtitle": "Seu email: {email}",
+      "nameLabel": "Nome completo",
+      "namePlaceholder": "João da Silva",
+      "passwordLabel": "Criar senha",
+      "passwordPlaceholder": "Mín. 8 caracteres, 1 letra e 1 número",
+      "confirmPasswordLabel": "Confirmar senha",
+      "strengthWeak": "Fraca",
+      "strengthMedium": "Média",
+      "strengthStrong": "Forte",
+      "errorNameShort": "Nome deve ter entre 2 e 120 caracteres.",
+      "errorPasswordWeak": "Senha precisa de no mínimo 8 caracteres, 1 letra e 1 número.",
+      "errorPasswordMismatch": "As senhas não coincidem."
+    },
+    "step2": {
+      "title": "Como você trabalha?",
+      "subtitle": "Isso nos ajuda a personalizar seu agente.",
+      "servicesTitle": "Serviços",
+      "servicesHint": "Agendamentos",
+      "salesTitle": "Vendas",
+      "salesHint": "Produtos",
+      "hybridTitle": "Ambos",
+      "hybridHint": "Vendas e serviços"
+    },
+    "step3": {
+      "title": "Qual o segmento do seu negócio?",
+      "subtitle": "Escolha uma opção e já configuramos tags, campos e FAQs pro seu ramo.",
+      "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
+      "confirm": "Confirmar",
+      "seeded": "Criamos {tags} tags, {fields} campos e {faqs} FAQs pra você. Edite em Configurações."
+    },
+    "step4": {
+      "title": "Sobre seu negócio",
+      "nameLabel": "Nome do negócio",
+      "namePlaceholder": "Barbearia do João",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Conte em poucas linhas o que seu negócio faz.",
+      "errorNameShort": "Nome deve ter entre 2 e 120 caracteres.",
+      "errorDescriptionShort": "Descrição deve ter entre 10 e 2000 caracteres."
+    },
+    "step5": {
+      "title": "Como os atendimentos acontecem?",
+      "presencial": "Presencial",
+      "presencialHint": "Clientes vão até você",
+      "remoto": "Remoto",
+      "remotoHint": "Atendimento 100% online",
+      "domicilio": "A domicílio",
+      "domicilioHint": "Você vai até o cliente",
+      "hibrido": "Híbrido",
+      "hibridoHint": "Mistura dos anteriores"
+    },
+    "step6": {
+      "title": "Políticas do atendimento",
+      "paymentLabel": "Forma de pagamento",
+      "paymentPlaceholder": "Ex: Aceitamos Pix e cartão em até 3x sem juros.",
+      "cancellationLabel": "Política de cancelamento",
+      "cancellationPlaceholder": "Ex: Cancelamento sem custo até 24h antes."
+    },
+    "step7": {
+      "title": "Detalhes extras",
+      "subtitle": "Opcional — você pode preencher depois nas configurações.",
+      "addressSection": "Endereço",
+      "socialSection": "Redes sociais",
+      "areasSection": "Áreas de atendimento",
+      "companySection": "Dados da empresa",
+      "streetLabel": "Rua e número",
+      "neighborhoodLabel": "Bairro",
+      "cityLabel": "Cidade",
+      "stateLabel": "UF",
+      "socialPlatformLabel": "Plataforma",
+      "socialUrlLabel": "URL",
+      "addSocial": "Adicionar link",
+      "areaNameLabel": "Cidade/bairro",
+      "addArea": "Adicionar área",
+      "cnpjLabel": "CNPJ",
+      "legalNameLabel": "Razão social",
+      "foundedYearLabel": "Ano de fundação",
+      "differentialsLabel": "Diferenciais"
+    },
+    "step8": {
+      "title": "Parabéns! Sua conta está configurada.",
+      "scoreTitle": "Seu perfil",
+      "tierNone": "Inicial",
+      "tierBronze": "Bronze",
+      "tierSilver": "Prata",
+      "tierGold": "Ouro",
+      "tierDiamond": "Diamante",
+      "nextTitle": "Próximos passos",
+      "nextAgent": "Personalizar agente",
+      "nextChannel": "Conectar WhatsApp",
+      "nextContacts": "Importar contatos",
+      "enter": "Entrar no sistema"
+    }
+  },
   "dashboard": {
     "title": "Visão geral",
     "greeting": {
@@ -70,7 +207,11 @@
       "duesToday": "vence hoje",
       "duesTomorrow": "vence amanhã",
       "duesIn": "vence em {days} dias",
-      "overdue": "vencida há {days} {days, plural, =1 {dia} other {dias}}"
+      "overdue": "vencida há {days} {days, plural, =1 {dia} other {dias}}",
+      "status": {
+        "confirmed": "Confirmado",
+        "cancelled": "Cancelado"
+      }
     },
     "projection": {
       "label": "Se mantiver esse ritmo",
@@ -108,7 +249,8 @@
       "contacted": "Contatado",
       "qualified": "Qualificado",
       "converted": "Convertido",
-      "lost": "Perdido"
+      "lost": "Perdido",
+      "created": "Criado"
     },
     "nameLabel": "Nome",
     "emailLabel": "Email",
@@ -117,7 +259,46 @@
     "emailPlaceholder": "email@exemplo.com",
     "phonePlaceholder": "(11) 99999-9999",
     "deleteConfirm": "Tem certeza que deseja excluir este lead?",
-    "timeline": "Linha do tempo"
+    "timeline": "Linha do tempo",
+    "statusChangeHeader": "Movimentação",
+    "list": {
+      "title": "Lista de Leads",
+      "subtitle": "{count} {count, plural, =1 {lead encontrado} other {leads encontrados}}",
+      "searchPlaceholder": "Buscar por nome ou email...",
+      "allStatuses": "Todos os status",
+      "allTemperatures": "Todas as temperaturas",
+      "empty": "Nenhum lead por aqui.",
+      "emptyHint": "Ajuste os filtros ou crie um lead para começar a acompanhar.",
+      "emptyCta": "Criar lead",
+      "columns": {
+        "name": "Nome",
+        "status": "Status",
+        "temperature": "Temperatura",
+        "contact": "Contato",
+        "updated": "Atualizado"
+      },
+      "pagination": {
+        "showing": "{from}–{to} de {total}",
+        "previous": "Anterior",
+        "next": "Próxima"
+      },
+      "temperatures": {
+        "hot": "Quente",
+        "warm": "Morno",
+        "cold": "Frio"
+      }
+    },
+    "agents": {
+      "lead": "Lead",
+      "human": "Humano"
+    },
+    "filters": {
+      "all": "Tudo",
+      "messages": "Mensagens",
+      "status": "Status",
+      "empty": "Nada por aqui.",
+      "emptyHint": "Tente outro filtro ou volte em breve — o histórico aparece conforme o lead interage."
+    }
   },
   "conversations": {
     "title": "Conversas",
@@ -440,7 +621,8 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "crm": "CRM",
+    "crm": "Funil",
+    "leads": "Leads",
     "conversations": "Conversas",
     "calendar": "Calendário",
     "services": "Serviços",
