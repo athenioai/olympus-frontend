@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type { SubscriptionPublic } from "./interfaces/admin-types";
 import type {
   CreateSubscriptionPayload,
@@ -20,7 +21,8 @@ class AdminSubscriptionService implements IAdminSubscriptionService {
 
   async list(): Promise<readonly SubscriptionPublic[]> {
     const response = await authFetch("/admin/subscriptions", {
-      cache: "no-store",
+      revalidate: CACHE_TIMES.adminSubscriptions,
+      tags: [CACHE_TAGS.adminSubscriptions],
     });
     return unwrapEnvelope<readonly SubscriptionPublic[]>(response);
   }
@@ -28,7 +30,10 @@ class AdminSubscriptionService implements IAdminSubscriptionService {
   async getById(id: string): Promise<SubscriptionPublic> {
     const response = await authFetch(
       `/admin/subscriptions/${encodeURIComponent(id)}`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminSubscriptions,
+        tags: [CACHE_TAGS.adminSubscriptions],
+      },
     );
     return unwrapEnvelope<SubscriptionPublic>(response);
   }

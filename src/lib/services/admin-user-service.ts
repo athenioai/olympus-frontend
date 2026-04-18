@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type {
   AdminAppointment,
   AdminCalendarConfig,
@@ -26,14 +27,20 @@ class AdminUserService implements IAdminUserService {
   }
 
   async list(): Promise<readonly AdminUserPublic[]> {
-    const response = await authFetch("/admin/users", { cache: "no-store" });
+    const response = await authFetch("/admin/users", {
+      revalidate: CACHE_TIMES.adminUsers,
+      tags: [CACHE_TAGS.adminUsers],
+    });
     return unwrapEnvelope<readonly AdminUserPublic[]>(response);
   }
 
   async getById(id: string): Promise<AdminUserPublic> {
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminUsers,
+        tags: [CACHE_TAGS.adminUsers, CACHE_TAGS.adminUserDetail],
+      },
     );
     return unwrapEnvelope<AdminUserPublic>(response);
   }
@@ -63,7 +70,10 @@ class AdminUserService implements IAdminUserService {
   async getDashboard(id: string): Promise<UserDashboardSummary> {
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}/dashboard`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminUserDetail,
+        tags: [CACHE_TAGS.adminUserDetail],
+      },
     );
     return unwrapEnvelope<UserDashboardSummary>(response);
   }
@@ -71,7 +81,10 @@ class AdminUserService implements IAdminUserService {
   async getAppointments(id: string): Promise<readonly AdminAppointment[]> {
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}/appointments`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminUserDetail,
+        tags: [CACHE_TAGS.adminUserDetail],
+      },
     );
     return unwrapEnvelope<readonly AdminAppointment[]>(response);
   }
@@ -79,7 +92,10 @@ class AdminUserService implements IAdminUserService {
   async getChats(id: string): Promise<readonly AdminChat[]> {
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}/chats`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminUserDetail,
+        tags: [CACHE_TAGS.adminUserDetail],
+      },
     );
     return unwrapEnvelope<readonly AdminChat[]>(response);
   }
@@ -88,6 +104,8 @@ class AdminUserService implements IAdminUserService {
     id: string,
     sessionId: string,
   ): Promise<readonly AdminChatMessage[]> {
+    // Messages stay uncached: admins expect the freshest thread when they
+    // click into a chat, and stale messages undermine moderation reviews.
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}/chats/${encodeURIComponent(sessionId)}/messages`,
       { cache: "no-store" },
@@ -98,7 +116,10 @@ class AdminUserService implements IAdminUserService {
   async getCalendarConfig(id: string): Promise<AdminCalendarConfig | null> {
     const response = await authFetch(
       `/admin/users/${encodeURIComponent(id)}/calendar-config`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminUserDetail,
+        tags: [CACHE_TAGS.adminUserDetail],
+      },
     );
     return unwrapNullable<AdminCalendarConfig>(response);
   }

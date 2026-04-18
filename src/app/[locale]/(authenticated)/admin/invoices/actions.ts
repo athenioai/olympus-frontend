@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminInvoiceService } from "@/lib/services";
 import type { AdminInvoicePublic } from "@/lib/services";
 
@@ -30,6 +31,7 @@ export async function createInvoiceAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminInvoiceService.create(parsed.data);
+    invalidateInvoiceCaches();
     revalidatePath("/admin/invoices");
     return { success: true, data };
   } catch (err) {
@@ -42,6 +44,7 @@ export async function markInvoicePaidAction(
 ): Promise<InvoiceActionResult> {
   try {
     const data = await adminInvoiceService.markPaid(id);
+    invalidateInvoiceCaches();
     revalidatePath("/admin/invoices");
     return { success: true, data };
   } catch (err) {
@@ -54,11 +57,18 @@ export async function cancelInvoiceAction(
 ): Promise<InvoiceActionResult> {
   try {
     const data = await adminInvoiceService.cancel(id);
+    invalidateInvoiceCaches();
     revalidatePath("/admin/invoices");
     return { success: true, data };
   } catch (err) {
     return { success: false, error: mapErr(err) };
   }
+}
+
+function invalidateInvoiceCaches() {
+  updateTag(CACHE_TAGS.adminInvoices);
+  updateTag(CACHE_TAGS.adminInvoiceSummary);
+  updateTag(CACHE_TAGS.adminDashboard);
 }
 
 function mapErr(err: unknown): string {

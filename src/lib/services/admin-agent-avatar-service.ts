@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import { authFetch } from "./auth-fetch";
 import type { AgentAvatarAdmin } from "./interfaces/admin-types";
 import type {
@@ -44,7 +45,8 @@ class AdminAgentAvatarService implements IAdminAgentAvatarService {
 
   async list(): Promise<readonly AgentAvatarAdmin[]> {
     const response = await authFetch("/admin/agent-avatars", {
-      cache: "no-store",
+      revalidate: CACHE_TIMES.adminAvatars,
+      tags: [CACHE_TAGS.adminAvatars],
     });
     return unwrapEnvelope<readonly AgentAvatarAdmin[]>(response);
   }

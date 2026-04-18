@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type { PlanPublic } from "./interfaces/admin-types";
 import type {
   CreatePlanPayload,
@@ -17,14 +18,20 @@ class AdminPlanService implements IAdminPlanService {
   }
 
   async list(): Promise<readonly PlanPublic[]> {
-    const response = await authFetch("/admin/plans", { cache: "no-store" });
+    const response = await authFetch("/admin/plans", {
+      revalidate: CACHE_TIMES.adminPlans,
+      tags: [CACHE_TAGS.adminPlans],
+    });
     return unwrapEnvelope<readonly PlanPublic[]>(response);
   }
 
   async getById(id: string): Promise<PlanPublic> {
     const response = await authFetch(
       `/admin/plans/${encodeURIComponent(id)}`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminPlans,
+        tags: [CACHE_TAGS.adminPlans],
+      },
     );
     return unwrapEnvelope<PlanPublic>(response);
   }

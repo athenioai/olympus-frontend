@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminUserService } from "@/lib/services";
 import type {
   AdminCalendarConfig,
@@ -27,6 +28,7 @@ export async function updateCalendarConfigAction(
 ): Promise<CalendarUpdateResult> {
   try {
     const data = await adminUserService.updateCalendarConfig(userId, payload);
+    updateTag(CACHE_TAGS.adminUserDetail);
     revalidatePath(`/admin/users/${userId}`);
     return { success: true, data };
   } catch (err) {

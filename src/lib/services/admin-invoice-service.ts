@@ -1,5 +1,6 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
+import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type {
   AdminInvoicePublic,
   AdminInvoiceSummary,
@@ -19,21 +20,28 @@ class AdminInvoiceService implements IAdminInvoiceService {
   }
 
   async list(): Promise<readonly AdminInvoicePublic[]> {
-    const response = await authFetch("/admin/invoices", { cache: "no-store" });
+    const response = await authFetch("/admin/invoices", {
+      revalidate: CACHE_TIMES.adminInvoices,
+      tags: [CACHE_TAGS.adminInvoices],
+    });
     return unwrapEnvelope<readonly AdminInvoicePublic[]>(response);
   }
 
   async getById(id: string): Promise<AdminInvoicePublic> {
     const response = await authFetch(
       `/admin/invoices/${encodeURIComponent(id)}`,
-      { cache: "no-store" },
+      {
+        revalidate: CACHE_TIMES.adminInvoices,
+        tags: [CACHE_TAGS.adminInvoices],
+      },
     );
     return unwrapEnvelope<AdminInvoicePublic>(response);
   }
 
   async getDashboard(): Promise<AdminInvoiceSummary> {
     const response = await authFetch("/admin/invoices/dashboard", {
-      cache: "no-store",
+      revalidate: CACHE_TIMES.adminInvoices,
+      tags: [CACHE_TAGS.adminInvoiceSummary],
     });
     return unwrapEnvelope<AdminInvoiceSummary>(response);
   }

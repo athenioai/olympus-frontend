@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminPlanService } from "@/lib/services";
 import type { PlanPublic } from "@/lib/services";
 
@@ -29,6 +30,7 @@ export async function createPlanAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminPlanService.create(parsed.data);
+    updateTag(CACHE_TAGS.adminPlans);
     revalidatePath("/admin/plans");
     return { success: true, data };
   } catch (err) {
@@ -44,6 +46,7 @@ export async function updatePlanAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminPlanService.update(id, parsed.data);
+    updateTag(CACHE_TAGS.adminPlans);
     revalidatePath("/admin/plans");
     return { success: true, data };
   } catch (err) {
@@ -56,6 +59,8 @@ export async function deletePlanAction(
 ): Promise<PlanActionResult> {
   try {
     await adminPlanService.remove(id);
+    updateTag(CACHE_TAGS.adminPlans);
+    updateTag(CACHE_TAGS.adminUsers);
     revalidatePath("/admin/plans");
     return { success: true };
   } catch (err) {

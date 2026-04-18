@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminAgentAvatarService } from "@/lib/services";
 import type { AgentAvatarAdmin } from "@/lib/services";
 
@@ -47,6 +48,7 @@ export async function uploadAgentAvatarAction(
       ...(sortOrder !== undefined && !Number.isNaN(sortOrder) ? { sortOrder } : {}),
       ...(isActive !== undefined ? { isActive } : {}),
     });
+    updateTag(CACHE_TAGS.adminAvatars);
     revalidatePath("/admin/agent-avatars");
     return { success: true, data };
   } catch (err) {
@@ -62,6 +64,7 @@ export async function updateAgentAvatarAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminAgentAvatarService.update(id, parsed.data);
+    updateTag(CACHE_TAGS.adminAvatars);
     revalidatePath("/admin/agent-avatars");
     return { success: true, data };
   } catch (err) {
@@ -74,6 +77,7 @@ export async function deleteAgentAvatarAction(
 ): Promise<AvatarActionResult> {
   try {
     await adminAgentAvatarService.remove(id);
+    updateTag(CACHE_TAGS.adminAvatars);
     revalidatePath("/admin/agent-avatars");
     return { success: true };
   } catch (err) {

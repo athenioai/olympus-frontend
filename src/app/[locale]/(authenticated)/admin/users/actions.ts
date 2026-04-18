@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminUserService } from "@/lib/services";
 import type { AdminUserPublic } from "@/lib/services";
 
@@ -38,6 +39,8 @@ export async function createAdminUserAction(
 
   try {
     const data = await adminUserService.create(parsed.data);
+    updateTag(CACHE_TAGS.adminUsers);
+    updateTag(CACHE_TAGS.adminDashboard);
     revalidatePath("/admin/users");
     return { success: true, data };
   } catch (err) {
@@ -54,6 +57,8 @@ export async function updateAdminUserAction(
 
   try {
     const data = await adminUserService.update(id, parsed.data);
+    updateTag(CACHE_TAGS.adminUsers);
+    updateTag(CACHE_TAGS.adminUserDetail);
     revalidatePath("/admin/users");
     revalidatePath(`/admin/users/${id}`);
     return { success: true, data };

@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminSubscriptionService } from "@/lib/services";
 import type { SubscriptionPublic } from "@/lib/services";
 
@@ -31,6 +32,8 @@ export async function createSubscriptionAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminSubscriptionService.create(parsed.data);
+    updateTag(CACHE_TAGS.adminSubscriptions);
+    updateTag(CACHE_TAGS.adminDashboard);
     revalidatePath("/admin/subscriptions");
     return { success: true, data };
   } catch (err) {
@@ -46,6 +49,8 @@ export async function updateSubscriptionAction(
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
     const data = await adminSubscriptionService.update(id, parsed.data);
+    updateTag(CACHE_TAGS.adminSubscriptions);
+    updateTag(CACHE_TAGS.adminDashboard);
     revalidatePath("/admin/subscriptions");
     return { success: true, data };
   } catch (err) {
