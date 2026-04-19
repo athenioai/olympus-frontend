@@ -391,6 +391,12 @@
       "seedHolidaysDone": "Feriados sembrados.",
       "created": "Usuario creado.",
       "updated": "Usuario actualizado.",
+      "roleChange": {
+        "promoteTitle": "¿Promover a administrador?",
+        "promoteWarning": "Este usuario tendrá acceso total al panel admin: gestión de usuarios, planes, facturas y avatares.",
+        "demoteTitle": "¿Quitar privilegios de admin?",
+        "demoteWarning": "Este usuario perderá el acceso al panel admin y ya no podrá modificar otros usuarios."
+      },
       "table": {
         "name": "Nombre",
         "email": "Email",

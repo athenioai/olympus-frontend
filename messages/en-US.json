@@ -391,6 +391,12 @@
       "seedHolidaysDone": "Holidays seeded.",
       "created": "User created.",
       "updated": "User updated.",
+      "roleChange": {
+        "promoteTitle": "Promote to admin?",
+        "promoteWarning": "This user will gain full access to the admin panel: user management, plans, invoices and avatars.",
+        "demoteTitle": "Remove admin privileges?",
+        "demoteWarning": "This user will lose access to the admin panel and will no longer be able to modify other users."
+      },
       "table": {
         "name": "Name",
         "email": "Email",

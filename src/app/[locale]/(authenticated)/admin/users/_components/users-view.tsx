@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Calendar, Plus, UserCog } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PromptDialog } from "@/components/ui/prompt-dialog";
 import type { AdminUserPublic, PlanPublic } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
@@ -38,6 +39,10 @@ export function UsersView({
     | null
   >(null);
   const [seedPromptOpen, setSeedPromptOpen] = useState(false);
+  const [pendingRoleChange, setPendingRoleChange] = useState<
+    | { readonly id: string; readonly values: UserFormValues; readonly target: "admin" | "user" }
+    | null
+  >(null);
   const [isPending, startTransition] = useTransition();
 
   function handleCreateSubmit(values: UserFormValues) {
@@ -55,7 +60,23 @@ export function UsersView({
 
   function handleEditSubmit(values: UserFormValues) {
     if (formState?.mode !== "edit") return;
-    const id = formState.user.id;
+    const currentRole = formState.user.role;
+    const nextRole = values.role;
+    if (nextRole && nextRole !== currentRole) {
+      // Privilege change — promoting to admin or demoting from admin.
+      // Gate it behind a confirmation so a stray click doesn't grant
+      // platform-wide powers or lock out another operator.
+      setPendingRoleChange({
+        id: formState.user.id,
+        values,
+        target: nextRole,
+      });
+      return;
+    }
+    submitEdit(formState.user.id, values);
+  }
+
+  function submitEdit(id: string, values: UserFormValues) {
     startTransition(async () => {
       const result = await updateAdminUserAction(id, values);
       if (!result.success || !result.data) {
@@ -65,6 +86,7 @@ export function UsersView({
       const updated = result.data;
       setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
       setFormState(null);
+      setPendingRoleChange(null);
       toast.success(t("updated"));
     });
   }
@@ -202,6 +224,29 @@ export function UsersView({
         open={seedPromptOpen}
         placeholder="2026,2027"
         title={t("seedHolidays")}
+      />
+
+      <ConfirmDialog
+        cancelLabel={tCommon("cancel")}
+        confirmLabel={tCommon("confirm")}
+        description={
+          pendingRoleChange?.target === "admin"
+            ? t("roleChange.promoteWarning")
+            : t("roleChange.demoteWarning")
+        }
+        isPending={isPending}
+        onCancel={() => setPendingRoleChange(null)}
+        onConfirm={() => {
+          if (!pendingRoleChange) return;
+          submitEdit(pendingRoleChange.id, pendingRoleChange.values);
+        }}
+        open={pendingRoleChange !== null}
+        title={
+          pendingRoleChange?.target === "admin"
+            ? t("roleChange.promoteTitle")
+            : t("roleChange.demoteTitle")
+        }
+        variant="danger"
       />
     </div>
   );
