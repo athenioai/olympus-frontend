@@ -44,11 +44,27 @@ export function SocialLinksSection({
     onChange(links.filter((l) => l.id !== id));
   }
 
+  function pickAvailablePlatform(): SocialPlatform | null {
+    const used = new Set(links.map((l) => l.platform));
+    return SOCIAL_PLATFORMS.find((p) => !used.has(p)) ?? null;
+  }
+
   function addLink() {
-    onChange([
-      ...links,
-      { id: Date.now(), platform: "instagram", url: "" },
-    ]);
+    const next = pickAvailablePlatform();
+    if (!next) return;
+    onChange([...links, { id: Date.now(), platform: next, url: "" }]);
+  }
+
+  const availableForNew = pickAvailablePlatform();
+
+  function platformOptions(currentId: number) {
+    const usedByOthers = new Set(
+      links.filter((l) => l.id !== currentId).map((l) => l.platform),
+    );
+    return SOCIAL_PLATFORMS.map((p) => ({
+      value: p,
+      disabled: usedByOthers.has(p),
+    }));
   }
 
   return (
@@ -69,9 +85,9 @@ export function SocialLinksSection({
                 }
                 value={link.platform}
               >
-                {SOCIAL_PLATFORMS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
+                {platformOptions(link.id).map(({ value, disabled }) => (
+                  <option disabled={disabled} key={value} value={value}>
+                    {value}
                   </option>
                 ))}
               </select>
@@ -98,7 +114,8 @@ export function SocialLinksSection({
           </div>
         ))}
         <button
-          className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+          className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={availableForNew === null}
           onClick={addLink}
           type="button"
         >

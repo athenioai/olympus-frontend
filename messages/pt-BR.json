@@ -159,7 +159,8 @@
       "cnpjLabel": "CNPJ",
       "legalNameLabel": "Razão social",
       "foundedYearLabel": "Ano de fundação",
-      "differentialsLabel": "Diferenciais"
+      "differentialsLabel": "Diferenciais",
+      "addressRequiredError": "Preencha rua, cidade e UF ou limpe o endereço."
     },
     "step8": {
       "title": "Parabéns! Sua conta está configurada.",

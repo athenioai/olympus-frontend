@@ -59,18 +59,34 @@ export function Step7Extras({ state, onAdvance, onBack }: StepProps) {
     setOpenSection((prev) => (prev === section ? null : section));
   }
 
-  function buildInput(): SaveExtrasInput {
+  type BuildResult =
+    | { readonly ok: true; readonly input: SaveExtrasInput }
+    | { readonly ok: false; readonly reason: "addressPartial" };
+
+  function buildInput(): BuildResult {
     const input: SaveExtrasInput = {};
 
-    if (showAddress && address.street.trim() && address.city.trim() && address.state.trim()) {
-      input.address = {
-        street: address.street.trim(),
-        city: address.city.trim(),
-        state: address.state.trim().toUpperCase(),
-        ...(address.neighborhood.trim()
-          ? { neighborhood: address.neighborhood.trim() }
-          : {}),
-      };
+    if (showAddress) {
+      const street = address.street.trim();
+      const city = address.city.trim();
+      const stateValue = address.state.trim();
+      const anyFilled = Boolean(
+        street || city || stateValue || address.neighborhood.trim(),
+      );
+      const allRequired = Boolean(street && city && stateValue);
+      if (anyFilled && !allRequired) {
+        return { ok: false, reason: "addressPartial" };
+      }
+      if (allRequired) {
+        input.address = {
+          street,
+          city,
+          state: stateValue.toUpperCase(),
+          ...(address.neighborhood.trim()
+            ? { neighborhood: address.neighborhood.trim() }
+            : {}),
+        };
+      }
     }
 
     const links = socialLinks
@@ -97,11 +113,19 @@ export function Step7Extras({ state, onAdvance, onBack }: StepProps) {
     }
     if (Object.keys(companyPayload).length > 0) input.company = companyPayload;
 
-    return input;
+    return { ok: true, input };
   }
 
   function handleContinue() {
-    const input = buildInput();
+    const built = buildInput();
+    if (!built.ok) {
+      if (built.reason === "addressPartial") {
+        toast.error(t("addressRequiredError"));
+        setOpenSection("address");
+      }
+      return;
+    }
+    const input = built.input;
     if (Object.keys(input).length === 0) {
       onAdvance({}, 8);
       return;

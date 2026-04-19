@@ -159,7 +159,8 @@
       "cnpjLabel": "Tax ID",
       "legalNameLabel": "Legal name",
       "foundedYearLabel": "Founded year",
-      "differentialsLabel": "Differentials"
+      "differentialsLabel": "Differentials",
+      "addressRequiredError": "Fill street, city and state or clear the address."
     },
     "step8": {
       "title": "Congrats! Your account is set up.",
