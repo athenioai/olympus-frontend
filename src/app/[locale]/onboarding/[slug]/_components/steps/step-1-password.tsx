@@ -8,7 +8,7 @@ import { setPasswordStepAction } from "../../actions";
 import {
   meetsBackendPolicy,
   scorePasswordStrength,
-} from "../../_lib/password-strength";
+} from "@/lib/auth/password-strength";
 import type { StepProps } from "../wizard";
 
 export function Step1Password({ slug, state, onAdvance }: StepProps) {

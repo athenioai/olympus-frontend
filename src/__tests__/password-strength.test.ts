@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   meetsBackendPolicy,
   scorePasswordStrength,
-} from "@/app/[locale]/onboarding/[slug]/_lib/password-strength";
+} from "@/lib/auth/password-strength";
 
 describe("scorePasswordStrength", () => {
   it("rates short passwords as weak", () => {

@@ -9,8 +9,9 @@ const EXPIRY_BUFFER_MS = 30_000;
 const PUBLIC_REDIRECT_IF_AUTH = ["/login", "/forgot-password", "/signup"];
 
 // Paths that allow both anonymous and authenticated visitors without redirect
-// (the onboarding wizard authenticates the user mid-flow).
-const PUBLIC_ALLOW_BOTH = ["/onboarding"];
+// (onboarding wizard authenticates mid-flow; reset-password is a single-use
+// flow that may be opened on any device regardless of session state).
+const PUBLIC_ALLOW_BOTH = ["/onboarding", "/reset-password"];
 
 const intlMiddleware = createIntlMiddleware(routing);
 
