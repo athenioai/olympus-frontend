@@ -86,7 +86,11 @@ export async function seedHolidaysAction(
 }
 
 function apiErrorMessage(err: unknown): string {
-  if (err instanceof ApiError) return err.message;
+  if (err instanceof ApiError) {
+    // Known codes get a stable identifier the client can localize.
+    if (err.code === "AUTH_REGISTER_001") return "EMAIL_EXISTS";
+    return err.message;
+  }
   if (err instanceof Error) return err.message;
   return "UNKNOWN_ERROR";
 }

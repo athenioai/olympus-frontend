@@ -15,6 +15,7 @@ import type {
 } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
+import { endOfDayIsoInSaoPaulo } from "../../_lib/date";
 import { formatBRL, formatDate } from "../../_lib/format";
 import {
   cancelInvoiceAction,
@@ -103,8 +104,27 @@ export function InvoicesView({
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const amountParsed = Number.parseFloat(amount.replace(",", "."));
-    if (!Number.isFinite(amountParsed)) {
-      toast.error(tCommon("loadError"));
+    // Backend accepts 0.01..999999.99. Reject client-side to give a
+    // specific message instead of letting Zod error bubble up as INVALID_INPUT.
+    if (
+      !Number.isFinite(amountParsed) ||
+      amountParsed < 0.01 ||
+      amountParsed > 999999.99
+    ) {
+      toast.error(t("form.amountOutOfRange"));
+      return;
+    }
+    const latePercent = Number.parseFloat(lateFeePercent);
+    const interestPercent = Number.parseFloat(lateInterestPercent);
+    if (
+      !Number.isFinite(latePercent) ||
+      latePercent < 0 ||
+      latePercent > 100 ||
+      !Number.isFinite(interestPercent) ||
+      interestPercent < 0 ||
+      interestPercent > 100
+    ) {
+      toast.error(t("form.percentOutOfRange"));
       return;
     }
 
@@ -113,10 +133,10 @@ export function InvoicesView({
       ...(subscriptionId ? { subscriptionId } : {}),
       amount: amountParsed,
       ...(description.trim() ? { description: description.trim() } : {}),
-      dueDate: new Date(dueDate).toISOString(),
-      lateFeePercent: Number.parseFloat(lateFeePercent),
+      dueDate: endOfDayIsoInSaoPaulo(dueDate),
+      lateFeePercent: latePercent,
       lateInterestType,
-      lateInterestPercent: Number.parseFloat(lateInterestPercent),
+      lateInterestPercent: interestPercent,
     };
 
     startTransition(async () => {

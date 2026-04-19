@@ -810,6 +810,26 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
     loadChannels();
   }, [loadChannels]);
 
+  // If the backend redirected us back with ?whatsapp_error=..., surface it.
+  // Backend uses this param for expired/invalid state coming off the Meta
+  // callback. Strip the param from the URL so a reload doesn't re-toast.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("whatsapp_error");
+    if (!error) return;
+
+    if (error === "state_expired" || error === "invalid_state") {
+      toast.error(t("channels.whatsapp.stateExpired"));
+    } else {
+      toast.error(t("channels.whatsapp.connectFailed"));
+    }
+    params.delete("whatsapp_error");
+    const qs = params.toString();
+    const clean = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+    window.history.replaceState({}, "", clean);
+  }, [t]);
+
   const whatsappAccount = channels.find((c) => c.channel === "whatsapp");
   const telegramAccount = channels.find((c) => c.channel === "telegram");
 
@@ -818,7 +838,7 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
     // rejects any other value, so we must fetch it before redirecting.
     const result = await initWhatsAppOAuthAction();
     if (!result.success || !result.data) {
-      toast.error(result.error ?? tc("error"));
+      toast.error(t("channels.whatsapp.initFailed"));
       return;
     }
     const url =

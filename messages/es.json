@@ -110,7 +110,8 @@
       "subtitle": "Elige una opción y configuraremos tags, campos y FAQs para tu sector.",
       "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
       "confirm": "Confirmar",
-      "seeded": "Creamos {tags} tags, {fields} campos y {faqs} FAQs para ti. Edita en Configuración."
+      "seeded": "Creamos {tags} tags, {fields} campos y {faqs} FAQs para ti. Edita en Configuración.",
+      "updated": "Segmento actualizado."
     },
     "step4": {
       "title": "Sobre tu negocio",
@@ -158,7 +159,8 @@
       "cnpjLabel": "ID fiscal",
       "legalNameLabel": "Razón social",
       "foundedYearLabel": "Año de fundación",
-      "differentialsLabel": "Diferenciales"
+      "differentialsLabel": "Diferenciales",
+      "addressRequiredError": "Completa calle, ciudad y estado o limpia la dirección."
     },
     "step8": {
       "title": "¡Felicidades! Tu cuenta está configurada.",
@@ -389,6 +391,13 @@
       "seedHolidaysDone": "Feriados sembrados.",
       "created": "Usuario creado.",
       "updated": "Usuario actualizado.",
+      "emailExists": "Ya existe un usuario con este email.",
+      "roleChange": {
+        "promoteTitle": "¿Promover a administrador?",
+        "promoteWarning": "Este usuario tendrá acceso total al panel admin: gestión de usuarios, planes, facturas y avatares.",
+        "demoteTitle": "¿Quitar privilegios de admin?",
+        "demoteWarning": "Este usuario perderá el acceso al panel admin y ya no podrá modificar otros usuarios."
+      },
       "table": {
         "name": "Nombre",
         "email": "Email",
@@ -440,7 +449,9 @@
         "minCancelAdvance": "Antelación para cancelar (min)",
         "slotDuration": "Duración del slot (min)",
         "saveConfig": "Guardar configuración",
-        "saved": "Configuración actualizada."
+        "saved": "Configuración actualizada.",
+        "slotOutOfRange": "La duración del slot debe estar entre 10 y 240 minutos.",
+        "advanceOutOfRange": "Las antelaciones deben estar entre 0 y 10080 minutos (7 días)."
       }
     },
     "plans": {
@@ -517,7 +528,9 @@
         "lateInterestType": "Intereses",
         "lateInterestPercent": "Intereses mensuales (%)",
         "simple": "Simples",
-        "compound": "Compuestos"
+        "compound": "Compuestos",
+        "amountOutOfRange": "El importe debe estar entre R$ 0,01 y R$ 999.999,99.",
+        "percentOutOfRange": "Multa e intereses deben estar entre 0% y 100%."
       },
       "status": {
         "pending": "Pendiente",

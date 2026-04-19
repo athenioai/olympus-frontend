@@ -38,20 +38,30 @@ export function Step3Vertical({ state, onAdvance, onBack }: StepProps) {
 
   function handleConfirm() {
     if (!selected) return;
+    // Backend seeds tags/fields/FAQs only on the *first* vertical set.
+    // If the profile already has a vertical, this action just updates
+    // the pointer — no new catalog content is created, so we skip the
+    // "we created X tags" copy to avoid misleading the user.
+    const isFirstSelection =
+      !state.profileView?.profile?.businessVertical;
     startTransition(async () => {
       const result = await setVerticalAction(selected);
       if (!result.success || !result.profileView || !result.vertical) {
         toast.error(tNav("genericError"));
         return;
       }
-      const { tagsCount, customFieldsCount, faqsCount } = result.vertical;
-      toast.success(
-        t("seeded", {
-          tags: tagsCount,
-          fields: customFieldsCount,
-          faqs: faqsCount,
-        }),
-      );
+      if (isFirstSelection) {
+        const { tagsCount, customFieldsCount, faqsCount } = result.vertical;
+        toast.success(
+          t("seeded", {
+            tags: tagsCount,
+            fields: customFieldsCount,
+            faqs: faqsCount,
+          }),
+        );
+      } else {
+        toast.success(t("updated"));
+      }
       onAdvance({ profileView: result.profileView }, 4);
     });
   }

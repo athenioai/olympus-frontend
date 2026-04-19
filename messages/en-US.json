@@ -110,7 +110,8 @@
       "subtitle": "Pick one and we'll set up tags, fields and FAQs for your industry.",
       "counters": "{tags} tags · {fields} fields · {faqs} FAQs",
       "confirm": "Confirm",
-      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings."
+      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings.",
+      "updated": "Segment updated."
     },
     "step4": {
       "title": "About your business",
@@ -158,7 +159,8 @@
       "cnpjLabel": "Tax ID",
       "legalNameLabel": "Legal name",
       "foundedYearLabel": "Founded year",
-      "differentialsLabel": "Differentials"
+      "differentialsLabel": "Differentials",
+      "addressRequiredError": "Fill street, city and state or clear the address."
     },
     "step8": {
       "title": "Congrats! Your account is set up.",
@@ -389,6 +391,13 @@
       "seedHolidaysDone": "Holidays seeded.",
       "created": "User created.",
       "updated": "User updated.",
+      "emailExists": "A user with this email already exists.",
+      "roleChange": {
+        "promoteTitle": "Promote to admin?",
+        "promoteWarning": "This user will gain full access to the admin panel: user management, plans, invoices and avatars.",
+        "demoteTitle": "Remove admin privileges?",
+        "demoteWarning": "This user will lose access to the admin panel and will no longer be able to modify other users."
+      },
       "table": {
         "name": "Name",
         "email": "Email",
@@ -440,7 +449,9 @@
         "minCancelAdvance": "Cancel advance (min)",
         "slotDuration": "Slot duration (min)",
         "saveConfig": "Save configuration",
-        "saved": "Configuration updated."
+        "saved": "Configuration updated.",
+        "slotOutOfRange": "Slot duration must be between 10 and 240 minutes.",
+        "advanceOutOfRange": "Advance windows must be between 0 and 10080 minutes (7 days)."
       }
     },
     "plans": {
@@ -517,7 +528,9 @@
         "lateInterestType": "Interest type",
         "lateInterestPercent": "Monthly interest (%)",
         "simple": "Simple",
-        "compound": "Compound"
+        "compound": "Compound",
+        "amountOutOfRange": "Amount must be between R$ 0.01 and R$ 999,999.99.",
+        "percentOutOfRange": "Late fee and interest must be between 0% and 100%."
       },
       "status": {
         "pending": "Pending",
