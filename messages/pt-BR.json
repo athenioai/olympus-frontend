@@ -589,7 +589,10 @@
         "description": "Conecte sua conta do WhatsApp Business para receber e responder mensagens automaticamente.",
         "connect": "Conectar WhatsApp",
         "connected": "Conectado",
-        "notConnected": "Não conectado"
+        "notConnected": "Não conectado",
+        "initFailed": "Não foi possível iniciar a conexão com o WhatsApp. Tente novamente.",
+        "stateExpired": "A sessão expirou antes de concluir a conexão. Clique em Conectar novamente.",
+        "connectFailed": "Não foi possível completar a conexão com o WhatsApp."
       },
       "telegram": {
         "name": "Telegram",
