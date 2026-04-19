@@ -416,10 +416,30 @@ function CalendarPanel({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const slot = Number.parseInt(slotDuration, 10);
+    const advance = Number.parseInt(minAdvance, 10);
+    const cancel = Number.parseInt(minCancelAdvance, 10);
+    // Backend ranges (contract 2026-04-18): slot 10..240, advance/cancel 0..10080.
+    if (!Number.isFinite(slot) || slot < 10 || slot > 240) {
+      toast.error(t("slotOutOfRange"));
+      return;
+    }
+    if (
+      !Number.isFinite(advance) ||
+      advance < 0 ||
+      advance > 10080 ||
+      !Number.isFinite(cancel) ||
+      cancel < 0 ||
+      cancel > 10080
+    ) {
+      toast.error(t("advanceOutOfRange"));
+      return;
+    }
+
     const payload: UpdateCalendarConfigPayload = {
-      minAdvanceMinutes: Number.parseInt(minAdvance, 10),
-      minCancelAdvanceMinutes: Number.parseInt(minCancelAdvance, 10),
-      slotDurationMinutes: Number.parseInt(slotDuration, 10),
+      minAdvanceMinutes: advance,
+      minCancelAdvanceMinutes: cancel,
+      slotDurationMinutes: slot,
     };
 
     startTransition(async () => {

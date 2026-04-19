@@ -692,6 +692,7 @@
       "seedHolidaysDone": "Feriados preenchidos.",
       "created": "Usuário criado.",
       "updated": "Usuário atualizado.",
+      "emailExists": "Já existe um usuário com esse email.",
       "roleChange": {
         "promoteTitle": "Promover para administrador?",
         "promoteWarning": "Este usuário terá acesso total ao painel admin: gestão de usuários, planos, cobranças e avatares.",
@@ -749,7 +750,9 @@
         "minCancelAdvance": "Antecedência para cancelar (min)",
         "slotDuration": "Duração de slot (min)",
         "saveConfig": "Salvar configuração",
-        "saved": "Configuração atualizada."
+        "saved": "Configuração atualizada.",
+        "slotOutOfRange": "Duração de slot deve estar entre 10 e 240 minutos.",
+        "advanceOutOfRange": "Antecedências devem estar entre 0 e 10080 minutos (7 dias)."
       }
     },
     "plans": {
@@ -826,7 +829,9 @@
         "lateInterestType": "Juros",
         "lateInterestPercent": "Juros ao mês (%)",
         "simple": "Simples",
-        "compound": "Compostos"
+        "compound": "Compostos",
+        "amountOutOfRange": "Valor deve estar entre R$ 0,01 e R$ 999.999,99.",
+        "percentOutOfRange": "Multa e juros devem estar entre 0% e 100%."
       },
       "status": {
         "pending": "Pendente",

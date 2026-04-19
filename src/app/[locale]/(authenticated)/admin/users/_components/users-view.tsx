@@ -49,7 +49,12 @@ export function UsersView({
     startTransition(async () => {
       const result = await createAdminUserAction(values);
       if (!result.success || !result.data) {
-        toast.error(result.error ?? tc("loadError"));
+        const code = result.error;
+        toast.error(
+          code === "EMAIL_EXISTS"
+            ? t("emailExists")
+            : (code ?? tc("loadError")),
+        );
         return;
       }
       setUsers((prev) => [result.data as AdminUserPublic, ...prev]);
@@ -80,7 +85,12 @@ export function UsersView({
     startTransition(async () => {
       const result = await updateAdminUserAction(id, values);
       if (!result.success || !result.data) {
-        toast.error(result.error ?? tc("loadError"));
+        const code = result.error;
+        toast.error(
+          code === "EMAIL_EXISTS"
+            ? t("emailExists")
+            : (code ?? tc("loadError")),
+        );
         return;
       }
       const updated = result.data;
