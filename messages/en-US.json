@@ -110,7 +110,8 @@
       "subtitle": "Pick one and we'll set up tags, fields and FAQs for your industry.",
       "counters": "{tags} tags · {fields} fields · {faqs} FAQs",
       "confirm": "Confirm",
-      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings."
+      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings.",
+      "updated": "Segment updated."
     },
     "step4": {
       "title": "About your business",

@@ -110,7 +110,8 @@
       "subtitle": "Escolha uma opção e já configuramos tags, campos e FAQs pro seu ramo.",
       "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
       "confirm": "Confirmar",
-      "seeded": "Criamos {tags} tags, {fields} campos e {faqs} FAQs pra você. Edite em Configurações."
+      "seeded": "Criamos {tags} tags, {fields} campos e {faqs} FAQs pra você. Edite em Configurações.",
+      "updated": "Segmento atualizado."
     },
     "step4": {
       "title": "Sobre seu negócio",
