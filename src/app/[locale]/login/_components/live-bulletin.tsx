@@ -1,23 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useTicker } from "../_hooks/use-ticker";
 import { useBulletinContext } from "../_hooks/use-bulletin-context";
 import { useCountUp } from "../_hooks/use-count-up";
 import { fmtBRL } from "../_lib/fmt";
 import { BulletinTabs } from "./bulletin-tabs";
 import { BulletinSkeleton } from "./bulletin-skeleton";
-
-const DATE_FMT = new Intl.DateTimeFormat("pt-BR", {
-  weekday: "long",
-  day: "2-digit",
-  month: "long",
-});
-const TIME_FMT = new Intl.DateTimeFormat("pt-BR", {
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-});
 
 /**
  * Left dark column. Renders a skeleton during SSR/hydration so the layout
@@ -27,6 +17,7 @@ const TIME_FMT = new Intl.DateTimeFormat("pt-BR", {
  * data state instead of just hydration.
  */
 export function LiveBulletin() {
+  const t = useTranslations("auth.bulletin");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -38,9 +29,9 @@ export function LiveBulletin() {
       <BulletinHeader mounted={mounted} />
       {mounted ? <LiveBulletinContent /> : <BulletinSkeleton />}
       <footer className="auth-ed-footer">
-        <span>Boletim gerado a cada login.</span>
+        <span>{t("footerLeft")}</span>
         <span className="auth-ed-rule" />
-        <span>Olympus não dorme.</span>
+        <span>{t("footerRight")}</span>
       </footer>
     </div>
   );
@@ -51,6 +42,8 @@ interface BulletinHeaderProps {
 }
 
 function BulletinHeader({ mounted }: BulletinHeaderProps) {
+  const t = useTranslations("auth.bulletin");
+
   return (
     <header className="auth-ed-header">
       <div className="flex items-center gap-2.5">
@@ -60,7 +53,7 @@ function BulletinHeader({ mounted }: BulletinHeaderProps) {
         </div>
         <span className="auth-ed-live">
           <span className="auth-ed-live-dot" />
-          AO VIVO
+          {t("live")}
         </span>
       </div>
       {mounted && <BulletinClock />}
@@ -69,14 +62,30 @@ function BulletinHeader({ mounted }: BulletinHeaderProps) {
 }
 
 function BulletinClock() {
+  const t = useTranslations("auth.bulletin");
+  const locale = useLocale();
   const now = useTicker();
-  const dateStr = DATE_FMT.format(now);
-  const timeStr = TIME_FMT.format(now);
+
+  const dateFmt = new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+  });
+  const timeFmt = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  const dateStr = dateFmt.format(now);
+  const timeStr = timeFmt.format(now);
   const issueNo = String(now.getDate() + 7).padStart(3, "0");
 
   return (
     <div className="font-mono flex items-center gap-4 text-[10.5px] uppercase tracking-[0.12em] text-white/55">
-      <span>Nº {issueNo}</span>
+      <span>
+        {t("issuePrefix")} {issueNo}
+      </span>
       <span aria-hidden>·</span>
       <span>{dateStr}</span>
       <span aria-hidden>·</span>
@@ -86,6 +95,8 @@ function BulletinClock() {
 }
 
 function LiveBulletinContent() {
+  const t = useTranslations("auth.bulletin");
+  const locale = useLocale();
   const now = useTicker();
   const ctx = useBulletinContext(now);
 
@@ -93,21 +104,28 @@ function LiveBulletinContent() {
   const collected = useCountUp(ctx.collected, 1600, 260);
   const appts = useCountUp(ctx.appts, 1200, 220);
 
-  const windowCapitalized =
-    ctx.window.charAt(0).toUpperCase() + ctx.window.slice(1);
-
   return (
     <>
       <div className="auth-ed-masthead">
-        <div className="auth-ed-eyebrow">{ctx.label}</div>
+        <div className="auth-ed-eyebrow">
+          {t(`windowLabel.${ctx.daypart}`)}
+        </div>
         <h1 className="auth-ed-title">
-          {windowCapitalized}, Olympus atendeu{" "}
-          <em className="hot">{Math.round(people)} pessoas</em> e recuperou{" "}
-          <strong>{fmtBRL(collected)}</strong>.
+          {t.rich("title", {
+            window: t(`windowDesc.${ctx.daypart}`),
+            people: Math.round(people),
+            collected: fmtBRL(collected, locale),
+            em: (chunks) => <em className="hot">{chunks}</em>,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </h1>
       </div>
 
-      <BulletinTabs unit={ctx.unit} collected={collected} appts={appts} />
+      <BulletinTabs
+        unitKey={ctx.unit}
+        collected={collected}
+        appts={appts}
+      />
     </>
   );
 }

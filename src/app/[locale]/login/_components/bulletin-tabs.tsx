@@ -1,23 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChatTranscript } from "./chat-transcript";
 import { FinanceTab } from "./finance-tab";
 import { AgendaTab } from "./agenda-tab";
+import type { WindowUnit } from "../_hooks/use-bulletin-context";
 
 type TabKey = "chat" | "finance" | "agenda";
 
 const TAB_KEYS: readonly TabKey[] = ["chat", "finance", "agenda"];
 const STORAGE_KEY = "olympus.login.lastTab";
 
-interface TabDef {
-  readonly key: TabKey;
-  readonly label: string;
-  readonly meta: string;
-}
-
 interface BulletinTabsProps {
-  readonly unit: string;
+  readonly unitKey: WindowUnit;
   readonly collected: number;
   readonly appts: number;
 }
@@ -29,7 +25,8 @@ function readStoredTab(): TabKey {
 }
 
 /** Tab navigator + animated panel switcher; remembers the last tab choice. */
-export function BulletinTabs({ unit, collected, appts }: BulletinTabsProps) {
+export function BulletinTabs({ unitKey, collected, appts }: BulletinTabsProps) {
+  const t = useTranslations("auth.bulletin");
   const [active, setActive] = useState<TabKey>("chat");
 
   useEffect(() => {
@@ -43,13 +40,13 @@ export function BulletinTabs({ unit, collected, appts }: BulletinTabsProps) {
     }
   };
 
-  const tabs: readonly TabDef[] = [
-    { key: "chat", label: "Chat", meta: "WhatsApp · agora" },
-    { key: "finance", label: "Financeiro", meta: unit },
-    { key: "agenda", label: "Agenda", meta: "amanhã" },
+  const tabs: readonly { key: TabKey; label: string; meta: string }[] = [
+    { key: "chat", label: t("tabs.chat"), meta: t("tabs.chatMeta") },
+    { key: "finance", label: t("tabs.finance"), meta: t(`windowUnit.${unitKey}`) },
+    { key: "agenda", label: t("tabs.agenda"), meta: t("tabs.agendaMeta") },
   ];
 
-  const meta = tabs.find((t) => t.key === active)?.meta ?? "";
+  const meta = tabs.find((tab) => tab.key === active)?.meta ?? "";
 
   return (
     <div className="auth-ed-tabs">

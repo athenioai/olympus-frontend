@@ -31,7 +31,58 @@
     "welcomeBack": "Bienvenido de nuevo.",
     "lastSession": "Última sesión",
     "lastSessionAgo": "hace 9h, São Paulo",
-    "signupCta": "Crear cuenta"
+    "signupCta": "Crear cuenta",
+    "bulletin": {
+      "live": "EN VIVO",
+      "issuePrefix": "Nº",
+      "footerLeft": "Boletín generado en cada inicio de sesión.",
+      "footerRight": "Olympus no duerme.",
+      "windowLabel": {
+        "night": "Boletín de madrugada",
+        "morning": "Boletín matutino",
+        "afternoon": "Boletín de la tarde",
+        "evening": "Boletín de fin de día"
+      },
+      "windowDesc": {
+        "night": "Mientras dormías",
+        "morning": "Desde que empezó el día",
+        "afternoon": "En las últimas 4 horas",
+        "evening": "A lo largo de hoy"
+      },
+      "windowUnit": {
+        "shortDay": "últimas 8h",
+        "shortHalfDay": "últimas 4h",
+        "fullDay": "24h"
+      },
+      "title": "{window}, Olympus atendió a <em>{people} personas</em> y recuperó <strong>{collected}</strong>.",
+      "tabs": {
+        "chat": "Chat",
+        "finance": "Financiero",
+        "agenda": "Agenda",
+        "chatMeta": "WhatsApp · ahora",
+        "agendaMeta": "mañana"
+      },
+      "chat": {
+        "typing": "escribiendo"
+      },
+      "finance": {
+        "heroLabel": "Cobros recuperados",
+        "paid": "{count} pagados",
+        "pending": "{count} pendientes",
+        "delta": "▲ +18%",
+        "statusPaid": "pagado",
+        "statusPending": "esperando"
+      },
+      "agenda": {
+        "heroLabel": "Mañana · miércoles",
+        "heroValue": "{count} citas",
+        "confirmed": "{count} confirmadas",
+        "free": "{count} libres",
+        "tagNew": "cliente nuevo",
+        "tagConfirmed": "auto-agendado",
+        "freeService": "horario libre"
+      }
+    }
   },
   "forgotPassword": {
     "badge": "RECUPERACIÓN",

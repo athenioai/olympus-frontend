@@ -31,7 +31,58 @@
     "welcomeBack": "Welcome back.",
     "lastSession": "Last session",
     "lastSessionAgo": "9h ago, São Paulo",
-    "signupCta": "Create account"
+    "signupCta": "Create account",
+    "bulletin": {
+      "live": "LIVE",
+      "issuePrefix": "Nº",
+      "footerLeft": "Bulletin generated on every login.",
+      "footerRight": "Olympus never sleeps.",
+      "windowLabel": {
+        "night": "Overnight bulletin",
+        "morning": "Morning bulletin",
+        "afternoon": "Afternoon bulletin",
+        "evening": "End-of-day bulletin"
+      },
+      "windowDesc": {
+        "night": "While you were asleep",
+        "morning": "Since the day started",
+        "afternoon": "In the last 4 hours",
+        "evening": "Throughout today"
+      },
+      "windowUnit": {
+        "shortDay": "last 8h",
+        "shortHalfDay": "last 4h",
+        "fullDay": "24h"
+      },
+      "title": "{window}, Olympus served <em>{people} people</em> and recovered <strong>{collected}</strong>.",
+      "tabs": {
+        "chat": "Chat",
+        "finance": "Finance",
+        "agenda": "Agenda",
+        "chatMeta": "WhatsApp · now",
+        "agendaMeta": "tomorrow"
+      },
+      "chat": {
+        "typing": "typing"
+      },
+      "finance": {
+        "heroLabel": "Recovered charges",
+        "paid": "{count} paid",
+        "pending": "{count} pending",
+        "delta": "▲ +18%",
+        "statusPaid": "paid",
+        "statusPending": "awaiting"
+      },
+      "agenda": {
+        "heroLabel": "Tomorrow · Wed",
+        "heroValue": "{count} appointments",
+        "confirmed": "{count} confirmed",
+        "free": "{count} free",
+        "tagNew": "new client",
+        "tagConfirmed": "self-booked",
+        "freeService": "open slot"
+      }
+    }
   },
   "forgotPassword": {
     "badge": "RECOVERY",

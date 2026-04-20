@@ -1,9 +1,11 @@
 "use client";
 
+export type DayPart = "night" | "morning" | "afternoon" | "evening";
+export type WindowUnit = "shortDay" | "shortHalfDay" | "fullDay";
+
 export interface BulletinContext {
-  readonly label: string;
-  readonly window: string;
-  readonly unit: string;
+  readonly daypart: DayPart;
+  readonly unit: WindowUnit;
   readonly people: number;
   readonly revenue: number;
   readonly appts: number;
@@ -12,8 +14,9 @@ export interface BulletinContext {
 }
 
 /**
- * Returns time-aware copy + mocked counters for the editorial bulletin.
- * Buckets the day into 4 windows (madrugada, manhã, tarde, fim de dia).
+ * Returns time-aware bucket + mocked counters for the editorial bulletin.
+ * Buckets the day into 4 windows. Returns enum keys (not translated text)
+ * so the component can resolve copy via i18n.
  *
  * TODO(backend): replace counters with real "platform pulse" query results.
  */
@@ -22,9 +25,8 @@ export function useBulletinContext(now: Date): BulletinContext {
 
   if (hour < 6) {
     return {
-      label: "Boletim da madrugada",
-      window: "enquanto você dormiu",
-      unit: "últimas 8h",
+      daypart: "night",
+      unit: "shortDay",
       people: 312,
       revenue: 14200,
       appts: 47,
@@ -34,9 +36,8 @@ export function useBulletinContext(now: Date): BulletinContext {
   }
   if (hour < 12) {
     return {
-      label: "Boletim matutino",
-      window: "desde que o dia começou",
-      unit: "últimas 4h",
+      daypart: "morning",
+      unit: "shortHalfDay",
       people: 186,
       revenue: 8640,
       appts: 29,
@@ -46,9 +47,8 @@ export function useBulletinContext(now: Date): BulletinContext {
   }
   if (hour < 18) {
     return {
-      label: "Boletim da tarde",
-      window: "nas últimas 4 horas",
-      unit: "últimas 4h",
+      daypart: "afternoon",
+      unit: "shortHalfDay",
       people: 224,
       revenue: 11430,
       appts: 38,
@@ -57,9 +57,8 @@ export function useBulletinContext(now: Date): BulletinContext {
     };
   }
   return {
-    label: "Boletim do fim de dia",
-    window: "ao longo de hoje",
-    unit: "24h",
+    daypart: "evening",
+    unit: "fullDay",
     people: 647,
     revenue: 32810,
     appts: 94,

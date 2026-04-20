@@ -1,7 +1,8 @@
 /**
  * Formats a number as Brazilian Real currency (e.g., "R$ 1.234").
- * Rounds to nearest integer; uses non-breaking space between symbol and value.
+ * Currency is always BRL (the platform operates in Brazil); only the
+ * thousands/decimal separator follows the user's locale.
  */
-export function fmtBRL(value: number): string {
-  return `R$\u00A0${Math.round(value).toLocaleString("pt-BR")}`;
+export function fmtBRL(value: number, locale = "pt-BR"): string {
+  return `R$\u00A0${Math.round(value).toLocaleString(locale)}`;
 }

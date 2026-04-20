@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CHAT_MESSAGES } from "../_lib/bulletin-data";
 
 /**
@@ -15,6 +16,7 @@ let hasPlayedThisPageLoad = false;
  * render the full transcript instantly.
  */
 export function ChatTranscript() {
+  const t = useTranslations("auth.bulletin.chat");
   const [visible, setVisible] = useState(() =>
     hasPlayedThisPageLoad ? CHAT_MESSAGES.length : 0,
   );
@@ -60,7 +62,9 @@ export function ChatTranscript() {
       ))}
       {typing && next && (
         <div className={`auth-ed-msg ${next.who} auth-ed-typing fade-in-up`}>
-          <span className="auth-ed-msg-meta">{next.name} · digitando</span>
+          <span className="auth-ed-msg-meta">
+            {next.name} · {t("typing")}
+          </span>
           <span className="auth-ed-dots">
             <i />
             <i />
