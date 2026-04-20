@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminPlanService } from "@/lib/services";
 import type { PlanPublic } from "@/lib/services";
@@ -15,17 +16,22 @@ export interface PlanActionResult {
 
 const createSchema = z.object({
   name: z.string().trim().min(1).max(100),
-  cost: z.number().min(0).max(999999.99),
+  cost: z.number().min(0.01).max(999999.99),
 });
 
 const updateSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
-  cost: z.number().min(0).max(999999.99).optional(),
+  cost: z.number().min(0.01).max(999999.99).optional(),
 });
+
+const idSchema = z.string().uuid();
 
 export async function createPlanAction(
   input: unknown,
 ): Promise<PlanActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
   const parsed = createSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
@@ -42,6 +48,12 @@ export async function updatePlanAction(
   id: string,
   input: unknown,
 ): Promise<PlanActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   const parsed = updateSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
@@ -57,6 +69,12 @@ export async function updatePlanAction(
 export async function deletePlanAction(
   id: string,
 ): Promise<PlanActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   try {
     await adminPlanService.remove(id);
     updateTag(CACHE_TAGS.adminPlans);

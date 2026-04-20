@@ -7,6 +7,7 @@ import type {
   AuthUser,
   IAuthService,
   LoginResponse,
+  PasswordResetTokenValidation,
   WhatsAppOAuthInit,
 } from "./interfaces/auth-service";
 
@@ -109,6 +110,60 @@ class AuthService implements IAuthService {
       method: "POST",
     });
     return unwrapEnvelope<WhatsAppOAuthInit>(response);
+  }
+
+  /**
+   * Request a password recovery link.
+   *
+   * The backend MUST always return 204 regardless of whether the email
+   * exists (to prevent account enumeration) and MUST rate-limit per IP
+   * and per email.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const response = await fetch(`${API_URL}/auth/password/forgot`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) {
+      throw new Error("PASSWORD_RESET_REQUEST_FAILED");
+    }
+  }
+
+  /**
+   * Validate a password-reset token without consuming it. Used to decide
+   * whether to show the form or the invalid-link state on page load.
+   */
+  async validateResetToken(
+    token: string,
+  ): Promise<PasswordResetTokenValidation> {
+    const response = await fetch(
+      `${API_URL}/auth/password/reset/validate?token=${encodeURIComponent(token)}`,
+    );
+    if (response.status === 404 || response.status === 410) {
+      return { valid: false };
+    }
+    if (!response.ok) {
+      return { valid: false };
+    }
+    return unwrapEnvelope<PasswordResetTokenValidation>(response);
+  }
+
+  /**
+   * Consume the reset token and set a new password. Backend MUST invalidate
+   * all active refresh tokens for the user so other sessions are logged out.
+   */
+  async resetPassword(token: string, password: string): Promise<void> {
+    const response = await fetch(`${API_URL}/auth/password/reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password }),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => null);
+      const code = body?.error?.code as string | undefined;
+      throw new Error(code ?? "PASSWORD_RESET_FAILED");
+    }
   }
 }
 

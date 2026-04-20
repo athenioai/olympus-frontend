@@ -127,6 +127,35 @@ export function formatCNPJ(cnpj: string): string {
 }
 
 /**
+ * Validates a Brazilian CNPJ (14 digits + checksum).
+ * Strips formatting characters before checking.
+ */
+export function isValidCNPJ(cnpj: string): boolean {
+  const digits = cnpj.replace(/\D/g, "");
+  if (digits.length !== 14) return false;
+  // Reject sequences of identical digits (e.g. "00000000000000") — they
+  // pass the checksum algorithm but are never real CNPJs.
+  if (/^(\d)\1{13}$/.test(digits)) return false;
+
+  const calc = (base: string, weights: readonly number[]): number => {
+    const sum = base
+      .split("")
+      .reduce((acc, char, i) => acc + Number(char) * weights[i], 0);
+    const rem = sum % 11;
+    return rem < 2 ? 0 : 11 - rem;
+  };
+
+  const base12 = digits.slice(0, 12);
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] as const;
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] as const;
+
+  const d1 = calc(base12, weights1);
+  const d2 = calc(base12 + String(d1), weights2);
+
+  return digits[12] === String(d1) && digits[13] === String(d2);
+}
+
+/**
  * Format a date as ISO date string (YYYY-MM-DD).
  * @param date - Date object
  * @returns ISO date string

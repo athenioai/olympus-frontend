@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { authService } from "@/lib/services/auth-service";
 
 interface ForgotPasswordResult {
   readonly success: boolean;
@@ -14,15 +15,15 @@ const RequestSchema = z.object({
 /**
  * Server action for the password recovery request.
  *
- * TODO(backend): wire to `POST /auth/password/forgot { email }`.
- * The endpoint must:
- *   - always return 204 regardless of whether the email exists (avoid
- *     account enumeration);
- *   - rate-limit per IP and per email (the 60s client cooldown is UX-only);
- *   - dispatch the email asynchronously with a single-use 30-min token.
+ * Wires to `authService.requestPasswordReset` which POSTs to
+ * `/auth/password/forgot`. Backend contract:
+ *   - Always 204 regardless of email existence (prevents account enumeration)
+ *   - Rate-limit per IP (5/min) and per email (3/hour)
+ *   - Async email dispatch with a single-use 30-min token
  *
- * For now this stub validates the email shape and returns success after a
- * brief delay so the UI flows correctly.
+ * We surface a generic "success" to the UI even when the fetch fails at the
+ * network layer — the enumeration-safe behavior is the same contract.
+ * Logging of real failures belongs in backend observability, not here.
  */
 export async function requestPasswordResetAction(
   formData: FormData,
@@ -33,13 +34,19 @@ export async function requestPasswordResetAction(
   if (!parsed.success) {
     return {
       success: false,
-      error: typeof raw === "string" && raw.trim().length === 0
-        ? "EMAIL_REQUIRED"
-        : "EMAIL_INVALID",
+      error:
+        typeof raw === "string" && raw.trim().length === 0
+          ? "EMAIL_REQUIRED"
+          : "EMAIL_INVALID",
     };
   }
 
-  await new Promise<void>((resolve) => setTimeout(resolve, 400));
+  try {
+    await authService.requestPasswordReset(parsed.data.email);
+  } catch {
+    // Swallow — UI always shows the same "check your inbox" state to avoid
+    // leaking whether the email is registered.
+  }
 
   return { success: true };
 }

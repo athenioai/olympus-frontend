@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminUserService } from "@/lib/services";
 import type { AdminUserPublic } from "@/lib/services";
@@ -15,6 +16,7 @@ export interface AdminActionResult<T = undefined> {
 
 const workTypeSchema = z.enum(["services", "sales", "hybrid"]);
 const roleSchema = z.enum(["admin", "user"]);
+const idSchema = z.string().uuid();
 
 const createUserSchema = z.object({
   name: z.string().trim().min(1).max(255),
@@ -34,6 +36,9 @@ const updateUserSchema = z.object({
 export async function createAdminUserAction(
   input: unknown,
 ): Promise<AdminActionResult<AdminUserPublic>> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
   const parsed = createUserSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
 
@@ -52,6 +57,12 @@ export async function updateAdminUserAction(
   id: string,
   input: unknown,
 ): Promise<AdminActionResult<AdminUserPublic>> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   const parsed = updateUserSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
 
@@ -70,6 +81,9 @@ export async function updateAdminUserAction(
 export async function seedHolidaysAction(
   yearsCsv: string,
 ): Promise<AdminActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
   const years = yearsCsv
     .split(",")
     .map((y) => y.trim())
@@ -87,7 +101,6 @@ export async function seedHolidaysAction(
 
 function apiErrorMessage(err: unknown): string {
   if (err instanceof ApiError) {
-    // Known codes get a stable identifier the client can localize.
     if (err.code === "AUTH_REGISTER_001") return "EMAIL_EXISTS";
     return err.message;
   }

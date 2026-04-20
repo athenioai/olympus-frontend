@@ -61,6 +61,7 @@ export function InvoicesView({
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const todayYmd = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const [lateFeePercent, setLateFeePercent] = useState("2");
   const [lateInterestType, setLateInterestType] =
     useState<LateInterestType>("simple");
@@ -103,6 +104,9 @@ export function InvoicesView({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Guard against double-submit: isPending may not have flipped to true yet
+    // on a second rapid click within the same render frame.
+    if (isPending) return;
     const amountParsed = Number.parseFloat(amount.replace(",", "."));
     // Backend accepts 0.01..999999.99. Reject client-side to give a
     // specific message instead of letting Zod error bubble up as INVALID_INPUT.
@@ -364,6 +368,7 @@ export function InvoicesView({
             <Field label={t("form.dueDate")}>
               <input
                 className={INPUT_CLASS}
+                min={todayYmd}
                 onChange={(e) => setDueDate(e.target.value)}
                 required
                 type="date"

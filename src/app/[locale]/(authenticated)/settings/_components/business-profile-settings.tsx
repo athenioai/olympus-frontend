@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { isValidCNPJ } from "@/lib/format";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 import {
   fetchBusinessProfile,
@@ -233,6 +234,12 @@ export function BusinessProfileSettings() {
   useEffect(() => { loadProfile(); }, [loadProfile]);
 
   function handleSave() {
+    const cnpjDigits = cnpj.replace(/\D/g, "");
+    if (cnpjDigits && !isValidCNPJ(cnpjDigits)) {
+      toast.error(t("profile.errors.cnpjInvalid"));
+      return;
+    }
+
     startTransition(async () => {
       const profileResult = await saveBusinessProfile({
         businessName: businessName.trim(),
@@ -242,7 +249,7 @@ export function BusinessProfileSettings() {
         cancellationPolicy: cancellationPolicy.trim(),
         differentials: differentials.trim() || null,
         escalationRules: escalationRules.trim() || null,
-        cnpj: cnpj.replace(/\D/g, "") || null,
+        cnpj: cnpjDigits || null,
         legalName: legalName.trim() || null,
         foundedYear: foundedYear ? Number(foundedYear) : null,
       });

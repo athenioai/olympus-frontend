@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminAgentAvatarService } from "@/lib/services";
 import type { AgentAvatarAdmin } from "@/lib/services";
@@ -19,9 +20,14 @@ const updateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+const idSchema = z.string().uuid();
+
 export async function uploadAgentAvatarAction(
   formData: FormData,
 ): Promise<AvatarActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
   const file = formData.get("file");
   const name = formData.get("name");
   const sortOrderRaw = formData.get("sortOrder");
@@ -60,6 +66,12 @@ export async function updateAgentAvatarAction(
   id: string,
   input: unknown,
 ): Promise<AvatarActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   const parsed = updateSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
@@ -75,6 +87,12 @@ export async function updateAgentAvatarAction(
 export async function deleteAgentAvatarAction(
   id: string,
 ): Promise<AvatarActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   try {
     await adminAgentAvatarService.remove(id);
     updateTag(CACHE_TAGS.adminAvatars);

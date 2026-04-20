@@ -17,9 +17,17 @@ export interface WhatsAppOAuthInit {
   readonly state: string;
 }
 
+export interface PasswordResetTokenValidation {
+  readonly valid: boolean;
+  readonly maskedEmail?: string;
+}
+
 export interface IAuthService {
   login(email: string, password: string): Promise<LoginResponse>;
   logout(): Promise<void>;
   getSession(): Promise<AuthUser | null>;
   initWhatsAppOAuth(): Promise<WhatsAppOAuthInit>;
+  requestPasswordReset(email: string): Promise<void>;
+  validateResetToken(token: string): Promise<PasswordResetTokenValidation>;
+  resetPassword(token: string, password: string): Promise<void>;
 }

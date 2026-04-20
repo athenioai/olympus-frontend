@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { isValidCNPJ } from "@/lib/format";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import {
   businessProfileService,
@@ -305,7 +306,15 @@ const socialLinkSchema = z.object({
 const serviceAreaSchema = z.object({ name: z.string().trim().min(1).max(100) });
 
 const companySchema = z.object({
-  cnpj: z.string().trim().max(32).nullish(),
+  cnpj: z
+    .string()
+    .trim()
+    .max(32)
+    .nullish()
+    .refine(
+      (value) => !value || isValidCNPJ(value),
+      { message: "CNPJ_INVALID" },
+    ),
   legalName: z.string().trim().max(200).nullish(),
   foundedYear: z
     .number()

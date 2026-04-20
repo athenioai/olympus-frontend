@@ -668,6 +668,9 @@
       "optional": "Opcional",
       "save": "Salvar perfil",
       "discard": "Descartar",
+      "errors": {
+        "cnpjInvalid": "CNPJ inválido. Verifique os 14 dígitos."
+      },
       "sections": {
         "required": "Dados obrigatórios",
         "requiredDesc": "Esses campos são necessários para conectar um canal de atendimento.",

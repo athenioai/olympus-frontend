@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminSubscriptionService } from "@/lib/services";
 import type { SubscriptionPublic } from "@/lib/services";
@@ -25,9 +26,14 @@ const updateSchema = z.object({
   status: z.enum(["active", "suspended", "cancelled"]).optional(),
 });
 
+const idSchema = z.string().uuid();
+
 export async function createSubscriptionAction(
   input: unknown,
 ): Promise<SubscriptionActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
   const parsed = createSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
   try {
@@ -45,8 +51,28 @@ export async function updateSubscriptionAction(
   id: string,
   input: unknown,
 ): Promise<SubscriptionActionResult> {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { success: false, error: guard.error };
+
+  if (!idSchema.safeParse(id).success) {
+    return { success: false, error: "INVALID_ID" };
+  }
   const parsed = updateSchema.safeParse(input);
   if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+
+  // `cancelled` is a terminal state — reactivating requires creating a new
+  // subscription so billing cycles restart cleanly. Reject transitions out.
+  if (parsed.data.status !== undefined) {
+    try {
+      const current = await adminSubscriptionService.getById(id);
+      if (current?.status === "cancelled") {
+        return { success: false, error: "SUBSCRIPTION_CANCELLED_TERMINAL" };
+      }
+    } catch {
+      // If the current lookup fails (e.g. 404), let the backend decide on update.
+    }
+  }
+
   try {
     const data = await adminSubscriptionService.update(id, parsed.data);
     updateTag(CACHE_TAGS.adminSubscriptions);

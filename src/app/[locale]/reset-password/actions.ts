@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { authService } from "@/lib/services/auth-service";
 import { meetsBackendPolicy } from "@/lib/auth/password-strength";
 
 export interface TokenValidationResult {
@@ -19,14 +20,11 @@ const ResetSchema = z.object({
 });
 
 /**
- * Validates the recovery token. Called server-side from the page so the user
- * lands directly on the right state (form / invalid).
+ * Validates the recovery token via the backend. Called server-side from the
+ * page so the user lands directly on the right state (form / invalid).
  *
- * TODO(backend): wire to `GET /auth/password/reset/validate?token=...`
- *   Response: { valid: boolean, maskedEmail?: string }
- *   The endpoint must NOT consume the token — only check existence + expiry.
- *
- * Mock rule: any non-empty token >= 10 chars is considered valid.
+ * Backend contract: GET /auth/password/reset/validate?token=... returns
+ *   { valid: boolean, maskedEmail?: string } without consuming the token.
  */
 export async function validateResetTokenAction(
   token: string,
@@ -34,17 +32,20 @@ export async function validateResetTokenAction(
   if (!token || token.length < 10) {
     return { valid: false };
   }
-  return { valid: true, maskedEmail: "ra\u2022\u2022\u2022\u2022@studioapice.com.br" };
+  try {
+    return await authService.validateResetToken(token);
+  } catch {
+    return { valid: false };
+  }
 }
 
 /**
  * Submits the new password.
  *
- * TODO(backend): wire to `POST /auth/password/reset { token, password }`.
- *   - validate token + consume (single-use)
- *   - enforce password policy server-side
- *   - return 204 on success; 400 with code on failure (TOKEN_INVALID,
- *     TOKEN_EXPIRED, PASSWORD_WEAK)
+ * Backend contract: POST /auth/password/reset { token, password }
+ *   - 204 on success
+ *   - 400/410 with code TOKEN_INVALID | TOKEN_EXPIRED | PASSWORD_WEAK
+ *   - On success, invalidate ALL active refresh tokens for the user
  */
 export async function resetPasswordAction(
   formData: FormData,
@@ -62,7 +63,11 @@ export async function resetPasswordAction(
     return { success: false, error: "PASSWORD_WEAK" };
   }
 
-  await new Promise<void>((resolve) => setTimeout(resolve, 500));
-
-  return { success: true };
+  try {
+    await authService.resetPassword(parsed.data.token, parsed.data.password);
+    return { success: true };
+  } catch (err) {
+    const code = err instanceof Error ? err.message : "PASSWORD_RESET_FAILED";
+    return { success: false, error: code };
+  }
 }

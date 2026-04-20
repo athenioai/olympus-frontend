@@ -100,16 +100,25 @@ export async function updatePrepaymentSetting(
  * @param accessToken - Access/bot token
  * @returns Created channel account or error
  */
+const channelSchema = z.enum(["whatsapp", "telegram"]);
+
 export async function connectChannel(
   channel: string,
   accessToken: string,
 ): Promise<ActionResult<ChannelAccount>> {
-  if (!channel || !accessToken.trim()) {
+  const channelParsed = channelSchema.safeParse(channel);
+  if (!channelParsed.success) {
+    return { success: false, error: "INVALID_CHANNEL" };
+  }
+  if (!accessToken.trim()) {
     return { success: false, error: "Token obrigatório." };
   }
 
   try {
-    const data = await channelAccountService.create({ channel, accessToken: accessToken.trim() });
+    const data = await channelAccountService.create({
+      channel: channelParsed.data,
+      accessToken: accessToken.trim(),
+    });
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {

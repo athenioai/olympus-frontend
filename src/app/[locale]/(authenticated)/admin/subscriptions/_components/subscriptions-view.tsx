@@ -264,6 +264,7 @@ export function SubscriptionsView({
             <Field label={t("form.status")}>
               <select
                 className={INPUT_CLASS}
+                disabled={formState.subscription.status === "cancelled"}
                 onChange={(e) => setStatus(e.target.value as SubscriptionStatus)}
                 value={status}
               >
