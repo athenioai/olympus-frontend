@@ -166,8 +166,49 @@
     "next": "Continue",
     "back": "Back",
     "skip": "Skip",
+    "skipWithWarn": "Skip — agent will ask later",
+    "skipWithRisk": "Skip without filling — reduces quality",
+    "finish": "Finish",
+    "stepWord": "Step",
+    "etaMins": "~ {mins} min until your agent is ready",
+    "etaFinal": "final touches",
     "submitting": "Saving...",
     "genericError": "Could not save. Please try again.",
+    "bulletin": {
+      "label": "Configuring your agent",
+      "exit": "Save and continue later",
+      "previewLabel": "Your agent · live preview",
+      "online": "online",
+      "inputPlaceholder": "Type a message…",
+      "statusConfiguring": "Configuring…",
+      "statusReady": "Ready to operate",
+      "contextLabel": "Learned context",
+      "ctxType": "Type",
+      "ctxVertical": "Vertical",
+      "ctxName": "Name",
+      "ctxModality": "Modality",
+      "ctxPolicies": "Policies",
+      "ctxExtras": "Extras"
+    },
+    "eyebrows": {
+      "step1": "Security",
+      "step2": "Business type",
+      "step3": "Identity",
+      "step4": "Vertical",
+      "step5": "Service mode",
+      "step6": "Ground rules",
+      "step7": "Final details",
+      "step8": "System live"
+    },
+    "ready": {
+      "eyebrow": "System live",
+      "title": "{name} is open for business.",
+      "fallbackName": "Your business",
+      "sub": "Your agent already answers, schedules and bills. The first customer who messages you now, it handles alone.",
+      "ctaPrimary": "See my Olympus at work",
+      "ctaSecondary": "Send a test message",
+      "scoreLabel": "Profile"
+    },
     "errorBoundary": {
       "title": "Something went wrong",
       "retry": "Try again",
@@ -207,15 +248,8 @@
       "hybridHint": "Sales and services"
     },
     "step3": {
-      "title": "What's your business segment?",
-      "subtitle": "Pick one and we'll set up tags, fields and FAQs for your industry.",
-      "counters": "{tags} tags · {fields} fields · {faqs} FAQs",
-      "confirm": "Confirm",
-      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings.",
-      "updated": "Segment updated."
-    },
-    "step4": {
       "title": "About your business",
+      "subtitle": "The name your agent will introduce itself with. The description sets the tone of the conversation.",
       "nameLabel": "Business name",
       "namePlaceholder": "John's Barbershop",
       "descriptionLabel": "Description",
@@ -223,8 +257,17 @@
       "errorNameShort": "Name must be between 2 and 120 characters.",
       "errorDescriptionShort": "Description must be between 10 and 2000 characters."
     },
+    "step4": {
+      "title": "What's your business segment?",
+      "subtitle": "Pick one and we'll set up tags, fields and FAQs for your industry.",
+      "counters": "{tags} tags · {fields} fields · {faqs} FAQs",
+      "confirm": "Confirm",
+      "seeded": "We created {tags} tags, {fields} fields and {faqs} FAQs for you. Edit in Settings.",
+      "updated": "Segment updated."
+    },
     "step5": {
       "title": "How do you serve customers?",
+      "subtitle": "Tells the agent whether to suggest an address, share a link, or ask the customer.",
       "presencial": "In person",
       "presencialHint": "Customers come to you",
       "remoto": "Remote",
@@ -236,6 +279,7 @@
     },
     "step6": {
       "title": "Service policies",
+      "subtitle": "What the agent can promise and what it needs to charge.",
       "paymentLabel": "Payment methods",
       "paymentPlaceholder": "E.g. We accept Pix and card up to 3x interest-free.",
       "cancellationLabel": "Cancellation policy",
@@ -451,7 +495,8 @@
       "subscriptions": "Subscriptions",
       "billing": "Billing",
       "invoices": "Invoices",
-      "avatars": "Avatars"
+      "avatars": "Avatars",
+      "onboardingPreview": "Onboarding Preview"
     }
   },
   "admin": {

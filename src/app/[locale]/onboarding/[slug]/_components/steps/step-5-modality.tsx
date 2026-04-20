@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 import type { ServiceModality } from "@/lib/services";
 import { updateServiceModalityAction } from "../../actions";
 import type { StepProps } from "../wizard";
+import { OnbNav } from "../onb-nav";
 
 const OPTIONS: readonly ServiceModality[] = [
   "presencial",
@@ -14,9 +16,13 @@ const OPTIONS: readonly ServiceModality[] = [
   "hibrido",
 ];
 
-export function Step5Modality({ state, onAdvance, onBack }: StepProps) {
+export function Step5Modality({
+  state,
+  onAdvance,
+  onBack,
+  onSkip,
+}: StepProps) {
   const t = useTranslations("onboarding.step5");
-  const tc = useTranslations("common");
   const tNav = useTranslations("onboarding");
 
   const [selected, setSelected] = useState<ServiceModality | null>(
@@ -37,65 +43,35 @@ export function Step5Modality({ state, onAdvance, onBack }: StepProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="font-display text-2xl font-bold text-on-surface">
-        {t("title")}
-      </h2>
-
-      <div className="space-y-2">
+    <div className="flex flex-col gap-6">
+      <div className="onb-grid-2">
         {OPTIONS.map((value) => {
-          const isSelected = selected === value;
+          const on = selected === value;
           return (
             <button
-              aria-pressed={isSelected}
-              className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 ${
-                isSelected
-                  ? "border-primary bg-primary/5"
-                  : "border-transparent bg-surface-container-high hover:border-primary/40"
-              }`}
+              aria-pressed={on}
+              className={`onb-pick${on ? " on" : ""}`}
               key={value}
               onClick={() => setSelected(value)}
               type="button"
             >
-              <div
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                  isSelected ? "border-primary" : "border-on-surface-variant/40"
-                }`}
-              >
-                {isSelected && (
-                  <div className="h-2.5 w-2.5 rounded-full bg-primary" />
-                )}
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="onb-pick-title">{t(value)}</div>
+                <div className="onb-pick-sub">{t(`${value}Hint`)}</div>
               </div>
-              <div>
-                <p className="font-display text-sm font-bold text-on-surface">
-                  {t(value)}
-                </p>
-                <p className="text-xs text-on-surface-variant">
-                  {t(`${value}Hint`)}
-                </p>
-              </div>
+              {on && <Check className="size-4 text-primary" />}
             </button>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <button
-          className="text-sm font-medium text-on-surface-variant hover:text-on-surface"
-          onClick={onBack}
-          type="button"
-        >
-          {tNav("back")}
-        </button>
-        <button
-          className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 font-display font-bold text-on-primary shadow-lg shadow-primary/10 transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
-          disabled={!selected || isPending}
-          onClick={handleContinue}
-          type="button"
-        >
-          {isPending ? tc("loading") : tNav("next")}
-        </button>
-      </div>
+      <OnbNav
+        canContinue={!!selected}
+        isPending={isPending}
+        onBack={onBack}
+        onContinue={handleContinue}
+        onSkip={onSkip}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { saveExtrasAction, type SaveExtrasInput } from "../../actions";
 import type { StepProps } from "../wizard";
+import { OnbNav } from "../onb-nav";
 import {
   AddressSection,
   EMPTY_ADDRESS,
@@ -28,9 +29,13 @@ import {
 
 type SectionKey = "address" | "social" | "areas" | "company";
 
-export function Step7Extras({ state, onAdvance, onBack }: StepProps) {
+export function Step7Extras({
+  state,
+  onAdvance,
+  onBack,
+  onSkip,
+}: StepProps) {
   const t = useTranslations("onboarding.step7");
-  const tc = useTranslations("common");
   const tNav = useTranslations("onboarding");
 
   const modality = state.profileView?.profile?.serviceModality;
@@ -142,15 +147,8 @@ export function Step7Extras({ state, onAdvance, onBack }: StepProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="font-display text-2xl font-bold text-on-surface">
-          {t("title")}
-        </h2>
-        <p className="text-sm text-on-surface-variant">{t("subtitle")}</p>
-      </div>
-
-      <div className="space-y-3">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         {showAddress && (
           <AddressSection
             isOpen={openSection === "address"}
@@ -184,32 +182,14 @@ export function Step7Extras({ state, onAdvance, onBack }: StepProps) {
         />
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <div className="flex gap-3">
-          <button
-            className="text-sm font-medium text-on-surface-variant hover:text-on-surface"
-            onClick={onBack}
-            type="button"
-          >
-            {tNav("back")}
-          </button>
-          <button
-            className="text-sm font-medium text-on-surface-variant hover:text-on-surface"
-            onClick={() => onAdvance({}, 8)}
-            type="button"
-          >
-            {tNav("skip")}
-          </button>
-        </div>
-        <button
-          className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 font-display font-bold text-on-primary shadow-lg shadow-primary/10 transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
-          disabled={isPending}
-          onClick={handleContinue}
-          type="button"
-        >
-          {isPending ? tc("loading") : tNav("next")}
-        </button>
-      </div>
+      <OnbNav
+        canContinue={true}
+        isFinalStep
+        isPending={isPending}
+        onBack={onBack}
+        onContinue={handleContinue}
+        onSkip={onSkip}
+      />
     </div>
   );
 }

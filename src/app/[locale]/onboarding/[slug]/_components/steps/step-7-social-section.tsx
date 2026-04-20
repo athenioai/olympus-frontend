@@ -69,15 +69,15 @@ export function SocialLinksSection({
 
   return (
     <Section isOpen={isOpen} onToggle={onToggle} title={t("socialSection")}>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {links.map((link) => (
           <div className="flex items-end gap-2" key={link.id}>
-            <div className="flex-1">
-              <label className="mb-1 block text-xs font-semibold text-on-surface">
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label className="onb-field-label">
                 {t("socialPlatformLabel")}
               </label>
               <select
-                className="h-10 w-full rounded-lg bg-surface-container-high px-3 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary/30"
+                className="onb-input"
                 onChange={(e) =>
                   updateLink(link.id, {
                     platform: e.target.value as SocialPlatform,
@@ -92,12 +92,10 @@ export function SocialLinksSection({
                 ))}
               </select>
             </div>
-            <div className="flex-[2]">
-              <label className="mb-1 block text-xs font-semibold text-on-surface">
-                {t("socialUrlLabel")}
-              </label>
+            <div className="flex flex-[2] flex-col gap-1.5">
+              <label className="onb-field-label">{t("socialUrlLabel")}</label>
               <input
-                className="h-10 w-full rounded-lg bg-surface-container-high px-3 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary/30"
+                className="onb-input"
                 onChange={(e) => updateLink(link.id, { url: e.target.value })}
                 type="url"
                 value={link.url}
@@ -105,21 +103,21 @@ export function SocialLinksSection({
             </div>
             <button
               aria-label="remove"
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-on-surface-variant hover:text-danger"
+              className="flex size-12 shrink-0 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-danger"
               onClick={() => removeLink(link.id)}
               type="button"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="size-4" />
             </button>
           </div>
         ))}
         <button
-          className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+          className="onb-suggest"
           disabled={availableForNew === null}
           onClick={addLink}
           type="button"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="size-3" />
           {t("addSocial")}
         </button>
       </div>

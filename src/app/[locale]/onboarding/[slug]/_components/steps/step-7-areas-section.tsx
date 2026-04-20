@@ -38,15 +38,13 @@ export function ServiceAreasSection({
 
   return (
     <Section isOpen={isOpen} onToggle={onToggle} title={t("areasSection")}>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {areas.map((area) => (
           <div className="flex items-end gap-2" key={area.id}>
-            <div className="flex-1">
-              <label className="mb-1 block text-xs font-semibold text-on-surface">
-                {t("areaNameLabel")}
-              </label>
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label className="onb-field-label">{t("areaNameLabel")}</label>
               <input
-                className="h-10 w-full rounded-lg bg-surface-container-high px-3 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary/30"
+                className="onb-input"
                 onChange={(e) => updateArea(area.id, e.target.value)}
                 type="text"
                 value={area.name}
@@ -54,20 +52,16 @@ export function ServiceAreasSection({
             </div>
             <button
               aria-label="remove"
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-on-surface-variant hover:text-danger"
+              className="flex size-12 shrink-0 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-danger"
               onClick={() => removeArea(area.id)}
               type="button"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="size-4" />
             </button>
           </div>
         ))}
-        <button
-          className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-          onClick={addArea}
-          type="button"
-        >
-          <Plus className="h-4 w-4" />
+        <button className="onb-suggest" onClick={addArea} type="button">
+          <Plus className="size-3" />
           {t("addArea")}
         </button>
       </div>

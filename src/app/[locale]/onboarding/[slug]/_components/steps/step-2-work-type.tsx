@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { WorkType } from "@/lib/services";
 import { setWorkTypeAction } from "../../actions";
 import type { StepProps } from "../wizard";
+import { OnbNav } from "../onb-nav";
 
 const OPTIONS: readonly {
   readonly value: WorkType;
@@ -19,7 +20,6 @@ const OPTIONS: readonly {
 
 export function Step2WorkType({ state, onAdvance, onBack }: StepProps) {
   const t = useTranslations("onboarding.step2");
-  const tc = useTranslations("common");
   const tNav = useTranslations("onboarding");
 
   const [selected, setSelected] = useState<WorkType | null>(
@@ -35,70 +35,39 @@ export function Step2WorkType({ state, onAdvance, onBack }: StepProps) {
         toast.error(tNav("genericError"));
         return;
       }
-      onAdvance({ workType: result.workType }, 3);
+      onAdvance({ workType: result.workType }, 3); // → business (essential)
     });
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="font-display text-2xl font-bold text-on-surface">
-          {t("title")}
-        </h2>
-        <p className="text-sm text-on-surface-variant">{t("subtitle")}</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="flex flex-col gap-6">
+      <div className="onb-cards">
         {OPTIONS.map(({ value, icon: Icon }) => {
-          const isSelected = selected === value;
+          const on = selected === value;
           return (
             <button
-              aria-pressed={isSelected}
-              className={`flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-all duration-200 ${
-                isSelected
-                  ? "border-primary bg-primary/5 shadow-ambient"
-                  : "border-transparent bg-surface-container-high hover:border-primary/40"
-              }`}
+              aria-pressed={on}
+              className={`onb-card${on ? " on" : ""}`}
               key={value}
               onClick={() => setSelected(value)}
               type="button"
             >
-              <Icon
-                className={`h-8 w-8 ${
-                  isSelected ? "text-primary" : "text-on-surface-variant"
-                }`}
-              />
-              <div className="space-y-0.5">
-                <p className="font-display text-sm font-bold text-on-surface">
-                  {t(`${value}Title`)}
-                </p>
-                <p className="text-xs text-on-surface-variant">
-                  {t(`${value}Hint`)}
-                </p>
+              <div className="onb-card-ico">
+                <Icon className="size-[18px]" />
               </div>
+              <div className="onb-card-title">{t(`${value}Title`)}</div>
+              <div className="onb-card-sub">{t(`${value}Hint`)}</div>
             </button>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <button
-          className="text-sm font-medium text-on-surface-variant hover:text-on-surface disabled:opacity-40"
-          disabled
-          onClick={onBack}
-          type="button"
-        >
-          {tNav("back")}
-        </button>
-        <button
-          className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 font-display font-bold text-on-primary shadow-lg shadow-primary/10 transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
-          disabled={!selected || isPending}
-          onClick={handleContinue}
-          type="button"
-        >
-          {isPending ? tc("loading") : tNav("next")}
-        </button>
-      </div>
+      <OnbNav
+        canContinue={!!selected}
+        isPending={isPending}
+        onBack={onBack}
+        onContinue={handleContinue}
+      />
     </div>
   );
 }

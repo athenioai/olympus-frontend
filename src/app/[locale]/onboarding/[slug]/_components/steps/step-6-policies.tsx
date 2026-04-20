@@ -5,10 +5,15 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { updatePoliciesAction } from "../../actions";
 import type { StepProps } from "../wizard";
+import { OnbNav } from "../onb-nav";
 
-export function Step6Policies({ state, onAdvance, onBack }: StepProps) {
+export function Step6Policies({
+  state,
+  onAdvance,
+  onBack,
+  onSkip,
+}: StepProps) {
   const t = useTranslations("onboarding.step6");
-  const tc = useTranslations("common");
   const tNav = useTranslations("onboarding");
 
   const [paymentPolicy, setPaymentPolicy] = useState(
@@ -18,6 +23,9 @@ export function Step6Policies({ state, onAdvance, onBack }: StepProps) {
     state.profileView?.profile?.cancellationPolicy ?? "",
   );
   const [isPending, startTransition] = useTransition();
+
+  const canContinue =
+    paymentPolicy.trim().length > 0 && cancellationPolicy.trim().length > 0;
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -31,20 +39,13 @@ export function Step6Policies({ state, onAdvance, onBack }: StepProps) {
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6">
-      <h2 className="font-display text-2xl font-bold text-on-surface">
-        {t("title")}
-      </h2>
-
-      <div className="space-y-2">
-        <label
-          className="block font-display text-sm font-semibold text-on-surface"
-          htmlFor="paymentPolicy"
-        >
+    <form action={handleSubmit} className="flex flex-col gap-5">
+      <div className="flex flex-col gap-1.5">
+        <label className="onb-field-label" htmlFor="paymentPolicy">
           {t("paymentLabel")}
         </label>
         <textarea
-          className="min-h-[100px] w-full resize-y rounded-xl border-none bg-surface-container-high px-4 py-3 text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
+          className="onb-textarea"
           id="paymentPolicy"
           name="paymentPolicy"
           onChange={(e) => setPaymentPolicy(e.target.value)}
@@ -54,15 +55,12 @@ export function Step6Policies({ state, onAdvance, onBack }: StepProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <label
-          className="block font-display text-sm font-semibold text-on-surface"
-          htmlFor="cancellationPolicy"
-        >
+      <div className="flex flex-col gap-1.5">
+        <label className="onb-field-label" htmlFor="cancellationPolicy">
           {t("cancellationLabel")}
         </label>
         <textarea
-          className="min-h-[100px] w-full resize-y rounded-xl border-none bg-surface-container-high px-4 py-3 text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
+          className="onb-textarea"
           id="cancellationPolicy"
           name="cancellationPolicy"
           onChange={(e) => setCancellationPolicy(e.target.value)}
@@ -72,22 +70,12 @@ export function Step6Policies({ state, onAdvance, onBack }: StepProps) {
         />
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <button
-          className="text-sm font-medium text-on-surface-variant hover:text-on-surface"
-          onClick={onBack}
-          type="button"
-        >
-          {tNav("back")}
-        </button>
-        <button
-          className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 font-display font-bold text-on-primary shadow-lg shadow-primary/10 transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
-          disabled={isPending}
-          type="submit"
-        >
-          {isPending ? tc("loading") : tNav("next")}
-        </button>
-      </div>
+      <OnbNav
+        canContinue={canContinue}
+        isPending={isPending}
+        onBack={onBack}
+        onSkip={onSkip}
+      />
     </form>
   );
 }

@@ -166,8 +166,49 @@
     "next": "Continuar",
     "back": "Volver",
     "skip": "Omitir",
+    "skipWithWarn": "Omitir — el agente pregunta después",
+    "skipWithRisk": "Omitir sin completar — reduce calidad",
+    "finish": "Finalizar",
+    "stepWord": "Paso",
+    "etaMins": "~ {mins} min hasta tener tu agente listo",
+    "etaFinal": "últimos toques",
     "submitting": "Guardando...",
     "genericError": "No pudimos guardar. Intenta de nuevo.",
+    "bulletin": {
+      "label": "Configurando tu agente",
+      "exit": "Salir y continuar después",
+      "previewLabel": "Tu agente · vista previa en vivo",
+      "online": "en línea",
+      "inputPlaceholder": "Escribe un mensaje…",
+      "statusConfiguring": "Configurando…",
+      "statusReady": "Listo para operar",
+      "contextLabel": "Contexto aprendido",
+      "ctxType": "Tipo",
+      "ctxVertical": "Vertical",
+      "ctxName": "Nombre",
+      "ctxModality": "Modalidad",
+      "ctxPolicies": "Políticas",
+      "ctxExtras": "Extras"
+    },
+    "eyebrows": {
+      "step1": "Seguridad",
+      "step2": "Tipo de negocio",
+      "step3": "Identidad",
+      "step4": "Vertical",
+      "step5": "Atención",
+      "step6": "Reglas del juego",
+      "step7": "Detalles finales",
+      "step8": "Sistema en línea"
+    },
+    "ready": {
+      "eyebrow": "Sistema en línea",
+      "title": "{name} está atendiendo.",
+      "fallbackName": "Tu negocio",
+      "sub": "Tu agente ya responde, agenda y cobra. El primer cliente que te escriba ahora, lo resuelve solo.",
+      "ctaPrimary": "Ver mi Olympus trabajando",
+      "ctaSecondary": "Probar con un mensaje",
+      "scoreLabel": "Perfil"
+    },
     "errorBoundary": {
       "title": "Algo salió mal",
       "retry": "Intentar de nuevo",
@@ -207,15 +248,8 @@
       "hybridHint": "Ventas y servicios"
     },
     "step3": {
-      "title": "¿Cuál es el segmento de tu negocio?",
-      "subtitle": "Elige una opción y configuraremos tags, campos y FAQs para tu sector.",
-      "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
-      "confirm": "Confirmar",
-      "seeded": "Creamos {tags} tags, {fields} campos y {faqs} FAQs para ti. Edita en Configuración.",
-      "updated": "Segmento actualizado."
-    },
-    "step4": {
       "title": "Sobre tu negocio",
+      "subtitle": "El nombre con el que tu agente se presentará. La descripción define el tono de la conversación.",
       "nameLabel": "Nombre del negocio",
       "namePlaceholder": "Barbería de Juan",
       "descriptionLabel": "Descripción",
@@ -223,8 +257,17 @@
       "errorNameShort": "El nombre debe tener entre 2 y 120 caracteres.",
       "errorDescriptionShort": "La descripción debe tener entre 10 y 2000 caracteres."
     },
+    "step4": {
+      "title": "¿Cuál es el segmento de tu negocio?",
+      "subtitle": "Elige una opción y configuraremos tags, campos y FAQs para tu sector.",
+      "counters": "{tags} tags · {fields} campos · {faqs} FAQs",
+      "confirm": "Confirmar",
+      "seeded": "Creamos {tags} tags, {fields} campos y {faqs} FAQs para ti. Edita en Configuración.",
+      "updated": "Segmento actualizado."
+    },
     "step5": {
       "title": "¿Cómo atiendes a los clientes?",
+      "subtitle": "Define si el agente sugiere una dirección, comparte un enlace o pregunta al cliente.",
       "presencial": "Presencial",
       "presencialHint": "Los clientes van a ti",
       "remoto": "Remoto",
@@ -236,6 +279,7 @@
     },
     "step6": {
       "title": "Políticas de atención",
+      "subtitle": "Lo que el agente puede prometer y lo que necesita cobrar.",
       "paymentLabel": "Forma de pago",
       "paymentPlaceholder": "Ej: Aceptamos Pix y tarjeta en hasta 3x sin intereses.",
       "cancellationLabel": "Política de cancelación",
@@ -451,7 +495,8 @@
       "subscriptions": "Suscripciones",
       "billing": "Facturación",
       "invoices": "Cobros",
-      "avatars": "Avatares"
+      "avatars": "Avatares",
+      "onboardingPreview": "Vista previa Onboarding"
     }
   },
   "admin": {

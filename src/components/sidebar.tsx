@@ -23,6 +23,7 @@ import {
   Receipt,
   Filter,
   Sparkles,
+  Eye,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -39,6 +40,8 @@ interface NavItem {
   readonly href: string;
   readonly icon: React.ComponentType<{ className?: string }>;
   readonly labelKey: string;
+  /** When true, opens in a new tab (skips Next.js client routing). */
+  readonly external?: boolean;
 }
 
 const USER_NAV: NavItem[] = [
@@ -59,6 +62,7 @@ const ADMIN_NAV: NavItem[] = [
   { key: "admin-subscriptions", href: "/admin/subscriptions", icon: FileText, labelKey: "sidebar.admin.subscriptions" },
   { key: "admin-invoices", href: "/admin/invoices", icon: Receipt, labelKey: "sidebar.admin.invoices" },
   { key: "admin-avatars", href: "/admin/agent-avatars", icon: Sparkles, labelKey: "sidebar.admin.avatars" },
+  { key: "admin-onboarding-preview", href: "/onboarding-preview", icon: Eye, labelKey: "sidebar.admin.onboardingPreview", external: true },
 ];
 
 const STORAGE_KEY = "olympus-sidebar-collapsed";
@@ -77,22 +81,34 @@ function renderNavLink(
   collapsed: boolean,
   t: (key: string) => string,
 ) {
-  const active = isActive(item.href);
+  const active = !item.external && isActive(item.href);
   const label = t(item.labelKey);
-  const link = (
-    <Link
-      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-        active
-          ? "bg-primary/8 text-primary"
-          : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-      }`}
-      href={item.href}
-    >
+  const linkClassName = `group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+    active
+      ? "bg-primary/8 text-primary"
+      : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+  }`;
+  const linkContent = (
+    <>
       {active && (
         <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
       )}
       <item.icon className={`h-5 w-5 shrink-0 ${active ? "text-primary" : ""}`} />
       {!collapsed && <span>{label}</span>}
+    </>
+  );
+  const link = item.external ? (
+    <a
+      className={linkClassName}
+      href={item.href}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {linkContent}
+    </a>
+  ) : (
+    <Link className={linkClassName} href={item.href}>
+      {linkContent}
     </Link>
   );
 
