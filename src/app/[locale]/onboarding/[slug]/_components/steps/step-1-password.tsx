@@ -25,6 +25,7 @@ export function Step1Password({ slug, onAdvance, onBack }: StepProps) {
   const [isPending, startTransition] = useTransition();
 
   const strength = useMemo(() => scorePasswordStrength(password), [password]);
+  const passwordMismatch = confirm.length > 0 && password !== confirm;
   const canContinue =
     name.trim().length >= 2 &&
     meetsBackendPolicy(password) &&
@@ -136,6 +137,7 @@ export function Step1Password({ slug, onAdvance, onBack }: StepProps) {
           {t("confirmPasswordLabel")}
         </label>
         <input
+          aria-invalid={passwordMismatch ? true : undefined}
           autoComplete="new-password"
           className="onb-input"
           id="confirm"
@@ -144,6 +146,11 @@ export function Step1Password({ slug, onAdvance, onBack }: StepProps) {
           type={showPassword ? "text" : "password"}
           value={confirm}
         />
+        {passwordMismatch && (
+          <p className="text-xs text-danger">
+            {t("errorPasswordMismatch")}
+          </p>
+        )}
       </div>
 
       <OnbNav
