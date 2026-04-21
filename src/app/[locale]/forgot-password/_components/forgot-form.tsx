@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
-import { requestPasswordResetAction } from "../actions";
+import {
+  requestPasswordResetAction,
+  resendPasswordResetAction,
+  type ForgotErrorCode,
+} from "../actions";
 import { maskEmail } from "../_lib/mask-email";
 import { ForgotBulletin } from "./forgot-bulletin";
 
 const RESEND_COOLDOWN_SECONDS = 45;
 
-const SAFE_ERRORS: Record<string, string> = {
+const ERROR_KEY: Record<ForgotErrorCode, string> = {
   EMAIL_REQUIRED: "errorEmailRequired",
   EMAIL_INVALID: "errorEmailInvalid",
 };
@@ -21,11 +25,14 @@ const SAFE_ERRORS: Record<string, string> = {
  */
 export function ForgotPasswordView() {
   const t = useTranslations("forgotPassword");
+  const [state, formAction, isPending] = useActionState(
+    requestPasswordResetAction,
+    null,
+  );
   const [stage, setStage] = useState<"enter" | "sent">("enter");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
-  const [isPending, startTransition] = useTransition();
+  const [isResending, startResendTransition] = useTransition();
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -36,29 +43,23 @@ export function ForgotPasswordView() {
     return () => clearInterval(id);
   }, [cooldown]);
 
-  function handleSubmit(formData: FormData) {
-    setError(null);
-    const submittedEmail = String(formData.get("email") ?? "").trim();
+  useEffect(() => {
+    if (state?.ok && state.email) {
+      setEmail(state.email);
+      setStage("sent");
+      setCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+  }, [state]);
 
-    startTransition(async () => {
-      const result = await requestPasswordResetAction(formData);
-      if (result.success) {
-        setEmail(submittedEmail);
-        setStage("sent");
-        setCooldown(RESEND_COOLDOWN_SECONDS);
-      } else {
-        const key = SAFE_ERRORS[result.error ?? ""] ?? "errorGeneric";
-        setError(t(key));
-      }
-    });
-  }
+  const error =
+    state && !state.ok && state.error
+      ? t(ERROR_KEY[state.error] ?? "errorGeneric")
+      : null;
 
   function handleResend() {
     setCooldown(RESEND_COOLDOWN_SECONDS);
-    const fd = new FormData();
-    fd.set("email", email);
-    startTransition(async () => {
-      await requestPasswordResetAction(fd);
+    startResendTransition(async () => {
+      await resendPasswordResetAction(email);
     });
   }
 
@@ -73,7 +74,7 @@ export function ForgotPasswordView() {
               isPending={isPending}
               error={error}
               defaultEmail={email}
-              onSubmit={handleSubmit}
+              formAction={formAction}
             />
           ) : (
             <SentStage
@@ -101,19 +102,19 @@ interface EnterStageProps {
   readonly isPending: boolean;
   readonly error: string | null;
   readonly defaultEmail: string;
-  readonly onSubmit: (formData: FormData) => void;
+  readonly formAction: (formData: FormData) => void;
 }
 
 function EnterStage({
   isPending,
   error,
   defaultEmail,
-  onSubmit,
+  formAction,
 }: EnterStageProps) {
   const t = useTranslations("forgotPassword");
 
   return (
-    <form action={onSubmit}>
+    <form action={formAction}>
       <div className="auth-ed-eyebrow mb-2.5">{t("formEyebrow")}</div>
       <h2 className="font-display text-[28px] font-extrabold leading-[1.15] tracking-[-0.025em] text-on-surface">
         {t("formTitle")}

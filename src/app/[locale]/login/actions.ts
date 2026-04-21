@@ -1,13 +1,14 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { authService } from "@/lib/services/auth-service";
 import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 
-interface LoginActionResult {
-  readonly success: boolean;
-  readonly error?: string;
+export interface LoginActionResult {
+  readonly success: false;
+  readonly error: string;
 }
 
 type LoginResult = "success" | "invalid_credentials" | "error";
@@ -22,12 +23,13 @@ function emitLoginAttempt(result: LoginResult): void {
 }
 
 /**
- * Server action for user login.
- * Sets auth cookies and returns success for client-side redirect.
- * @param formData - Form data with email and password fields
- * @returns Action result with success flag and optional error message
+ * Server action for user login. Uses the React 19 `useActionState` signature
+ * `(prevState, formData)` so the form works even before client hydration.
+ * On success, performs a server-side redirect to `/dashboard`. On failure,
+ * returns an error state for the client to surface.
  */
 export async function loginAction(
+  _prevState: LoginActionResult | null,
   formData: FormData,
 ): Promise<LoginActionResult> {
   const email = formData.get("email");
@@ -41,34 +43,37 @@ export async function loginAction(
     return { success: false, error: "Preencha todos os campos." };
   }
 
+  let tokens;
   try {
-    const data = await authService.login(email.trim(), password);
-
-    const cookieStore = await cookies();
-    cookieStore.set("access_token", data.accessToken, {
-      maxAge: 60 * 60,
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
-    cookieStore.set("refresh_token", data.refreshToken, {
-      maxAge: 60 * 60 * 24 * 7,
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
-
-    emitLoginAttempt("success");
-    return { success: true };
+    tokens = await authService.login(email.trim(), password);
   } catch (err) {
     const message = err instanceof Error ? err.message : "UNKNOWN";
     captureUnexpected(err, { expectedMessages: ["INVALID_CREDENTIALS"] });
-    emitLoginAttempt(message === "INVALID_CREDENTIALS" ? "invalid_credentials" : "error");
+    emitLoginAttempt(
+      message === "INVALID_CREDENTIALS" ? "invalid_credentials" : "error",
+    );
     return {
       success: false,
       error: SAFE_ERRORS[message] ?? "Ocorreu um erro. Tente novamente.",
     };
   }
+
+  const cookieStore = await cookies();
+  cookieStore.set("access_token", tokens.accessToken, {
+    maxAge: 60 * 60,
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  });
+  cookieStore.set("refresh_token", tokens.refreshToken, {
+    maxAge: 60 * 60 * 24 * 7,
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  emitLoginAttempt("success");
+  redirect("/dashboard");
 }

@@ -1,32 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 import { loginAction } from "../actions";
 
 /**
  * Right column — discreet login form.
- * Wraps the existing `loginAction` server action; on success, hard-redirects
- * to /dashboard so the auth cookies set during the action are picked up.
+ * Uses `useActionState` so the form submits through the server action
+ * endpoint even before client hydration; on success the action issues
+ * a server-side redirect to `/dashboard`.
  */
 export function LoginForm() {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  function handleSubmit(formData: FormData) {
-    setError(null);
-    startTransition(async () => {
-      const result = await loginAction(formData);
-      if (result.success) {
-        window.location.href = "/dashboard";
-      } else {
-        setError(result.error ?? null);
-      }
-    });
-  }
+  const [state, formAction, isPending] = useActionState(loginAction, null);
+  const error = state?.error ?? null;
 
   return (
     <div className="auth-ed-right">
@@ -43,7 +32,7 @@ export function LoginForm() {
           <span>{t("lastSessionAgo")}</span>
         </div>
 
-        <form action={handleSubmit} className="mt-8 flex flex-col gap-3.5">
+        <form action={formAction} className="mt-8 flex flex-col gap-3.5">
           {error && <div className="auth-ed-error">{error}</div>}
 
           <input

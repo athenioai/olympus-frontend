@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
 import { signupService } from "@/lib/services";
@@ -13,6 +14,10 @@ export type SignupErrorCode =
   | "EMAIL_INVALID"
   | "EMAIL_EXISTS"
   | "GENERIC";
+
+export interface SignupActionState {
+  readonly error: SignupErrorCode;
+}
 
 export interface SignupActionResult {
   readonly success: boolean;
@@ -54,19 +59,26 @@ function emitSignupStarted(code: SignupErrorCode | "SUCCESS"): void {
   });
 }
 
+/**
+ * Server action for signup (useActionState signature). On success the
+ * pending-email cookie is set and the user is redirected to
+ * `/signup/success` server-side so the flow works even before client
+ * hydration. On failure returns a SignupActionState for the client.
+ */
 export async function signupAction(
+  _prevState: SignupActionState | null,
   formData: FormData,
-): Promise<SignupActionResult> {
+): Promise<SignupActionState> {
   const rawEmail = formData.get("email");
   if (typeof rawEmail !== "string" || rawEmail.trim() === "") {
     emitSignupStarted("EMAIL_REQUIRED");
-    return { success: false, error: "EMAIL_REQUIRED" };
+    return { error: "EMAIL_REQUIRED" };
   }
 
   const parsed = emailSchema.safeParse({ email: rawEmail });
   if (!parsed.success) {
     emitSignupStarted("EMAIL_INVALID");
-    return { success: false, error: "EMAIL_INVALID" };
+    return { error: "EMAIL_INVALID" };
   }
 
   try {
@@ -75,7 +87,7 @@ export async function signupAction(
     const code = mapSignupError(err);
     captureUnexpected(err);
     emitSignupStarted(code);
-    return { success: false, error: code };
+    return { error: code };
   }
 
   const cookieStore = await cookies();
@@ -88,7 +100,7 @@ export async function signupAction(
   });
 
   emitSignupStarted("SUCCESS");
-  return { success: true };
+  redirect("/signup/success");
 }
 
 export async function resendSignupAction(): Promise<SignupActionResult> {

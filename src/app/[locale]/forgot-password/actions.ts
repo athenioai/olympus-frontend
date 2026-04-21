@@ -4,37 +4,47 @@ import { z } from "zod";
 import { authService } from "@/lib/services/auth-service";
 import { captureUnexpected } from "@/lib/observability/capture";
 
-interface ForgotPasswordResult {
-  readonly success: boolean;
-  readonly error?: string;
+export type ForgotErrorCode = "EMAIL_REQUIRED" | "EMAIL_INVALID";
+
+export interface ForgotPasswordState {
+  readonly ok: boolean;
+  readonly email?: string;
+  readonly error?: ForgotErrorCode;
 }
 
 const RequestSchema = z.object({
   email: z.string().email(),
 });
 
+async function dispatchPasswordReset(email: string): Promise<void> {
+  try {
+    await authService.requestPasswordReset(email);
+  } catch (err) {
+    // Enumeration-safe: always return success to the UI. But still report
+    // real technical failures (5xx, network) to Sentry for investigation.
+    captureUnexpected(err);
+  }
+}
+
 /**
- * Server action for the password recovery request.
+ * Server action for the password recovery request (useActionState signature).
  *
  * Wires to `authService.requestPasswordReset` which POSTs to
  * `/auth/password/forgot`. Backend contract:
  *   - Always 204 regardless of email existence (prevents account enumeration)
  *   - Rate-limit per IP (5/min) and per email (3/hour)
  *   - Async email dispatch with a single-use 30-min token
- *
- * We surface a generic "success" to the UI even when the fetch fails at the
- * network layer — the enumeration-safe behavior is the same contract.
- * Logging of real failures belongs in backend observability, not here.
  */
 export async function requestPasswordResetAction(
+  _prevState: ForgotPasswordState | null,
   formData: FormData,
-): Promise<ForgotPasswordResult> {
+): Promise<ForgotPasswordState> {
   const raw = formData.get("email");
 
   const parsed = RequestSchema.safeParse({ email: raw });
   if (!parsed.success) {
     return {
-      success: false,
+      ok: false,
       error:
         typeof raw === "string" && raw.trim().length === 0
           ? "EMAIL_REQUIRED"
@@ -42,13 +52,17 @@ export async function requestPasswordResetAction(
     };
   }
 
-  try {
-    await authService.requestPasswordReset(parsed.data.email);
-  } catch (err) {
-    // Swallow for the UI (enumeration-safe), but still log real technical
-    // failures (5xx, network) so they surface in Sentry.
-    captureUnexpected(err);
-  }
+  await dispatchPasswordReset(parsed.data.email);
+  return { ok: true, email: parsed.data.email };
+}
 
-  return { success: true };
+/**
+ * Imperative resend used by the "sent" stage button. Takes a plain email
+ * string and re-triggers the same backend flow. Always resolves — errors
+ * are swallowed for the UI and captured in Sentry.
+ */
+export async function resendPasswordResetAction(email: string): Promise<void> {
+  const parsed = RequestSchema.safeParse({ email });
+  if (!parsed.success) return;
+  await dispatchPasswordReset(parsed.data.email);
 }

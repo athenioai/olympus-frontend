@@ -1,21 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, Check, Eye, EyeOff } from "lucide-react";
+import { scorePasswordStrength } from "@/lib/auth/password-strength";
 import {
-  meetsBackendPolicy,
-  scorePasswordStrength,
-} from "@/lib/auth/password-strength";
-import { resetPasswordAction } from "../actions";
+  resetPasswordAction,
+  type ResetPasswordErrorCode,
+} from "../actions";
 import { ResetBulletin, type ResetStage } from "./reset-bulletin";
 
 const REDIRECT_DELAY_SECONDS = 5;
 
-const SAFE_ERRORS: Record<string, string> = {
+const ERROR_KEY: Record<ResetPasswordErrorCode, string> = {
   PASSWORD_WEAK: "errorPasswordWeak",
+  PASSWORD_MISMATCH: "errorPasswordMismatch",
   TOKEN_INVALID: "errorTokenExpired",
+  TOKEN_EXPIRED: "errorTokenExpired",
+  PASSWORD_RESET_FAILED: "errorGeneric",
 };
 
 interface ResetPasswordViewProps {
@@ -66,36 +69,24 @@ function FormStage({ token, onSuccess }: FormStageProps) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(
+    resetPasswordAction,
+    null,
+  );
 
   const strength = useMemo(() => scorePasswordStrength(password), [password]);
 
-  function handleSubmit(formData: FormData) {
-    setError(null);
+  useEffect(() => {
+    if (state?.success) onSuccess();
+  }, [state, onSuccess]);
 
-    if (!meetsBackendPolicy(password)) {
-      setError(t("errorPasswordWeak"));
-      return;
-    }
-    if (password !== confirm) {
-      setError(t("errorPasswordMismatch"));
-      return;
-    }
-
-    startTransition(async () => {
-      const result = await resetPasswordAction(formData);
-      if (result.success) {
-        onSuccess();
-      } else {
-        const key = SAFE_ERRORS[result.error ?? ""] ?? "errorGeneric";
-        setError(t(key));
-      }
-    });
-  }
+  const error =
+    state && !state.success && state.error
+      ? t(ERROR_KEY[state.error] ?? "errorGeneric")
+      : null;
 
   return (
-    <form action={handleSubmit}>
+    <form action={formAction}>
       <input name="token" type="hidden" value={token} />
 
       <div className="auth-ed-eyebrow mb-2.5">{t("formEyebrow")}</div>
@@ -137,6 +128,7 @@ function FormStage({ token, onSuccess }: FormStageProps) {
         <input
           autoComplete="new-password"
           className="auth-ed-input"
+          name="confirm"
           onChange={(e) => setConfirm(e.target.value)}
           placeholder={t("confirmLabel")}
           required

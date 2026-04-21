@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -19,22 +19,10 @@ export function SignupView() {
   const t = useTranslations("signup");
   const ta = useTranslations("auth");
   const tc = useTranslations("common");
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<SignupErrorCode | null>(null);
-
-  function handleSubmit(formData: FormData) {
-    setError(null);
-    startTransition(async () => {
-      const result = await signupAction(formData);
-      if (result.success) {
-        window.location.href = "/signup/success";
-        return;
-      }
-      setError(result.error ?? "GENERIC");
-    });
-  }
-
-  const errorMessage = error ? t(`errors.${ERROR_KEY[error]}`) : null;
+  const [state, formAction, isPending] = useActionState(signupAction, null);
+  const errorMessage = state?.error
+    ? t(`errors.${ERROR_KEY[state.error]}`)
+    : null;
 
   return (
     <div className="auth-editorial">
@@ -47,7 +35,7 @@ export function SignupView() {
             {t("formTitle")}
           </h2>
 
-          <form action={handleSubmit} className="mt-7 flex flex-col gap-3.5">
+          <form action={formAction} className="mt-7 flex flex-col gap-3.5">
             {errorMessage && (
               <div className="auth-ed-error">{errorMessage}</div>
             )}

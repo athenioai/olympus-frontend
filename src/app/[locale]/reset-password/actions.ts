@@ -10,14 +10,22 @@ export interface TokenValidationResult {
   readonly maskedEmail?: string;
 }
 
-export interface ResetPasswordResult {
+export type ResetPasswordErrorCode =
+  | "TOKEN_INVALID"
+  | "TOKEN_EXPIRED"
+  | "PASSWORD_WEAK"
+  | "PASSWORD_MISMATCH"
+  | "PASSWORD_RESET_FAILED";
+
+export interface ResetPasswordState {
   readonly success: boolean;
-  readonly error?: string;
+  readonly error?: ResetPasswordErrorCode;
 }
 
 const ResetSchema = z.object({
   token: z.string().min(10),
   password: z.string(),
+  confirm: z.string(),
 });
 
 /**
@@ -49,16 +57,27 @@ export async function validateResetTokenAction(
  *   - 400/410 with code TOKEN_INVALID | TOKEN_EXPIRED | PASSWORD_WEAK
  *   - On success, invalidate ALL active refresh tokens for the user
  */
+/**
+ * Server action for submitting the new password (useActionState signature).
+ * Validates the password matches the confirmation server-side so the flow
+ * works even before client hydration.
+ */
 export async function resetPasswordAction(
+  _prevState: ResetPasswordState | null,
   formData: FormData,
-): Promise<ResetPasswordResult> {
+): Promise<ResetPasswordState> {
   const parsed = ResetSchema.safeParse({
     token: formData.get("token"),
     password: formData.get("password"),
+    confirm: formData.get("confirm"),
   });
 
   if (!parsed.success) {
     return { success: false, error: "TOKEN_INVALID" };
+  }
+
+  if (parsed.data.password !== parsed.data.confirm) {
+    return { success: false, error: "PASSWORD_MISMATCH" };
   }
 
   if (!meetsBackendPolicy(parsed.data.password)) {
@@ -72,7 +91,13 @@ export async function resetPasswordAction(
     captureUnexpected(err, {
       expectedMessages: ["TOKEN_INVALID", "TOKEN_EXPIRED", "PASSWORD_WEAK"],
     });
-    const code = err instanceof Error ? err.message : "PASSWORD_RESET_FAILED";
+    const code =
+      err instanceof Error &&
+      (err.message === "TOKEN_INVALID" ||
+        err.message === "TOKEN_EXPIRED" ||
+        err.message === "PASSWORD_WEAK")
+        ? (err.message as ResetPasswordErrorCode)
+        : "PASSWORD_RESET_FAILED";
     return { success: false, error: code };
   }
 }
