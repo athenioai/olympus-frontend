@@ -50,11 +50,33 @@ async function renderUnauthenticated(slug: string) {
 
 async function renderAuthenticated(slug: string) {
   try {
-    const [user, profileView] = await Promise.all([
+    // The slug identifies the onboarding session. The logged-in user may
+    // be someone else entirely (e.g. an admin who pasted the link). Always
+    // resolve the slug-owner's email so a visitor on the wrong slug sees
+    // whose onboarding they're looking at — never their own session email.
+    const [info, user] = await Promise.all([
+      onboardingService.getInfo(slug),
       userService.getMe(),
-      businessProfileService.getProfile(),
     ]);
 
+    // Current user is NOT the slug owner — treat like unauthenticated:
+    // show step 1 with the owner's email and no pre-filled profile. The
+    // admin can't continue someone else's onboarding using their session.
+    if (info.email !== user.email) {
+      return (
+        <Wizard
+          initial={{
+            slug,
+            email: info.email,
+            currentStep: 1,
+            profileView: null,
+            workType: null,
+          }}
+        />
+      );
+    }
+
+    const profileView = await businessProfileService.getProfile();
     const step = resolveCurrentStep(profileView.profile);
 
     return (
@@ -69,6 +91,10 @@ async function renderAuthenticated(slug: string) {
       />
     );
   } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.status === 404) redirect("/onboarding/error/invalid");
+      if (err.status === 410) redirect("/onboarding/error/completed");
+    }
     if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
       redirect("/login");
     }
