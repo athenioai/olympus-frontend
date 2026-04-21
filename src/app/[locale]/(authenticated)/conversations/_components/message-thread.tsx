@@ -135,9 +135,14 @@ export function MessageThread({
     });
   }, []);
 
+  // Scroll whenever a new message lands at the tail (optimistic send, WS
+  // inbound, etc.). Load-more prepends to the head so the last id stays
+  // the same and this effect doesn't fire — preserving the reader's
+  // scroll position during history pagination.
+  const lastMessageId = messages[messages.length - 1]?.id;
   useEffect(() => {
     scrollToBottom();
-  }, [scrollToBottom]);
+  }, [lastMessageId, scrollToBottom]);
 
   /* -- WebSocket connection -- */
   useEffect(() => {
