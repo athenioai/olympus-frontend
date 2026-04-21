@@ -27,18 +27,18 @@ describe("resolveCurrentStep", () => {
     expect(resolveCurrentStep(null)).toBe(2);
   });
 
-  it("returns step 3 when businessVertical is not set", () => {
-    const profile = buildProfile({ businessVertical: null });
+  it("returns step 3 when businessName is empty", () => {
+    const profile = buildProfile({ businessName: "" });
     expect(resolveCurrentStep(profile)).toBe(3);
   });
 
-  it("returns step 4 when businessName is empty", () => {
-    const profile = buildProfile({ businessName: "" });
-    expect(resolveCurrentStep(profile)).toBe(4);
+  it("returns step 3 when businessDescription is empty", () => {
+    const profile = buildProfile({ businessDescription: "" });
+    expect(resolveCurrentStep(profile)).toBe(3);
   });
 
-  it("returns step 4 when businessDescription is empty", () => {
-    const profile = buildProfile({ businessDescription: "" });
+  it("returns step 4 when businessVertical is not set", () => {
+    const profile = buildProfile({ businessVertical: null });
     expect(resolveCurrentStep(profile)).toBe(4);
   });
 

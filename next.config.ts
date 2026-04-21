@@ -4,7 +4,12 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+// Let the MSW-backed dev server live in a separate `.next-msw` build cache
+// so it doesn't fight the regular `next dev` lock when both run side by side.
+const isMswRun = process.env.MSW_ENABLED === "1";
+
 const nextConfig: NextConfig = {
+  ...(isMswRun ? { distDir: ".next-msw" } : {}),
   experimental: {
     optimizePackageImports: ["motion"],
     staleTimes: {

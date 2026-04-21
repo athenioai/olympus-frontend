@@ -163,3 +163,18 @@ export function isValidCNPJ(cnpj: string): boolean {
 export function formatISODate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
+
+const BRL_CURRENCY_FORMAT = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+});
+
+/**
+ * Format a number as Brazilian currency (R$ 1.234,56).
+ * @param amount - Numeric value in BRL (not cents)
+ * @returns Formatted currency string
+ */
+export function formatBRL(amount: number): string {
+  return BRL_CURRENCY_FORMAT.format(amount);
+}

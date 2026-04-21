@@ -10,11 +10,15 @@ test.describe("signup flow", () => {
   test("/signup renders the hero form", async ({ page }) => {
     await page.goto("/pt-BR/signup");
     await expect(
-      page.getByRole("heading", { name: "Comece grátis em 2 minutos" }),
+      page.getByRole("heading", {
+        name: "8 minutos pro seu negócio estar no piloto automático.",
+      }),
     ).toBeVisible();
-    await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Começar" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Entrar" })).toHaveAttribute(
+    await expect(page.getByPlaceholder("voce@empresa.com")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Criar conta grátis" }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: /Entrar/ })).toHaveAttribute(
       "href",
       "/login",
     );

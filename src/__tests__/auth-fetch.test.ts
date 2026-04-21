@@ -64,17 +64,24 @@ describe("authFetch", () => {
       set: mockSet,
     } as never);
 
-    const refreshResponse = {
-      accessToken: "new-access-token",
-      refreshToken: "new-refresh-token",
+    // Backend wraps responses in the standard envelope; authFetch calls
+    // unwrapEnvelope on the refresh response, so the mock must match that
+    // shape (not the bare TokenPair).
+    const refreshEnvelope = {
+      success: true,
+      data: {
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
+      },
+      error: null,
+      meta: { requestId: "test" },
     };
 
     let callCount = 0;
     const mockFetch = vi.fn().mockImplementation((url: string) => {
-      // Refresh endpoint
       if (url.includes("/auth/refresh")) {
         return Promise.resolve(
-          new Response(JSON.stringify(refreshResponse), { status: 200 }),
+          new Response(JSON.stringify(refreshEnvelope), { status: 200 }),
         );
       }
       // First call returns 401, second succeeds

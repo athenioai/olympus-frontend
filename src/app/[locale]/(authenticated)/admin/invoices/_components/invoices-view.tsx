@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Plus, X as XIcon } from "lucide-react";
 import { toast } from "sonner";
+import { BrlInput } from "@/components/ui/brl-input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type {
   AdminInvoicePublic,
@@ -39,6 +40,9 @@ const FILTERS: readonly ("all" | AdminInvoiceStatus)[] = [
   "cancelled",
 ];
 
+const MIN_AMOUNT_CENTS = 1;
+const MAX_AMOUNT_CENTS = 99_999_999;
+
 export function InvoicesView({
   initialInvoices,
   initialSummary,
@@ -58,7 +62,7 @@ export function InvoicesView({
 
   const [userId, setUserId] = useState("");
   const [subscriptionId, setSubscriptionId] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amountCents, setAmountCents] = useState(0);
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const todayYmd = useMemo(() => new Date().toISOString().slice(0, 10), []);
@@ -93,7 +97,7 @@ export function InvoicesView({
   function openCreate() {
     setUserId(initialUsers[0]?.id ?? "");
     setSubscriptionId("");
-    setAmount("");
+    setAmountCents(0);
     setDescription("");
     setDueDate("");
     setLateFeePercent("2");
@@ -107,17 +111,13 @@ export function InvoicesView({
     // Guard against double-submit: isPending may not have flipped to true yet
     // on a second rapid click within the same render frame.
     if (isPending) return;
-    const amountParsed = Number.parseFloat(amount.replace(",", "."));
-    // Backend accepts 0.01..999999.99. Reject client-side to give a
-    // specific message instead of letting Zod error bubble up as INVALID_INPUT.
-    if (
-      !Number.isFinite(amountParsed) ||
-      amountParsed < 0.01 ||
-      amountParsed > 999999.99
-    ) {
+    // Backend accepts 0.01..999999.99 — mirror as cents on the client to
+    // give a specific message instead of a generic INVALID_INPUT.
+    if (amountCents < MIN_AMOUNT_CENTS || amountCents > MAX_AMOUNT_CENTS) {
       toast.error(t("form.amountOutOfRange"));
       return;
     }
+    const amountParsed = amountCents / 100;
     const latePercent = Number.parseFloat(lateFeePercent);
     const interestPercent = Number.parseFloat(lateInterestPercent);
     if (
@@ -357,12 +357,12 @@ export function InvoicesView({
               </select>
             </Field>
             <Field label={t("form.amount")}>
-              <input
+              <BrlInput
+                cents={amountCents}
                 className={INPUT_CLASS}
-                inputMode="decimal"
-                onChange={(e) => setAmount(e.target.value)}
+                max={MAX_AMOUNT_CENTS}
+                onChange={setAmountCents}
                 required
-                value={amount}
               />
             </Field>
             <Field label={t("form.dueDate")}>

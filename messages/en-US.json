@@ -274,7 +274,7 @@
       "completedAction": "Go to login"
     },
     "step1": {
-      "title": "Welcome to Athenio!",
+      "title": "Welcome to Olympus!",
       "subtitle": "Your email: {email}",
       "nameLabel": "Full name",
       "namePlaceholder": "John Doe",

@@ -3,16 +3,14 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Calendar, Plus, UserCog } from "lucide-react";
+import { Plus, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { PromptDialog } from "@/components/ui/prompt-dialog";
 import type { AdminUserPublic, PlanPublic } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { formatDate } from "../../_lib/format";
 import {
   createAdminUserAction,
-  seedHolidaysAction,
   updateAdminUserAction,
 } from "../actions";
 import { UserFormModal, type UserFormValues } from "./user-form-modal";
@@ -38,7 +36,6 @@ export function UsersView({
     | { mode: "edit"; user: AdminUserPublic }
     | null
   >(null);
-  const [seedPromptOpen, setSeedPromptOpen] = useState(false);
   const [pendingRoleChange, setPendingRoleChange] = useState<
     | { readonly id: string; readonly values: UserFormValues; readonly target: "admin" | "user" }
     | null
@@ -101,42 +98,19 @@ export function UsersView({
     });
   }
 
-  function handleSeedHolidays(years: string) {
-    setSeedPromptOpen(false);
-    startTransition(async () => {
-      const result = await seedHolidaysAction(years);
-      if (!result.success) {
-        toast.error(result.error ?? tc("loadError"));
-        return;
-      }
-      toast.success(t("seedHolidaysDone"));
-    });
-  }
-
   return (
     <div className="space-y-6">
       <AdminHeader
         actions={
-          <>
-            <button
-              className="flex h-10 items-center gap-2 rounded-xl bg-surface-container-high px-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest disabled:opacity-60"
-              disabled={isPending}
-              onClick={() => setSeedPromptOpen(true)}
-              type="button"
-            >
-              <Calendar className="h-4 w-4" />
-              {t("seedHolidays")}
-            </button>
-            <button
-              className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-4 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
-              disabled={isPending}
-              onClick={() => setFormState({ mode: "create" })}
-              type="button"
-            >
-              <Plus className="h-4 w-4" />
-              {t("create")}
-            </button>
-          </>
+          <button
+            className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-4 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
+            disabled={isPending}
+            onClick={() => setFormState({ mode: "create" })}
+            type="button"
+          >
+            <Plus className="h-4 w-4" />
+            {t("create")}
+          </button>
         }
         subtitle={t("subtitle")}
         title={t("title")}
@@ -222,18 +196,6 @@ export function UsersView({
         }
         open={formState !== null}
         plans={initialPlans}
-      />
-
-      <PromptDialog
-        cancelLabel={tCommon("cancel")}
-        confirmLabel={t("seedHolidays")}
-        description={t("seedHolidaysPrompt")}
-        isPending={isPending}
-        onCancel={() => setSeedPromptOpen(false)}
-        onConfirm={handleSeedHolidays}
-        open={seedPromptOpen}
-        placeholder="2026,2027"
-        title={t("seedHolidays")}
       />
 
       <ConfirmDialog

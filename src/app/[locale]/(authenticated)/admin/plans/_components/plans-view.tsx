@@ -4,11 +4,14 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { BrlInput } from "@/components/ui/brl-input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { PlanPublic } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
 import { formatBRL, formatDate } from "../../_lib/format";
+
+const MAX_COST_CENTS = 99_999_999; // matches backend cap of 999999.99
 import {
   createPlanAction,
   deletePlanAction,
@@ -31,29 +34,29 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
   >(null);
   const [toDelete, setToDelete] = useState<PlanPublic | null>(null);
   const [name, setName] = useState("");
-  const [cost, setCost] = useState("");
+  const [costCents, setCostCents] = useState(0);
   const [isPending, startTransition] = useTransition();
 
   function openCreate() {
     setName("");
-    setCost("");
+    setCostCents(0);
     setFormState({ mode: "create" });
   }
 
   function openEdit(plan: PlanPublic) {
     setName(plan.name);
-    setCost(String(plan.cost));
+    setCostCents(Math.round(plan.cost * 100));
     setFormState({ mode: "edit", plan });
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!formState) return;
-    const parsedCost = Number.parseFloat(cost.replace(",", "."));
-    if (!Number.isFinite(parsedCost)) {
+    if (costCents <= 0) {
       toast.error(tCommon("loadError"));
       return;
     }
+    const parsedCost = costCents / 100;
 
     startTransition(async () => {
       if (formState.mode === "create") {
@@ -203,12 +206,12 @@ export function PlansView({ initialPlans, errorMessage }: PlansViewProps) {
             <span className="font-display text-xs font-semibold text-on-surface">
               {t("form.cost")}
             </span>
-            <input
+            <BrlInput
+              cents={costCents}
               className="h-10 w-full rounded-lg bg-surface-container-high px-3 text-sm text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
-              inputMode="decimal"
-              onChange={(e) => setCost(e.target.value)}
+              max={MAX_COST_CENTS}
+              onChange={setCostCents}
               required
-              value={cost}
             />
           </label>
           <div className="flex justify-end gap-2 pt-2">

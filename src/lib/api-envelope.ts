@@ -33,14 +33,23 @@ export class ApiError extends Error {
 
 /**
  * Unwrap an API envelope response, throwing on failure.
+ *
+ * When `success: true`, the payload is returned as-is — including `null`,
+ * which is the normal confirmation shape for DELETE and other endpoints
+ * that have nothing to return. Callers that need non-null data should
+ * check or type the return as nullable; turning `data: null` into an
+ * ApiError here broke every soft-delete flow in the app.
+ *
  * @param response - Fetch Response from the backend
- * @returns The unwrapped data of type T
- * @throws ApiError with the code/status from the envelope
+ * @returns The unwrapped data of type T (may be null when the endpoint
+ * contract is `success: true, data: null`)
+ * @throws ApiError with the code/status from the envelope when
+ * `success: false`
  */
 export async function unwrapEnvelope<T>(response: Response): Promise<T> {
   const envelope: ApiEnvelope<T> = await response.json();
 
-  if (!envelope.success || envelope.data === null || envelope.data === undefined) {
+  if (!envelope.success) {
     const message = envelope.error?.message;
     const errorText = Array.isArray(message) ? message[0] : message;
     throw new ApiError(
@@ -50,5 +59,5 @@ export async function unwrapEnvelope<T>(response: Response): Promise<T> {
     );
   }
 
-  return envelope.data;
+  return envelope.data as T;
 }

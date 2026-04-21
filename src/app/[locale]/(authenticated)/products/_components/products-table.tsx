@@ -11,19 +11,14 @@ import {
   Plus,
   MoreVertical,
 } from "lucide-react";
+import { BrlInput } from "@/components/ui/brl-input";
 import { cn } from "@/lib/utils";
+import { formatBRL } from "@/lib/format";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 import { deleteProduct, createProduct, updateProduct, toggleProductStatus } from "../actions";
 import type { Product } from "@/lib/services";
 
-// ---------------------------------------------------------------------------
-// BRL formatter
-// ---------------------------------------------------------------------------
-
-const BRL_FORMAT = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
+const MAX_PRICE_CENTS = 99_999_999;
 
 // ---------------------------------------------------------------------------
 // Props
@@ -52,6 +47,9 @@ function ProductFormModal({
 }: ProductFormModalProps) {
   const t = useTranslations("catalog");
   const tc = useTranslations("common");
+  const [priceCents, setPriceCents] = useState(
+    product ? Math.round(product.price * 100) : 0,
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -100,16 +98,18 @@ function ProductFormModal({
             <label className="text-sm font-medium text-on-surface" htmlFor="prod-price">
               {t("price")}
             </label>
-            <input
+            <BrlInput
+              cents={priceCents}
               className="h-10 w-full rounded-xl bg-surface-container-high px-4 text-sm text-on-surface outline-none transition-colors focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
-              defaultValue={product?.price ?? ""}
               id="prod-price"
-              min={0}
-              max={999999.99}
-              name="price"
+              max={MAX_PRICE_CENTS}
+              onChange={setPriceCents}
               required
-              step="0.01"
-              type="number"
+            />
+            <input
+              name="price"
+              type="hidden"
+              value={(priceCents / 100).toFixed(2)}
             />
           </div>
           <div className="space-y-1.5">
@@ -306,7 +306,7 @@ function ProductRow({ product, onEdit, onDelete, onToggleStatus, isPending }: Pr
       {/* Price */}
       <div className="hidden justify-center sm:flex">
         <span className="font-display text-base font-extrabold tracking-tight text-on-surface">
-          {BRL_FORMAT.format(product.price)}
+          {formatBRL(product.price)}
         </span>
       </div>
 
