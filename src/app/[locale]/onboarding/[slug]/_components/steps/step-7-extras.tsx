@@ -29,6 +29,15 @@ import {
 
 type SectionKey = "address" | "social" | "areas" | "company";
 
+function isValidUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export function Step7Extras({
   state,
   onAdvance,
@@ -131,6 +140,18 @@ export function Step7Extras({
       return;
     }
     const input = built.input;
+
+    // Client-side URL check — the backend would reject the whole
+    // saveExtrasAction with a generic INVALID_INPUT otherwise, which then
+    // surfaces as a vague "Algo deu errado" toast.
+    for (const link of input.socialLinks ?? []) {
+      if (!isValidUrl(link.url)) {
+        toast.error(t("socialUrlInvalid"));
+        setOpenSection("social");
+        return;
+      }
+    }
+
     if (Object.keys(input).length === 0) {
       onAdvance({}, 8);
       return;

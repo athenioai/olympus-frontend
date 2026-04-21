@@ -356,7 +356,8 @@
       "legalNameLabel": "Razón social",
       "foundedYearLabel": "Año de fundación",
       "differentialsLabel": "Diferenciales",
-      "addressRequiredError": "Completa calle, ciudad y estado o limpia la dirección."
+      "addressRequiredError": "Completa calle, ciudad y estado o limpia la dirección.",
+      "socialUrlInvalid": "URL inválida. Usa una dirección completa (ej: https://ejemplo.com)."
     },
     "step8": {
       "title": "¡Felicidades! Tu cuenta está configurada.",

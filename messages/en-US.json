@@ -356,7 +356,8 @@
       "legalNameLabel": "Legal name",
       "foundedYearLabel": "Founded year",
       "differentialsLabel": "Differentials",
-      "addressRequiredError": "Fill street, city and state or clear the address."
+      "addressRequiredError": "Fill street, city and state or clear the address.",
+      "socialUrlInvalid": "Invalid URL. Use a full address (e.g., https://example.com)."
     },
     "step8": {
       "title": "Congrats! Your account is set up.",
