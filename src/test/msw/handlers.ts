@@ -41,6 +41,62 @@ export const handlers = [
     return HttpResponse.json(envelope(ADMIN_USER));
   }),
 
+  http.get(`${API_URL}/dashboard`, () => {
+    return HttpResponse.json(
+      envelope({
+        revenueThisMonth: 12_500,
+        revenueGrowth: 0.18,
+        conversionRate: 0.22,
+        averageTicket: 187,
+        hotLeadsWaiting: 3,
+        overdueInvoices: 1,
+        overdueAmount: 450,
+        leadsGoneCold: 2,
+        todayAppointments: [],
+        leadsToFollowUp: [],
+        pendingInvoicesDueSoon: [],
+        revenueProjection: 14_200,
+        bestService: null,
+        leadFunnel: {
+          new: 12,
+          contacted: 7,
+          qualified: 4,
+          converted: 3,
+          lost: 2,
+        },
+        totalLeads: 28,
+        newLeadsThisMonth: 8,
+        appointmentsThisMonth: 14,
+        upcomingAppointments: 3,
+        invoiceCount: 9,
+        totalRevenue: 42_300,
+        totalPending: 1_200,
+        collectionRate: 0.94,
+        roi: 3.2,
+        charts: {
+          dailyRevenue: Array.from({ length: 14 }, (_, i) => ({
+            date: new Date(Date.now() - (13 - i) * 86_400_000)
+              .toISOString()
+              .slice(0, 10),
+            value: Math.round(300 + Math.random() * 800),
+          })),
+          dailyNewLeads: Array.from({ length: 14 }, (_, i) => ({
+            date: new Date(Date.now() - (13 - i) * 86_400_000)
+              .toISOString()
+              .slice(0, 10),
+            value: Math.floor(Math.random() * 6),
+          })),
+          dailyAppointments: Array.from({ length: 14 }, (_, i) => ({
+            date: new Date(Date.now() - (13 - i) * 86_400_000)
+              .toISOString()
+              .slice(0, 10),
+            value: Math.floor(Math.random() * 4),
+          })),
+        },
+      }),
+    );
+  }),
+
   http.get(`${API_URL}/admin/plans`, () => {
     return HttpResponse.json(envelope(state.plans));
   }),
