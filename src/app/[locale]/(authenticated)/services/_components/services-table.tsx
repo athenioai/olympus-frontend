@@ -11,6 +11,7 @@ import {
   Plus,
   MoreVertical,
 } from "lucide-react";
+import { toast } from "sonner";
 import { BrlInput } from "@/components/ui/brl-input";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
@@ -343,7 +344,6 @@ export function ServicesTable({ services }: ServicesTableProps) {
   const [isPending, startTransition] = useTransition();
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
@@ -361,47 +361,43 @@ export function ServicesTable({ services }: ServicesTableProps) {
   }, [services, searchQuery, statusFilter]);
 
   function handleCreate(formData: FormData) {
-    setError(null);
     startTransition(async () => {
       const result = await createService(formData);
       if (result.success) {
         setShowCreateModal(false);
       } else {
-        setError(result.error ?? null);
+        toast.error(result.error ?? tc("error"));
       }
     });
   }
 
   function handleUpdate(formData: FormData) {
     if (!editingService) return;
-    setError(null);
     startTransition(async () => {
       const result = await updateService(editingService.id, formData);
       if (result.success) {
         setEditingService(null);
       } else {
-        setError(result.error ?? null);
+        toast.error(result.error ?? tc("error"));
       }
     });
   }
 
   function handleDelete(id: string) {
     if (!confirm(t("deleteConfirm"))) return;
-    setError(null);
     startTransition(async () => {
       const result = await deleteService(id);
       if (!result.success) {
-        setError(result.error ?? null);
+        toast.error(result.error ?? tc("error"));
       }
     });
   }
 
   function handleToggleStatus(id: string, active: boolean) {
-    setError(null);
     startTransition(async () => {
       const result = await toggleServiceStatus(id, active);
       if (!result.success) {
-        setError(result.error ?? null);
+        toast.error(result.error ?? tc("error"));
       }
     });
   }
@@ -467,17 +463,6 @@ export function ServicesTable({ services }: ServicesTableProps) {
           ))}
         </div>
       </motion.div>
-
-      {/* Error */}
-      {error && (
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 rounded-xl bg-danger-muted px-5 py-3.5 text-sm text-danger"
-          initial={{ opacity: 0, y: -8 }}
-        >
-          {error}
-        </motion.div>
-      )}
 
       {/* Column headers */}
       <motion.div

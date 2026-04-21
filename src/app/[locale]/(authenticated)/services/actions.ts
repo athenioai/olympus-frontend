@@ -48,7 +48,9 @@ async function validateImageMagicBytes(file: File): Promise<boolean> {
 const serviceSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
-  price: z.coerce.number().min(0).max(999_999.99),
+  // Must be a positive value — 0 would let an operator publish a "free"
+  // service by mistake and the backend accepts it silently.
+  price: z.coerce.number().min(0.01).max(999_999.99),
   agentInstructions: z.string().max(2000).optional(),
 });
 
