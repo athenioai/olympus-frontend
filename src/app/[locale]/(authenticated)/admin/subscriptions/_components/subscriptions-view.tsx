@@ -174,10 +174,10 @@ export function SubscriptionsView({
                     key={sub.id}
                   >
                     <td className="px-5 py-3 font-medium text-on-surface">
-                      {user?.name ?? user?.email ?? sub.userId.slice(0, 8)}
+                      {user?.name ?? user?.email ?? "—"}
                     </td>
                     <td className="px-5 py-3 text-on-surface-variant">
-                      {plan?.name ?? sub.planId.slice(0, 8)}
+                      {plan?.name ?? "—"}
                     </td>
                     <td className="px-5 py-3">
                       <span
