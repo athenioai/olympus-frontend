@@ -108,12 +108,29 @@ test.describe("forgot-password form", () => {
 });
 
 test.describe("reset-password page", () => {
-  test("renders invalid-token stage when token is missing", async ({ page }) => {
+  test("missing token lands on the invalid-link stage", async ({ page }) => {
     await page.goto("/pt-BR/reset-password");
-    // Server-side validation of the token marks it invalid and we land on
-    // the invalid stage UI.
+
+    // Invalid stage shows the expired copy, not the password form.
     await expect(
-      page.getByRole("heading", { level: 2 }).first(),
+      page.getByRole("heading", {
+        name: "Esse link expirou ou já foi usado.",
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Pedir novo link" }),
+    ).toHaveAttribute("href", "/forgot-password");
+
+    // The password form must NOT be on screen.
+    await expect(page.getByPlaceholder(/senha/i)).toHaveCount(0);
+  });
+
+  test("too-short token also lands on invalid stage", async ({ page }) => {
+    await page.goto("/pt-BR/reset-password?token=abc");
+    await expect(
+      page.getByRole("heading", {
+        name: "Esse link expirou ou já foi usado.",
+      }),
     ).toBeVisible();
   });
 });
