@@ -2,16 +2,23 @@
 
 import { cookies } from "next/headers";
 import { authService } from "@/lib/services/auth-service";
+import { counter } from "@/lib/observability/sentry-metrics";
 
 interface LoginActionResult {
   readonly success: boolean;
   readonly error?: string;
 }
 
+type LoginResult = "success" | "invalid_credentials" | "error";
+
 const SAFE_ERRORS: Record<string, string> = {
   INVALID_CREDENTIALS: "Email ou senha inválidos.",
   NOT_AUTHENTICATED: "Sessão expirada. Faça login novamente.",
 };
+
+function emitLoginAttempt(result: LoginResult): void {
+  counter("auth.login_attempt", 1, { attributes: { result } });
+}
 
 /**
  * Server action for user login.
@@ -52,10 +59,11 @@ export async function loginAction(
       secure: process.env.NODE_ENV === "production",
     });
 
+    emitLoginAttempt("success");
     return { success: true };
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "UNKNOWN";
+    const message = err instanceof Error ? err.message : "UNKNOWN";
+    emitLoginAttempt(message === "INVALID_CREDENTIALS" ? "invalid_credentials" : "error");
     return {
       success: false,
       error: SAFE_ERRORS[message] ?? "Ocorreu um erro. Tente novamente.",

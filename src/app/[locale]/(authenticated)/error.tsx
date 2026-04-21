@@ -1,15 +1,22 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 export default function AuthenticatedError({
+  error,
   reset,
 }: {
   readonly error: Error & { digest?: string };
   readonly reset: () => void;
 }) {
   const t = useTranslations("common");
+
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">

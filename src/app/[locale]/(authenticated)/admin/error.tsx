@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -15,7 +16,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
   const tc = useTranslations("common");
 
   useEffect(() => {
-    console.error("[admin] unhandled error", error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

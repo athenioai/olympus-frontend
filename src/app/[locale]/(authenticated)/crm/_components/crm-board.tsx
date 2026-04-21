@@ -22,6 +22,7 @@ import { Plus, Sparkles, Phone, MessageSquare, Trophy, XCircle, Loader2 } from "
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
+import { counter } from "@/lib/observability/sentry-metrics";
 import { Button } from "@/components/ui/button";
 import type {
   BoardColumnCount,
@@ -195,7 +196,11 @@ export function CrmBoard({ initialCounters, initialColumns, filters }: CrmBoardP
           },
         }));
         toast.error(result.error ?? "Erro ao mover lead.");
+        return;
       }
+      counter("lead.status_changed", 1, {
+        attributes: { from: oldStatus, to: targetColumn },
+      });
     });
   }
 

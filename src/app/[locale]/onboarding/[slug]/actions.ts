@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { counter } from "@/lib/observability/sentry-metrics";
 import { isValidCNPJ } from "@/lib/format";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import {
@@ -21,6 +22,22 @@ import {
 
 const ACCESS_TOKEN_MAX_AGE = 60 * 60;
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
+
+type OnboardingStep =
+  | "password"
+  | "work_type"
+  | "vertical"
+  | "business_info"
+  | "service_modality"
+  | "policies"
+  | "extras";
+
+function emitStepCompleted(
+  step: OnboardingStep,
+  result: "success" | "error",
+): void {
+  counter("onboarding.step_completed", 1, { attributes: { step, result } });
+}
 
 export type StepErrorCode =
   | "INVALID_INPUT"
@@ -64,6 +81,7 @@ export async function setPasswordStepAction(
   });
 
   if (!parsed.success) {
+    emitStepCompleted("password", "error");
     return { success: false, error: "INVALID_INPUT" };
   }
 
@@ -71,6 +89,7 @@ export async function setPasswordStepAction(
   try {
     response = await onboardingService.setPassword(slug, parsed.data);
   } catch (err) {
+    emitStepCompleted("password", "error");
     return { success: false, error: mapSetPasswordError(err) };
   }
 
@@ -99,6 +118,7 @@ export async function setPasswordStepAction(
     profileView = undefined;
   }
 
+  emitStepCompleted("password", "success");
   return {
     success: true,
     user: response.user,
@@ -131,13 +151,16 @@ export async function setWorkTypeAction(
 ): Promise<SetWorkTypeResult> {
   const parsed = workTypeSchema.safeParse(rawWorkType);
   if (!parsed.success) {
+    emitStepCompleted("work_type", "error");
     return { success: false, error: "INVALID_INPUT" };
   }
 
   try {
     const updated = await userService.updateMe({ workType: parsed.data });
+    emitStepCompleted("work_type", "success");
     return { success: true, workType: updated.workType };
   } catch (err) {
+    emitStepCompleted("work_type", "error");
     return { success: false, error: mapAuthedError(err) };
   }
 }
@@ -183,6 +206,7 @@ export async function setVerticalAction(
   verticalId: string,
 ): Promise<SetVerticalResult> {
   if (typeof verticalId !== "string" || verticalId.trim() === "") {
+    emitStepCompleted("vertical", "error");
     return { success: false, error: "INVALID_INPUT" };
   }
 
@@ -195,8 +219,10 @@ export async function setVerticalAction(
       businessVerticalService.list(),
     ]);
     const vertical = verticals.find((v) => v.id === verticalId);
+    emitStepCompleted("vertical", "success");
     return { success: true, profileView, vertical };
   } catch (err) {
+    emitStepCompleted("vertical", "error");
     return { success: false, error: mapAuthedError(err) };
   }
 }
@@ -234,8 +260,13 @@ export async function updateBusinessInfoAction(
     businessName: formData.get("businessName"),
     businessDescription: formData.get("businessDescription"),
   });
-  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
-  return persistProfile(parsed.data);
+  if (!parsed.success) {
+    emitStepCompleted("business_info", "error");
+    return { success: false, error: "INVALID_INPUT" };
+  }
+  const result = await persistProfile(parsed.data);
+  emitStepCompleted("business_info", result.success ? "success" : "error");
+  return result;
 }
 
 /**
@@ -245,8 +276,13 @@ export async function updateServiceModalityAction(
   rawModality: string,
 ): Promise<UpdateProfileResult> {
   const parsed = modalitySchema.safeParse(rawModality);
-  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
-  return persistProfile({ serviceModality: parsed.data });
+  if (!parsed.success) {
+    emitStepCompleted("service_modality", "error");
+    return { success: false, error: "INVALID_INPUT" };
+  }
+  const result = await persistProfile({ serviceModality: parsed.data });
+  emitStepCompleted("service_modality", result.success ? "success" : "error");
+  return result;
 }
 
 /**
@@ -259,8 +295,13 @@ export async function updatePoliciesAction(
     paymentPolicy: formData.get("paymentPolicy"),
     cancellationPolicy: formData.get("cancellationPolicy"),
   });
-  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
-  return persistProfile(parsed.data);
+  if (!parsed.success) {
+    emitStepCompleted("policies", "error");
+    return { success: false, error: "INVALID_INPUT" };
+  }
+  const result = await persistProfile(parsed.data);
+  emitStepCompleted("policies", result.success ? "success" : "error");
+  return result;
 }
 
 async function persistProfile(
@@ -344,7 +385,10 @@ export async function saveExtrasAction(
   input: SaveExtrasInput,
 ): Promise<UpdateProfileResult> {
   const parsed = extrasSchema.safeParse(input);
-  if (!parsed.success) return { success: false, error: "INVALID_INPUT" };
+  if (!parsed.success) {
+    emitStepCompleted("extras", "error");
+    return { success: false, error: "INVALID_INPUT" };
+  }
 
   const { address, socialLinks, serviceAreas, company } = parsed.data;
   let hadError = false;
@@ -368,6 +412,7 @@ export async function saveExtrasAction(
     }
   } catch (err) {
     if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
+      emitStepCompleted("extras", "error");
       return { success: false, error: "NOT_AUTHENTICATED" };
     }
     hadError = true;
@@ -378,8 +423,10 @@ export async function saveExtrasAction(
 
   try {
     const profileView = await businessProfileService.getProfile();
+    emitStepCompleted("extras", hadError ? "error" : "success");
     return { success: !hadError, profileView, error: hadError ? "GENERIC" : undefined };
   } catch (err) {
+    emitStepCompleted("extras", "error");
     return { success: false, error: mapAuthedError(err) };
   }
 }

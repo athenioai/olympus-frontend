@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { leadService } from "@/lib/services";
+import { counter } from "@/lib/observability/sentry-metrics";
 import type {
   BoardColumnCount,
   LeadBoardItem,
@@ -170,10 +171,18 @@ export async function createLead(
   email: string,
   phone?: string,
 ): Promise<{ success: boolean; data?: LeadPublic; error?: string }> {
+  const emit = (
+    result: "success" | "validation_error" | "conflict" | "error",
+  ): void => {
+    counter("lead.created", 1, { attributes: { result } });
+  };
+
   if (typeof name !== "string" || !name.trim()) {
+    emit("validation_error");
     return { success: false, error: "Nome e obrigatorio." };
   }
   if (name.trim().length > MAX_NAME_LEN) {
+    emit("validation_error");
     return {
       success: false,
       error: "Nome deve ter no maximo 255 caracteres.",
@@ -181,15 +190,18 @@ export async function createLead(
   }
 
   if (typeof email !== "string" || !email.trim()) {
+    emit("validation_error");
     return { success: false, error: "Email e obrigatorio." };
   }
   if (email.trim().length > MAX_EMAIL_LEN) {
+    emit("validation_error");
     return {
       success: false,
       error: "Email deve ter no maximo 320 caracteres.",
     };
   }
   if (!EMAIL_RE.test(email.trim())) {
+    emit("validation_error");
     return { success: false, error: "Email invalido." };
   }
 
@@ -198,6 +210,7 @@ export async function createLead(
     typeof phone === "string" &&
     phone.length > MAX_PHONE_LEN
   ) {
+    emit("validation_error");
     return {
       success: false,
       error: "Telefone deve ter no maximo 50 caracteres.",
@@ -211,8 +224,11 @@ export async function createLead(
       phone: phone?.trim() || undefined,
     });
     revalidatePath("/crm");
+    emit("success");
     return { success: true, data };
   } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    emit(message === "CONFLICT" ? "conflict" : "error");
     return {
       success: false,
       error: safeError(error, "Erro ao criar lead."),

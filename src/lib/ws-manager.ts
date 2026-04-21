@@ -1,4 +1,5 @@
 import type { ChatMessage } from "./services/interfaces/chat-service";
+import { counter } from "./observability/sentry-metrics";
 
 export type WsState =
   | "connecting"
@@ -132,6 +133,7 @@ export class WsManager {
   private setState(newState: WsState): void {
     if (this.currentState === newState) return;
     this.currentState = newState;
+    counter("chat.ws_state_change", 1, { attributes: { state: newState } });
     this.onStateChange?.(newState);
   }
 
