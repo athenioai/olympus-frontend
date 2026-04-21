@@ -468,6 +468,15 @@
       "confirmed": "Confirmado",
       "cancelled": "Cancelado"
     },
+    "weekdays": {
+      "mon": "lun",
+      "tue": "mar",
+      "wed": "mié",
+      "thu": "jue",
+      "fri": "vie",
+      "sat": "sáb",
+      "sun": "dom"
+    },
     "noAppointments": "No hay citas en este período."
   },
   "catalog": {

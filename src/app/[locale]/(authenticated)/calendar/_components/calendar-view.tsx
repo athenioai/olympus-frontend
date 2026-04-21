@@ -183,6 +183,7 @@ function WeekView({
   readonly appointments: readonly Appointment[];
   readonly weekStart: Date;
 }) {
+  const t = useTranslations("calendar");
   const days = useMemo(
     () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
     [weekStart],
@@ -205,7 +206,7 @@ function WeekView({
                 )}
                 key={iso}
               >
-                <span>{WEEKDAY_KEYS[i]}</span>
+                <span>{t(`weekdays.${WEEKDAY_KEYS[i]}`)}</span>
                 <span
                   className={cn(
                     "ml-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs",
@@ -263,6 +264,7 @@ function MonthView({
   readonly year: number;
   readonly month: number;
 }) {
+  const t = useTranslations("calendar");
   const weeks = useMemo(() => getMonthGrid(year, month), [year, month]);
 
   return (
@@ -275,7 +277,7 @@ function MonthView({
               className="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
               key={day}
             >
-              {day}
+              {t(`weekdays.${day}`)}
             </div>
           ))}
         </div>

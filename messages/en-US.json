@@ -468,6 +468,15 @@
       "confirmed": "Confirmed",
       "cancelled": "Cancelled"
     },
+    "weekdays": {
+      "mon": "mon",
+      "tue": "tue",
+      "wed": "wed",
+      "thu": "thu",
+      "fri": "fri",
+      "sat": "sat",
+      "sun": "sun"
+    },
     "noAppointments": "No appointments in this period."
   },
   "catalog": {

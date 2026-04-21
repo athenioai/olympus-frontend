@@ -561,6 +561,15 @@
       "confirmed": "Confirmado",
       "cancelled": "Cancelado"
     },
+    "weekdays": {
+      "mon": "seg",
+      "tue": "ter",
+      "wed": "qua",
+      "thu": "qui",
+      "fri": "sex",
+      "sat": "sáb",
+      "sun": "dom"
+    },
     "noAppointments": "Nenhum agendamento neste período."
   },
   "catalog": {
