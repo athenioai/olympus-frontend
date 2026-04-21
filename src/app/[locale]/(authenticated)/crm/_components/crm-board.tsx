@@ -268,8 +268,27 @@ export function CrmBoard({ initialCounters, initialColumns, filters }: CrmBoardP
       </div>
 
       <CreateLeadDialog
-        open={dialogOpen}
         onClose={() => setDialogOpen(false)}
+        onCreated={(lead) => {
+          // New leads are created in the "new" column by the backend. Insert
+          // into local board state so the card appears without a reload.
+          const boardItem: LeadBoardItem = {
+            ...lead,
+            avatarUrl: null,
+            lastMessage: null,
+            tags: [],
+            customFields: [],
+          };
+          setBoard((prev) => ({
+            ...prev,
+            new: {
+              ...prev.new,
+              leads: [boardItem, ...prev.new.leads],
+              total: prev.new.total + 1,
+            },
+          }));
+        }}
+        open={dialogOpen}
       />
     </div>
   );

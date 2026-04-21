@@ -9,6 +9,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { LeadPublic } from "@/lib/services/interfaces/lead-service";
 import { createLead } from "../actions";
 
 const createLeadSchema = z.object({
@@ -20,12 +21,23 @@ const createLeadSchema = z.object({
 interface CreateLeadDialogProps {
   readonly open: boolean;
   readonly onClose: () => void;
+  /**
+   * Called with the freshly created lead when the server action succeeds.
+   * The parent is responsible for inserting it into the board state —
+   * `revalidatePath` on the action only busts the server cache, it does
+   * not re-initialize the client component's local `board` state.
+   */
+  readonly onCreated?: (lead: LeadPublic) => void;
 }
 
 /**
  * Modal dialog for creating a new lead with client-side Zod validation.
  */
-export function CreateLeadDialog({ open, onClose }: CreateLeadDialogProps) {
+export function CreateLeadDialog({
+  open,
+  onClose,
+  onCreated,
+}: CreateLeadDialogProps) {
   const t = useTranslations("crm");
   const tc = useTranslations("common");
   const [name, setName] = useState("");
@@ -68,8 +80,9 @@ export function CreateLeadDialog({ open, onClose }: CreateLeadDialogProps) {
         parsed.data.email,
         parsed.data.phone,
       );
-      if (result.success) {
+      if (result.success && result.data) {
         toast.success(t("newLead"));
+        onCreated?.(result.data);
         reset();
         onClose();
       } else {
