@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatTime, getMonday, addDays, formatISODate } from "@/lib/format";
 import type { Appointment } from "@/lib/services";
+import { AppointmentDetailsModal } from "./appointment-details-modal";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -104,15 +105,23 @@ function StatusBadge({ status }: { readonly status: "confirmed" | "cancelled" })
 // Appointment card
 // ---------------------------------------------------------------------------
 
-function AppointmentCard({ appointment }: { readonly appointment: Appointment }) {
+function AppointmentCard({
+  appointment,
+  onSelect,
+}: {
+  readonly appointment: Appointment;
+  readonly onSelect: (appointment: Appointment) => void;
+}) {
   return (
-    <div
+    <button
       className={cn(
-        "rounded-lg p-2 text-xs transition-colors",
+        "w-full rounded-lg p-2 text-left text-xs transition-colors hover:ring-1 hover:ring-primary/20",
         appointment.status === "confirmed"
           ? "bg-primary/8 text-on-surface"
           : "bg-danger-muted text-on-surface-variant line-through",
       )}
+      onClick={() => onSelect(appointment)}
+      type="button"
     >
       <div className="font-medium">
         {appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}
@@ -120,7 +129,7 @@ function AppointmentCard({ appointment }: { readonly appointment: Appointment })
       <div className="text-on-surface-variant">
         {appointment.status === "confirmed" ? "Confirmado" : "Cancelado"}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -131,9 +140,11 @@ function AppointmentCard({ appointment }: { readonly appointment: Appointment })
 function DayView({
   appointments,
   date,
+  onSelect,
 }: {
   readonly appointments: readonly Appointment[];
   readonly date: string;
+  readonly onSelect: (appointment: Appointment) => void;
 }) {
   const t = useTranslations("calendar");
   const dayAppointments = appointments.filter((a) => a.date === date);
@@ -156,7 +167,11 @@ function DayView({
               </div>
               <div className="flex-1 space-y-1 px-2 py-1">
                 {hourApps.map((app) => (
-                  <AppointmentCard appointment={app} key={app.id} />
+                  <AppointmentCard
+                    appointment={app}
+                    key={app.id}
+                    onSelect={onSelect}
+                  />
                 ))}
               </div>
             </div>
@@ -179,9 +194,11 @@ function DayView({
 function WeekView({
   appointments,
   weekStart,
+  onSelect,
 }: {
   readonly appointments: readonly Appointment[];
   readonly weekStart: Date;
+  readonly onSelect: (appointment: Appointment) => void;
 }) {
   const t = useTranslations("calendar");
   const days = useMemo(
@@ -239,7 +256,11 @@ function WeekView({
               return (
                 <div className="space-y-1 px-1 py-1" key={iso}>
                   {cellApps.map((app) => (
-                    <AppointmentCard appointment={app} key={app.id} />
+                    <AppointmentCard
+                      appointment={app}
+                      key={app.id}
+                      onSelect={onSelect}
+                    />
                   ))}
                 </div>
               );
@@ -259,10 +280,12 @@ function MonthView({
   appointments,
   year,
   month,
+  onSelect,
 }: {
   readonly appointments: readonly Appointment[];
   readonly year: number;
   readonly month: number;
+  readonly onSelect: (appointment: Appointment) => void;
 }) {
   const t = useTranslations("calendar");
   const weeks = useMemo(() => getMonthGrid(year, month), [year, month]);
@@ -311,17 +334,19 @@ function MonthView({
                   </span>
                   <div className="mt-1 space-y-0.5">
                     {dayApps.slice(0, 3).map((app) => (
-                      <div
+                      <button
                         className={cn(
-                          "truncate rounded px-1 py-0.5 text-[10px] font-medium",
+                          "w-full truncate rounded px-1 py-0.5 text-left text-[10px] font-medium hover:ring-1 hover:ring-primary/20",
                           app.status === "confirmed"
                             ? "bg-primary/8 text-primary"
                             : "bg-danger-muted text-danger",
                         )}
                         key={app.id}
+                        onClick={() => onSelect(app)}
+                        type="button"
                       >
                         {app.startTime.slice(0, 5)} - {app.endTime.slice(0, 5)}
-                      </div>
+                      </button>
                     ))}
                     {dayApps.length > 3 && (
                       <div className="text-[10px] text-on-surface-variant">
@@ -353,6 +378,7 @@ export function CalendarView({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [selected, setSelected] = useState<Appointment | null>(null);
 
   const dateObj = useMemo(() => new Date(currentDate + "T00:00:00"), [currentDate]);
 
@@ -487,11 +513,16 @@ export function CalendarView({
 
       {/* Calendar content — fills remaining space */}
       {currentView === "day" && (
-        <DayView appointments={appointments} date={currentDate} />
+        <DayView
+          appointments={appointments}
+          date={currentDate}
+          onSelect={setSelected}
+        />
       )}
       {currentView === "week" && (
         <WeekView
           appointments={appointments}
+          onSelect={setSelected}
           weekStart={getMonday(dateObj)}
         />
       )}
@@ -499,9 +530,15 @@ export function CalendarView({
         <MonthView
           appointments={appointments}
           month={dateObj.getMonth()}
+          onSelect={setSelected}
           year={dateObj.getFullYear()}
         />
       )}
+
+      <AppointmentDetailsModal
+        appointment={selected}
+        onClose={() => setSelected(null)}
+      />
     </div>
   );
 }

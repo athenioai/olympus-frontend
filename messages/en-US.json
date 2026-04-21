@@ -477,6 +477,13 @@
       "sat": "sat",
       "sun": "sun"
     },
+    "appointmentDetails": "Appointment details",
+    "detail": {
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "serviceId": "Service"
+    },
     "noAppointments": "No appointments in this period."
   },
   "catalog": {
