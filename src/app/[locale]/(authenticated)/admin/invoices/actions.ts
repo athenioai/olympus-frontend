@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminInvoiceService } from "@/lib/services";
@@ -105,6 +106,7 @@ function invalidateInvoiceCaches() {
 }
 
 function mapErr(err: unknown): string {
+  captureUnexpected(err);
   if (err instanceof ApiError || err instanceof Error) return err.message;
   return "UNKNOWN_ERROR";
 }

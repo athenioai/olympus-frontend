@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { businessExceptionService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type { BusinessException, CreateExceptionPayload, UpdateExceptionPayload } from "@/lib/services";
 
 interface ActionResult<T = undefined> {
@@ -15,6 +16,7 @@ export async function fetchExceptions(params?: { from?: string; to?: string }): 
     const data = await businessExceptionService.list(params);
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -26,6 +28,7 @@ export async function createException(payload: CreateExceptionPayload): Promise<
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -37,6 +40,7 @@ export async function updateException(id: string, payload: UpdateExceptionPayloa
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -48,6 +52,7 @@ export async function deleteException(id: string): Promise<ActionResult> {
     revalidatePath("/settings");
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }

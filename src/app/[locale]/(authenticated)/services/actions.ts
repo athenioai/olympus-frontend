@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { financeService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type { Service, Product } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
@@ -145,6 +146,7 @@ export async function createService(
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -188,6 +190,7 @@ export async function updateService(
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -211,6 +214,7 @@ export async function deleteService(
     revalidatePath("/services");
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -238,6 +242,7 @@ export async function toggleServiceStatus(
     revalidatePath("/services");
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -278,6 +283,7 @@ export async function createProduct(
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -321,6 +327,7 @@ export async function updateProduct(
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -344,6 +351,7 @@ export async function deleteProduct(
     revalidatePath("/products");
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }

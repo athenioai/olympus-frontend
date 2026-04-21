@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 import { isValidCNPJ } from "@/lib/format";
 import { CACHE_TAGS } from "@/lib/cache-config";
@@ -113,8 +114,10 @@ export async function setPasswordStepAction(
   let profileView: BusinessProfileView | undefined;
   try {
     profileView = await businessProfileService.getProfile();
-  } catch {
+  } catch (err) {
     // Profile may legitimately not exist yet; client falls back to defaults.
+    // Only backend bugs (5xx) surface in Sentry; 4xx are treated as expected.
+    captureUnexpected(err);
     profileView = undefined;
   }
 
@@ -127,6 +130,7 @@ export async function setPasswordStepAction(
 }
 
 function mapSetPasswordError(err: unknown): StepErrorCode {
+  captureUnexpected(err);
   if (err instanceof ApiError) {
     if (err.status === 404) return "INVALID_SLUG";
     if (err.status === 410) return "SLUG_CONSUMED";
@@ -169,6 +173,7 @@ function mapAuthedError(err: unknown): StepErrorCode {
   if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
     return "NOT_AUTHENTICATED";
   }
+  captureUnexpected(err);
   if (err instanceof ApiError && err.status === 400) {
     return "INVALID_INPUT";
   }
@@ -415,6 +420,7 @@ export async function saveExtrasAction(
       emitStepCompleted("extras", "error");
       return { success: false, error: "NOT_AUTHENTICATED" };
     }
+    captureUnexpected(err);
     hadError = true;
   }
 

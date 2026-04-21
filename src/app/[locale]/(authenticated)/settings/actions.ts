@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { authService, calendarConfigService, channelAccountService, financeService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type { CalendarConfig, ChannelAccount, PrepaymentSetting } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
@@ -54,6 +55,7 @@ export async function updateCalendarConfig(
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -85,6 +87,7 @@ export async function updatePrepaymentSetting(
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
@@ -129,6 +132,7 @@ export async function connectChannel(
     if (msg.includes("INCOMPLETE") || msg.includes("BUSINESS_PROFILE")) {
       return { success: false, error: "PROFILE_INCOMPLETE" };
     }
+    captureUnexpected(err);
     return { success: false, error: msg };
   }
 }
@@ -142,6 +146,7 @@ export async function listChannels(): Promise<ActionResult<ChannelAccount[]>> {
     const data = await channelAccountService.list();
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -162,6 +167,7 @@ export async function disconnectChannel(
     revalidatePath("/settings");
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -179,6 +185,7 @@ export async function initWhatsAppOAuthAction(): Promise<
     const { state } = await authService.initWhatsAppOAuth();
     return { success: true, data: { state } };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }

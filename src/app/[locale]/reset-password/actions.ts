@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { authService } from "@/lib/services/auth-service";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { meetsBackendPolicy } from "@/lib/auth/password-strength";
 
 export interface TokenValidationResult {
@@ -34,7 +35,8 @@ export async function validateResetTokenAction(
   }
   try {
     return await authService.validateResetToken(token);
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { valid: false };
   }
 }
@@ -67,6 +69,9 @@ export async function resetPasswordAction(
     await authService.resetPassword(parsed.data.token, parsed.data.password);
     return { success: true };
   } catch (err) {
+    captureUnexpected(err, {
+      expectedMessages: ["TOKEN_INVALID", "TOKEN_EXPIRED", "PASSWORD_WEAK"],
+    });
     const code = err instanceof Error ? err.message : "PASSWORD_RESET_FAILED";
     return { success: false, error: code };
   }

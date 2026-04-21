@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   businessProfileService,
 } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type {
   BusinessProfileView,
   BusinessProfile,
@@ -34,6 +35,7 @@ export async function fetchBusinessProfile(): Promise<ActionResult<BusinessProfi
     const data = await businessProfileService.getProfile();
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -50,6 +52,7 @@ export async function saveBusinessProfile(
     revalidate();
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -66,6 +69,7 @@ export async function saveBusinessAddress(
     revalidate();
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -80,6 +84,7 @@ export async function removeBusinessAddress(): Promise<ActionResult> {
     revalidate();
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -100,6 +105,7 @@ export async function addBusinessSocialLink(
     if (msg.includes("CONFLICT")) {
       return { success: false, error: "CONFLICT" };
     }
+    captureUnexpected(err);
     return { success: false, error: msg };
   }
 }
@@ -115,6 +121,7 @@ export async function removeBusinessSocialLink(
     revalidate();
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }
@@ -135,6 +142,7 @@ export async function addBusinessServiceArea(
     if (msg.includes("CONFLICT")) {
       return { success: false, error: "CONFLICT" };
     }
+    captureUnexpected(err);
     return { success: false, error: msg };
   }
 }
@@ -150,6 +158,7 @@ export async function removeBusinessServiceArea(
     revalidate();
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: msg };
   }

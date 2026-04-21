@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { authService } from "@/lib/services/auth-service";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 
 interface LoginActionResult {
@@ -63,6 +64,7 @@ export async function loginAction(
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : "UNKNOWN";
+    captureUnexpected(err, { expectedMessages: ["INVALID_CREDENTIALS"] });
     emitLoginAttempt(message === "INVALID_CREDENTIALS" ? "invalid_credentials" : "error");
     return {
       success: false,

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { leadService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 import type {
   BoardColumnCount,
@@ -80,6 +81,7 @@ function safeError(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message in SAFE_ERRORS) {
     return SAFE_ERRORS[error.message];
   }
+  captureUnexpected(error);
   return fallback;
 }
 

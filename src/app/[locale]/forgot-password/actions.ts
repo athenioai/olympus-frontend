@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { authService } from "@/lib/services/auth-service";
+import { captureUnexpected } from "@/lib/observability/capture";
 
 interface ForgotPasswordResult {
   readonly success: boolean;
@@ -43,9 +44,10 @@ export async function requestPasswordResetAction(
 
   try {
     await authService.requestPasswordReset(parsed.data.email);
-  } catch {
-    // Swallow — UI always shows the same "check your inbox" state to avoid
-    // leaking whether the email is registered.
+  } catch (err) {
+    // Swallow for the UI (enumeration-safe), but still log real technical
+    // failures (5xx, network) so they surface in Sentry.
+    captureUnexpected(err);
   }
 
   return { success: true };

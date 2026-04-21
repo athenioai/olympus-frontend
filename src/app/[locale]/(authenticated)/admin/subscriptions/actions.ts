@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminSubscriptionService } from "@/lib/services";
@@ -68,8 +69,9 @@ export async function updateSubscriptionAction(
       if (current?.status === "cancelled") {
         return { success: false, error: "SUBSCRIPTION_CANCELLED_TERMINAL" };
       }
-    } catch {
-      // If the current lookup fails (e.g. 404), let the backend decide on update.
+    } catch (err) {
+      // 404 is fine; backend decides on update. 5xx is captured as usual.
+      captureUnexpected(err);
     }
   }
 
@@ -85,6 +87,7 @@ export async function updateSubscriptionAction(
 }
 
 function mapErr(err: unknown): string {
+  captureUnexpected(err);
   if (err instanceof ApiError || err instanceof Error) return err.message;
   return "UNKNOWN_ERROR";
 }

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
 import { signupService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 import { PENDING_EMAIL_COOKIE, PENDING_EMAIL_MAX_AGE } from "./constants";
 
@@ -72,6 +73,7 @@ export async function signupAction(
     await signupService.begin({ email: parsed.data.email });
   } catch (err) {
     const code = mapSignupError(err);
+    captureUnexpected(err);
     emitSignupStarted(code);
     return { success: false, error: code };
   }
@@ -100,6 +102,7 @@ export async function resendSignupAction(): Promise<SignupActionResult> {
     await signupService.begin({ email });
     return { success: true };
   } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: mapSignupError(err) };
   }
 }

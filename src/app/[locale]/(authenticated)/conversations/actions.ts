@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { chatService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type { ChatMessage } from "@/lib/services/interfaces/chat-service";
 
 interface ActionResult {
@@ -35,7 +36,8 @@ export async function deleteChatSession(
     await chatService.deleteSession(sessionId);
     revalidatePath("/conversations");
     return { success: true };
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: "Failed to delete conversation." };
   }
 }
@@ -59,7 +61,8 @@ export async function loadMoreMessages(
       page: result.page,
       total: result.total,
     };
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: "Failed to load messages." };
   }
 }
@@ -83,7 +86,8 @@ export async function sendMessageToLead(
   try {
     await chatService.sendMessage(sessionId, trimmed);
     return { success: true };
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: "Failed to send message." };
   }
 }
@@ -101,7 +105,8 @@ export async function activateHandoff(
   try {
     await chatService.activateHandoff(sessionId);
     return { success: true };
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: "Failed to activate handoff." };
   }
 }
@@ -119,7 +124,8 @@ export async function deactivateHandoff(
   try {
     await chatService.deactivateHandoff(sessionId);
     return { success: true };
-  } catch {
+  } catch (err) {
+    captureUnexpected(err);
     return { success: false, error: "Failed to deactivate handoff." };
   }
 }

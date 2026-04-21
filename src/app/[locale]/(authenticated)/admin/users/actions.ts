@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
+import { captureUnexpected } from "@/lib/observability/capture";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { CACHE_TAGS } from "@/lib/cache-config";
 import { adminUserService } from "@/lib/services";
@@ -100,6 +101,7 @@ export async function seedHolidaysAction(
 }
 
 function apiErrorMessage(err: unknown): string {
+  captureUnexpected(err);
   if (err instanceof ApiError) {
     if (err.code === "AUTH_REGISTER_001") return "EMAIL_EXISTS";
     return err.message;

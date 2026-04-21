@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { agentConfigService } from "@/lib/services";
+import { captureUnexpected } from "@/lib/observability/capture";
 import type { AgentConfig } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ export async function updateAgentConfig(
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
+    captureUnexpected(err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: message };
   }
