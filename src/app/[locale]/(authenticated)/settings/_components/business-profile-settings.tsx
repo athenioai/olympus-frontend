@@ -262,6 +262,15 @@ export function BusinessProfileSettings() {
       return;
     }
 
+    if (trimmedName.length < 2) {
+      toast.error(t("profile.errors.businessNameTooShort"));
+      return;
+    }
+    if (trimmedDescription.length < 10) {
+      toast.error(t("profile.errors.businessDescriptionTooShort"));
+      return;
+    }
+
     if (cnpjDigits && !isValidCNPJ(cnpjDigits)) {
       toast.error(t("profile.errors.cnpjInvalid"));
       return;

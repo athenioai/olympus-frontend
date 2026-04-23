@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { ApiError } from "@/lib/api-envelope";
 import {
   businessProfileService,
 } from "@/lib/services";
@@ -25,6 +26,13 @@ interface ActionResult<T = undefined> {
 
 function revalidate() {
   revalidatePath("/settings");
+}
+
+function describeError(err: unknown, fallback = "Unknown error"): string {
+  if (err instanceof ApiError) {
+    return `[${err.code}] ${err.message}`;
+  }
+  return err instanceof Error ? err.message : fallback;
 }
 
 /**
@@ -52,9 +60,19 @@ export async function saveBusinessProfile(
     revalidate();
     return { success: true, data };
   } catch (err) {
-    captureUnexpected(err);
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: msg };
+    if (!(err instanceof ApiError)) {
+      captureUnexpected(err);
+    } else {
+      // Surface payload + backend envelope in server logs so we can diagnose
+      // "Dados inválidos" without asking the operator to reproduce with devtools.
+      console.error("[saveBusinessProfile] rejected", {
+        code: err.code,
+        status: err.status,
+        message: err.message,
+        payload,
+      });
+    }
+    return { success: false, error: describeError(err) };
   }
 }
 

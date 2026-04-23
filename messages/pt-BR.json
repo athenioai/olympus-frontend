@@ -760,6 +760,8 @@
         "cnpjInvalid": "CNPJ inválido. Verifique os 14 dígitos.",
         "socialUrlInvalid": "URL inválida. Use um endereço completo (ex: https://exemplo.com).",
         "missingRequired": "Preencha os campos obrigatórios: {fields}.",
+        "businessNameTooShort": "O nome do negócio precisa ter pelo menos 2 caracteres.",
+        "businessDescriptionTooShort": "A descrição precisa ter pelo menos 10 caracteres.",
         "foundedYearInvalid": "Ano de fundação inválido."
       },
       "sections": {
