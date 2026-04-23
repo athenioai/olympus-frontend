@@ -11,7 +11,6 @@ export const CACHE_TIMES = {
   services: 120,        // 2 min — catalog changes rarely
   products: 120,        // 2 min — catalog changes rarely
   settings: 300,        // 5 min — rarely changes, revalidated on save
-  channels: 300,        // 5 min — rarely changes
   businessVerticals: 60 * 60 * 24, // 24h — catalog is static
   adminDashboard: 60,   // 1 min — platform metrics
   adminUsers: 30,       // 30s — list changes on create/edit
@@ -33,7 +32,6 @@ export const CACHE_TAGS = {
   calendarConfig: "calendar-config",
   agentConfig: "agent-config",
   prepayment: "prepayment",
-  channels: "channels",
   businessProfile: "business-profile",
   businessScore: "business-score",
   businessFaqs: "business-faqs",

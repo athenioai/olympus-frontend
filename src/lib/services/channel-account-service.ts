@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   ChannelAccount,
   CreateChannelAccountPayload,
@@ -10,13 +9,18 @@ import type {
 class ChannelAccountService implements IChannelAccountService {
   /**
    * List all connected channel accounts for the current user.
+   *
+   * Always hits the backend: the connect/disconnect flows demand
+   * source-of-truth state, and Next.js `revalidateTag` did not reliably
+   * bust the legacy fetch cache in Next 16, leaving deleted channels
+   * visible after a page reload.
+   *
    * @returns Array of channel accounts
    * @throws Error if the request fails
    */
   async list(): Promise<ChannelAccount[]> {
     const response = await authFetch("/channel-accounts", {
-      revalidate: CACHE_TIMES.channels,
-      tags: [CACHE_TAGS.channels],
+      cache: "no-store",
     });
     return unwrapEnvelope<ChannelAccount[]>(response);
   }
