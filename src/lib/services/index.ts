@@ -109,6 +109,7 @@ export type {
 // Channel account types
 export type {
   ChannelAccount,
+  ChannelStatus,
   CreateChannelAccountPayload,
   IChannelAccountService,
 } from "./interfaces/channel-account-service";
@@ -126,6 +127,7 @@ export type {
   ServiceModality,
   SocialPlatform,
   ScoreTier,
+  WorkType,
   BusinessProfile,
   BusinessAddress,
   BusinessSocialLink,
@@ -176,7 +178,6 @@ export type {
 
 // User types
 export type {
-  WorkType,
   UpdateUserPayload,
   IUserService,
 } from "./interfaces/user-service";

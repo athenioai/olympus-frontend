@@ -6,7 +6,6 @@ import type {
   AdminUserPublic,
   PlanOption,
   UserRole,
-  WorkType,
 } from "@/lib/services";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Modal } from "../../_components/modal";
@@ -14,7 +13,6 @@ import { Modal } from "../../_components/modal";
 export interface UserFormValues {
   readonly name?: string;
   readonly email: string;
-  readonly workType?: WorkType;
   readonly role?: UserRole;
   readonly planId?: string;
 }
@@ -29,7 +27,6 @@ interface UserFormModalProps {
   readonly onSubmit: (values: UserFormValues) => void;
 }
 
-const WORK_TYPES: readonly WorkType[] = ["services", "sales", "hybrid"];
 const ROLES: readonly UserRole[] = ["user", "admin"];
 
 export function UserFormModal({
@@ -46,7 +43,6 @@ export function UserFormModal({
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [workType, setWorkType] = useState<WorkType>("services");
   const [role, setRole] = useState<UserRole>("user");
   const [planId, setPlanId] = useState<string>("");
 
@@ -55,13 +51,11 @@ export function UserFormModal({
     if (mode === "edit" && initialUser) {
       setName(initialUser.name ?? "");
       setEmail(initialUser.email);
-      setWorkType(initialUser.workType);
       setRole(initialUser.role);
       setPlanId(initialUser.planId ?? "");
     } else {
       setName("");
       setEmail("");
-      setWorkType("services");
       setRole("user");
       setPlanId("");
     }
@@ -77,7 +71,6 @@ export function UserFormModal({
     const values: UserFormValues = {
       name: name.trim(),
       email: email.trim(),
-      workType,
       role,
       ...(planId ? { planId } : {}),
     };
@@ -110,21 +103,6 @@ export function UserFormModal({
             value={email}
           />
         </Field>
-        {mode === "edit" && (
-          <Field label={t("workType")}>
-            <select
-              className={INPUT_CLASS}
-              onChange={(e) => setWorkType(e.target.value as WorkType)}
-              value={workType}
-            >
-              {WORK_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {t(`workType${type.charAt(0).toUpperCase()}${type.slice(1)}`)}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
         <Field label={t("plan")}>
           <SearchableSelect
             allowClear={mode === "edit"}

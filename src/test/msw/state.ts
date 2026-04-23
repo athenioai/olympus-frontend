@@ -14,7 +14,6 @@ export const ADMIN_USER: AuthUser = {
   name: "Admin Teste",
   email: "admin@test.local",
   role: "admin",
-  workType: "services",
   createdAt: "2026-01-01T00:00:00.000Z",
 };
 

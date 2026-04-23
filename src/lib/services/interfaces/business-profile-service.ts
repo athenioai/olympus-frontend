@@ -1,11 +1,13 @@
 export type ServiceModality = "presencial" | "remoto" | "domicilio" | "hibrido";
 export type SocialPlatform = "website" | "instagram" | "google_reviews" | "facebook" | "linkedin" | "youtube" | "tiktok";
 export type ScoreTier = "none" | "bronze" | "silver" | "gold" | "diamond";
+export type WorkType = "services" | "sales" | "hybrid";
 
 export interface BusinessProfile {
   readonly userId: string;
   readonly businessName: string;
   readonly businessDescription: string;
+  readonly workType: WorkType;
   readonly serviceModality: ServiceModality;
   readonly paymentPolicy: string;
   readonly cancellationPolicy: string;
@@ -57,6 +59,7 @@ export interface BusinessProfileView {
 export interface UpdateBusinessProfilePayload {
   readonly businessName?: string;
   readonly businessDescription?: string;
+  readonly workType?: WorkType;
   readonly serviceModality?: ServiceModality;
   readonly paymentPolicy?: string;
   readonly cancellationPolicy?: string;

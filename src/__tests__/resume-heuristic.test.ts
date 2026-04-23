@@ -7,6 +7,7 @@ function buildProfile(overrides: Partial<BusinessProfile> = {}): BusinessProfile
     userId: "user-1",
     businessName: "Acme",
     businessDescription: "A business",
+    workType: "services",
     serviceModality: "presencial",
     paymentPolicy: "Accept pix",
     cancellationPolicy: "Up to 24h",

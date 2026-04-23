@@ -915,16 +915,19 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
   ) {
     if (loading) return <Loader2 className="h-4 w-4 animate-spin text-on-surface-variant/40" />;
     if (account) {
+      const isActive = account.status === "active";
+      const statusPill = isActive
+        ? "bg-success/10 text-success"
+        : "bg-warning/10 text-warning";
+      const statusLabel = isActive
+        ? connectedLabel
+        : t(`channels.status.${account.status}`);
       return (
         <div className="flex items-center gap-3">
-          {account.accessToken && (
-            <code className="rounded-lg bg-surface-container-high px-3 py-1.5 font-mono text-[11px] text-on-surface-variant">
-              {account.accessToken}
-            </code>
-          )}
-          <span className="rounded-lg bg-success/10 px-3 py-1.5 text-[12px] font-semibold text-success">
-            {connectedLabel}
+          <span className={`rounded-lg px-3 py-1.5 text-[12px] font-semibold ${statusPill}`}>
+            {statusLabel}
           </span>
+          {!isActive && connectButton}
           <button
             className="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-danger-muted hover:text-danger"
             disabled={isPending}

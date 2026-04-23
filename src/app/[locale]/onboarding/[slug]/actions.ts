@@ -155,7 +155,10 @@ export interface SetWorkTypeResult {
 }
 
 /**
- * Step 2 action: set the user's work mode via PATCH /users/me.
+ * Step 2 action: set the user's work mode.
+ *
+ * 2026-04 backend change — workType lives on the business profile, so this
+ * goes through PATCH /business-profile instead of PATCH /users/me.
  */
 export async function setWorkTypeAction(
   rawWorkType: string,
@@ -167,7 +170,11 @@ export async function setWorkTypeAction(
   }
 
   try {
-    const updated = await userService.updateMe({ workType: parsed.data });
+    const updated = await businessProfileService.updateProfile({
+      workType: parsed.data,
+    });
+    updateTag(CACHE_TAGS.businessProfile);
+    updateTag(CACHE_TAGS.businessScore);
     emitStepCompleted("work_type", "success");
     return { success: true, workType: updated.workType };
   } catch (err) {

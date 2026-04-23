@@ -880,6 +880,12 @@
       "goToProfile": "Ir para Perfil",
       "disconnectConfirmTitle": "Desconectar canal?",
       "disconnectConfirm": "Tem certeza que deseja desconectar este canal? Você poderá reconectá-lo depois.",
+      "status": {
+        "active": "Conectado",
+        "deauthorized": "Autorização revogada — reconectar",
+        "deleted": "Removido",
+        "inactive": "Inativo"
+      },
       "whatsapp": {
         "name": "WhatsApp",
         "description": "Conecte sua conta do WhatsApp Business para receber e responder mensagens automaticamente.",

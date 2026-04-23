@@ -29,9 +29,17 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { logoutAction } from "@/app/[locale]/(authenticated)/actions";
 import type { AuthUser } from "@/lib/services/interfaces/auth-service";
+import type { WorkType } from "@/lib/services";
 
 interface SidebarProps {
   readonly user: AuthUser;
+  /**
+   * Drives which catalog items (Services / Products) appear in the nav.
+   * `null` means "we don't know yet" (pre-onboarding or profile fetch
+   * failed) — treat as permissive and render every item rather than
+   * hiding navigation from a user we can't classify.
+   */
+  readonly workType: WorkType | null;
 }
 
 interface NavItem {
@@ -65,7 +73,8 @@ const ADMIN_NAV: NavItem[] = [
 
 const STORAGE_KEY = "olympus-sidebar-collapsed";
 
-function getVisibleUserNav(workType: AuthUser["workType"]): NavItem[] {
+function getVisibleUserNav(workType: WorkType | null): NavItem[] {
+  if (workType === null) return USER_NAV;
   return USER_NAV.filter((item) => {
     if (item.key === "services") return workType === "services" || workType === "hybrid";
     if (item.key === "products") return workType === "sales" || workType === "hybrid";
@@ -123,7 +132,7 @@ function renderNavLink(
   );
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, workType }: SidebarProps) {
   const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
@@ -151,7 +160,7 @@ export function Sidebar({ user }: SidebarProps) {
     router.push("/login");
   }
 
-  const visibleNav = getVisibleUserNav(user.workType);
+  const visibleNav = getVisibleUserNav(workType);
   const isAdmin = user.role === "admin";
 
   const navContent = (

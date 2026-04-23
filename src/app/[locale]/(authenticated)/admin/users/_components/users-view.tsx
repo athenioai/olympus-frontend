@@ -271,7 +271,6 @@ export function UsersView({
               <tr className="text-left text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
                 <th className="px-5 py-3">{t("table.name")}</th>
                 <th className="px-5 py-3">{t("table.email")}</th>
-                <th className="px-5 py-3">{t("table.workType")}</th>
                 <th className="px-5 py-3">{t("table.createdAt")}</th>
                 <th className="px-5 py-3">{t("table.actions")}</th>
               </tr>
@@ -287,9 +286,6 @@ export function UsersView({
                   </td>
                   <td className="px-5 py-3 text-on-surface-variant">
                     {user.email}
-                  </td>
-                  <td className="px-5 py-3 text-on-surface-variant">
-                    {t(`form.workType${capitalize(user.workType)}`)}
                   </td>
                   <td className="px-5 py-3 text-on-surface-variant">
                     {formatDate(user.createdAt)}
@@ -393,10 +389,3 @@ export function UsersView({
 
 const FILTER_SELECT_CLASS =
   "h-10 w-full rounded-lg bg-surface-container-high px-3 text-sm text-on-surface outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30";
-
-function capitalize(value: string): "Services" | "Sales" | "Hybrid" {
-  return (value.charAt(0).toUpperCase() + value.slice(1)) as
-    | "Services"
-    | "Sales"
-    | "Hybrid";
-}

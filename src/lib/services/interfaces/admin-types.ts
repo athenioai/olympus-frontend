@@ -4,7 +4,6 @@
  */
 
 export type UserRole = "admin" | "user";
-export type WorkType = "services" | "sales" | "hybrid";
 export type SubscriptionStatus = "active" | "suspended" | "cancelled";
 export type AdminInvoiceStatus =
   | "pending"
@@ -26,7 +25,6 @@ export interface AdminUserPublic {
   readonly planId: string | null;
   readonly contractUrl: string | null;
   readonly onboardingSlug: string | null;
-  readonly workType: WorkType;
   readonly createdAt: string;
 }
 

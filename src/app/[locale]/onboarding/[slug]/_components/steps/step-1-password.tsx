@@ -63,7 +63,7 @@ export function Step1Password({ slug, onAdvance, onBack }: StepProps) {
       onAdvance(
         {
           profileView: result.profileView,
-          workType: result.user.workType,
+          workType: result.profileView?.profile?.workType ?? undefined,
         },
         2,
       );

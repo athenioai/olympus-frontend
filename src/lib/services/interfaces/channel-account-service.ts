@@ -1,12 +1,16 @@
+export type ChannelStatus =
+  | "active"
+  | "deauthorized"
+  | "deleted"
+  | "inactive";
+
 export interface ChannelAccount {
   readonly id: string;
-  readonly userId: string;
   readonly channel: "whatsapp" | "telegram";
   readonly channelAccountId: string | null;
-  readonly accessToken: string | null;
   readonly metadata: Record<string, unknown>;
-  readonly status: "active" | "inactive";
-  readonly connectedAt: string;
+  readonly status: ChannelStatus;
+  readonly connectedAt: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
 }

@@ -86,7 +86,7 @@ async function renderAuthenticated(slug: string) {
           email: user.email,
           currentStep: step,
           profileView,
-          workType: user.workType,
+          workType: profileView.profile?.workType ?? null,
         }}
       />
     );

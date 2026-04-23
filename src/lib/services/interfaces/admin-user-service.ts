@@ -7,7 +7,6 @@ import type {
   UpdateCalendarConfigPayload,
   UserDashboardSummary,
   UserRole,
-  WorkType,
 } from "./admin-types";
 
 export type OnboardingStatus = "pending" | "completed";
@@ -43,7 +42,6 @@ export interface UpdateAdminUserPayload {
   readonly name?: string;
   readonly email?: string;
   readonly planId?: string;
-  readonly workType?: WorkType;
   readonly role?: UserRole;
 }
 

@@ -3,7 +3,6 @@ export interface AuthUser {
   readonly name: string;
   readonly email: string;
   readonly role: "admin" | "user";
-  readonly workType: "services" | "sales" | "hybrid";
   readonly createdAt: string;
 }
 

@@ -15,7 +15,6 @@ export interface AdminActionResult<T = undefined> {
   readonly error?: string;
 }
 
-const workTypeSchema = z.enum(["services", "sales", "hybrid"]);
 const roleSchema = z.enum(["admin", "user"]);
 const idSchema = z.string().uuid();
 
@@ -27,7 +26,6 @@ const createUserSchema = z.object({
 const updateUserSchema = z.object({
   name: z.string().trim().min(1).max(255).optional(),
   email: z.string().trim().email().optional(),
-  workType: workTypeSchema.optional(),
   role: roleSchema.optional(),
   planId: z.string().uuid().optional().or(z.literal("").transform(() => undefined)),
 });
