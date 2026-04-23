@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   BusinessProfile,
   BusinessProfileView,
@@ -15,19 +14,24 @@ import type {
   UpdateBusinessProfilePayload,
 } from "./interfaces/business-profile-service";
 
+/**
+ * Settings reads bypass the Next 16 Data Cache. `revalidateTag` on legacy
+ * tagged fetches does not reliably invalidate here, so edits to the profile,
+ * FAQs, exceptions, agent config, etc. looked like no-ops until the TTL
+ * expired. `cache: "no-store"` is cheap on these tiny payloads and keeps the
+ * edit → reload loop honest.
+ */
 class BusinessProfileService implements IBusinessProfileService {
   async getProfile(): Promise<BusinessProfileView> {
     const response = await authFetch("/business-profile", {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.businessProfile],
+      cache: "no-store",
     });
     return unwrapEnvelope<BusinessProfileView>(response);
   }
 
   async getScore(): Promise<ScoreResult> {
     const response = await authFetch("/business-profile/score", {
-      revalidate: CACHE_TIMES.dashboard,
-      tags: [CACHE_TAGS.businessScore],
+      cache: "no-store",
     });
     return unwrapEnvelope<ScoreResult>(response);
   }

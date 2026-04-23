@@ -190,9 +190,9 @@ class FinanceService implements IFinanceService {
    * @throws Error if the request fails
    */
   async getPrepaymentSetting(): Promise<PrepaymentSetting> {
+    // Settings reads bypass the Data Cache — see business-profile-service.
     const response = await authFetch("/settings/prepayment", {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.prepayment],
+      cache: "no-store",
     });
     return unwrapEnvelope<PrepaymentSetting>(response);
   }

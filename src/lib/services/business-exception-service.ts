@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   BusinessException,
   CreateExceptionPayload,
@@ -11,6 +10,7 @@ import type {
 } from "./interfaces/business-exception-service";
 
 class BusinessExceptionService implements IBusinessExceptionService {
+  // Settings reads bypass the Data Cache — see business-profile-service.
   async list(
     params?: ListBusinessExceptionsParams,
   ): Promise<PaginatedBusinessExceptions> {
@@ -25,8 +25,7 @@ class BusinessExceptionService implements IBusinessExceptionService {
     const path = query ? `/business-exceptions?${query}` : "/business-exceptions";
 
     const response = await authFetch(path, {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.businessExceptions],
+      cache: "no-store",
     });
     return unwrapEnvelope<PaginatedBusinessExceptions>(response);
   }

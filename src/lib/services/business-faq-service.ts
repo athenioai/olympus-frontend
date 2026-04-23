@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   BusinessFaq,
   CreateFaqPayload,
@@ -9,10 +8,10 @@ import type {
 } from "./interfaces/business-faq-service";
 
 class BusinessFaqService implements IBusinessFaqService {
+  // Settings reads bypass the Data Cache — see business-profile-service.
   async list(): Promise<BusinessFaq[]> {
     const response = await authFetch("/business-faqs", {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.businessFaqs],
+      cache: "no-store",
     });
     return unwrapEnvelope<BusinessFaq[]>(response);
   }

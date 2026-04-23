@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   AgentConfig,
   IAgentConfigService,
@@ -9,14 +8,13 @@ import type {
 
 class AgentConfigService implements IAgentConfigService {
   /**
-   * Get the current agent configuration.
-   * @returns Agent configuration data
-   * @throws Error if the request fails
+   * Get the current agent configuration. Bypasses the Data Cache so edits
+   * made via updateConfig are visible on the next reload without waiting
+   * for a TTL (see business-profile-service for the full rationale).
    */
   async getConfig(): Promise<AgentConfig> {
     const response = await authFetch("/agent/config", {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.agentConfig],
+      cache: "no-store",
     });
     return unwrapEnvelope<AgentConfig>(response);
   }

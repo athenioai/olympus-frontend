@@ -1,6 +1,5 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
-import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
 import type {
   CalendarConfig,
   ICalendarConfigService,
@@ -9,14 +8,13 @@ import type {
 
 class CalendarConfigService implements ICalendarConfigService {
   /**
-   * Get the current calendar configuration.
-   * @returns Calendar configuration data
-   * @throws Error if the request fails
+   * Get the current calendar configuration. Bypasses the Data Cache so
+   * edits via update() show up on the next reload without a TTL wait
+   * (see business-profile-service for the full rationale).
    */
   async get(): Promise<CalendarConfig> {
     const response = await authFetch("/calendar-config", {
-      revalidate: CACHE_TIMES.settings,
-      tags: [CACHE_TAGS.calendarConfig],
+      cache: "no-store",
     });
     return unwrapEnvelope<CalendarConfig>(response);
   }

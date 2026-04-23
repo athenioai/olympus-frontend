@@ -1,13 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-envelope";
 import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 import { isValidCNPJ } from "@/lib/format";
-import { CACHE_TAGS } from "@/lib/cache-config";
 import {
   businessProfileService,
   businessVerticalService,
@@ -173,8 +171,6 @@ export async function setWorkTypeAction(
     const updated = await businessProfileService.updateProfile({
       workType: parsed.data,
     });
-    updateTag(CACHE_TAGS.businessProfile);
-    updateTag(CACHE_TAGS.businessScore);
     emitStepCompleted("work_type", "success");
     return { success: true, workType: updated.workType };
   } catch (err) {
@@ -231,8 +227,6 @@ export async function setVerticalAction(
 
   try {
     await businessProfileService.updateProfile({ businessVertical: verticalId });
-    updateTag(CACHE_TAGS.businessProfile);
-    updateTag(CACHE_TAGS.businessScore);
     const [profileView, verticals] = await Promise.all([
       businessProfileService.getProfile(),
       businessVerticalService.list(),
@@ -328,8 +322,6 @@ async function persistProfile(
 ): Promise<UpdateProfileResult> {
   try {
     await businessProfileService.updateProfile(payload);
-    updateTag(CACHE_TAGS.businessProfile);
-    updateTag(CACHE_TAGS.businessScore);
     const profileView = await businessProfileService.getProfile();
     return { success: true, profileView };
   } catch (err) {
@@ -437,9 +429,6 @@ export async function saveExtrasAction(
     captureUnexpected(err);
     hadError = true;
   }
-
-  updateTag(CACHE_TAGS.businessProfile);
-  updateTag(CACHE_TAGS.businessScore);
 
   try {
     const profileView = await businessProfileService.getProfile();
