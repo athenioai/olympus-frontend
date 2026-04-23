@@ -5,6 +5,8 @@ export interface ChatSessionLead {
   readonly channel: string | null;
   readonly status: string;
   readonly temperature: string;
+  /** Optional — backend may or may not expose it; falls back to initials. */
+  readonly avatarUrl?: string | null;
 }
 
 export interface ChatSessionLastMessage {
@@ -32,26 +34,49 @@ export interface ChatMessage {
 }
 
 export interface PaginatedSessions {
-  readonly data: ChatSession[];
+  readonly items: ChatSession[];
   readonly total: number;
   readonly page: number;
   readonly limit: number;
 }
 
-export interface PaginatedMessages {
-  readonly data: ChatMessage[];
-  readonly total: number;
-  readonly page: number;
-  readonly limit: number;
+/**
+ * Cursor-paginated message page. `items` comes ordered by createdAt DESC
+ * (newest first). `nextCursor` is the ISO datetime of the oldest message
+ * on this page — pass it back as `before` to load older messages. `null`
+ * when there is nothing older.
+ */
+export interface ChatMessagesCursorPage {
+  readonly items: ChatMessage[];
+  readonly nextCursor: string | null;
+  readonly hasMore: boolean;
 }
+
+export type ChatChannelFilter = "whatsapp" | "telegram";
+
+export type LeadStatusFilter =
+  | "new"
+  | "contacted"
+  | "qualified"
+  | "converted"
+  | "lost";
 
 export interface ListSessionsParams {
   readonly page?: number;
   readonly limit?: number;
+  readonly search?: string;
+  readonly handoff?: boolean;
+  readonly channel?: ChatChannelFilter;
+  readonly leadStatus?: LeadStatusFilter;
+  /** YYYY-MM-DD — chat created on or after this date. */
+  readonly createdAfter?: string;
+  /** YYYY-MM-DD — chat created on or before this date. */
+  readonly createdBefore?: string;
 }
 
-export interface ListMessagesParams {
-  readonly page?: number;
+export interface GetMessagesParams {
+  /** ISO 8601 timestamp — returns messages strictly older than this instant. */
+  readonly before?: string;
   readonly limit?: number;
 }
 
@@ -60,11 +85,11 @@ export interface IChatService {
     params?: ListSessionsParams,
   ): Promise<PaginatedSessions>;
   getMessages(
-    sessionId: string,
-    params?: ListMessagesParams,
-  ): Promise<PaginatedMessages>;
-  deleteSession(sessionId: string): Promise<void>;
-  sendMessage(sessionId: string, message: string): Promise<void>;
-  activateHandoff(sessionId: string): Promise<void>;
-  deactivateHandoff(sessionId: string): Promise<void>;
+    chatId: string,
+    params?: GetMessagesParams,
+  ): Promise<ChatMessagesCursorPage>;
+  deleteSession(chatId: string): Promise<void>;
+  sendMessage(chatId: string, message: string): Promise<void>;
+  activateHandoff(chatId: string): Promise<void>;
+  deactivateHandoff(chatId: string): Promise<void>;
 }

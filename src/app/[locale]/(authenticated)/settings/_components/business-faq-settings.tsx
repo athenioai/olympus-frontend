@@ -15,16 +15,19 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 import { fetchFaqs, createFaq, updateFaq, deleteFaq } from "../business-faq-actions";
 import type { BusinessFaq } from "@/lib/services";
 
 export function BusinessFaqSettings() {
   const t = useTranslations("settings");
+  const tc = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(true);
   const [faqs, setFaqs] = useState<BusinessFaq[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [faqToDelete, setFaqToDelete] = useState<BusinessFaq | null>(null);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -57,7 +60,12 @@ export function BusinessFaqSettings() {
   }
 
   function handleSave() {
-    if (!question.trim() || !answer.trim()) return;
+    // Button is disabled when either field is empty, but keyboard submission
+    // can still reach this path — surface a toast instead of failing silently.
+    if (!question.trim() || !answer.trim()) {
+      toast.error(t("faqs.validationRequired"));
+      return;
+    }
 
     startTransition(async () => {
       if (editingId) {
@@ -82,13 +90,16 @@ export function BusinessFaqSettings() {
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm(t("faqs.deleteConfirm"))) return;
+  function handleConfirmDelete() {
+    if (!faqToDelete) return;
+    const target = faqToDelete;
     startTransition(async () => {
-      const result = await deleteFaq(id);
+      const result = await deleteFaq(target.id);
       if (result.success) {
-        setFaqs((prev) => prev.filter((f) => f.id !== id));
-        if (expandedId === id) setExpandedId(null);
+        setFaqs((prev) => prev.filter((f) => f.id !== target.id));
+        if (expandedId === target.id) setExpandedId(null);
+        setFaqToDelete(null);
+        toast.success(tc("delete"));
       } else {
         toast.error(result.error ?? "Erro ao excluir");
       }
@@ -169,7 +180,7 @@ export function BusinessFaqSettings() {
                 </button>
                 <button
                   className="rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-40"
-                  disabled={isPending || !question.trim() || !answer.trim()}
+                  disabled={isPending}
                   onClick={handleSave}
                   type="button"
                 >
@@ -237,7 +248,7 @@ export function BusinessFaqSettings() {
                           <button
                             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium text-danger transition-colors hover:bg-danger-muted"
                             disabled={isPending}
-                            onClick={() => handleDelete(faq.id)}
+                            onClick={() => setFaqToDelete(faq)}
                             type="button"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -253,6 +264,18 @@ export function BusinessFaqSettings() {
           })}
         </motion.div>
       )}
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("faqs.deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setFaqToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        open={faqToDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </motion.div>
   );
 }

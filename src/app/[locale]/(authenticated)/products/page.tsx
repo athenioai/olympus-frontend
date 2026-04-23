@@ -1,5 +1,5 @@
 import { financeService } from "@/lib/services";
-import type { Product, FinancePagination } from "@/lib/services";
+import type { Product } from "@/lib/services";
 import { ProductsTable } from "./_components/products-table";
 
 interface ProductsPageProps {
@@ -19,7 +19,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const search = params.search ?? "";
 
   let products: readonly Product[] = [];
-  let pagination: FinancePagination = { page: 1, limit: 20, total: 0 };
 
   try {
     const result = await financeService.listProducts({
@@ -27,8 +26,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       limit: 20,
       search: search || undefined,
     });
-    products = result.data;
-    pagination = result.pagination;
+    products = result.items;
   } catch {
     return (
       <div className="flex min-h-[400px] items-center justify-center">

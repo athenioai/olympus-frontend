@@ -26,9 +26,10 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   const dateStr = params.date ?? today;
   const dateObj = new Date(dateStr + "T00:00:00");
 
-  const status = params.status === "confirmed" || params.status === "cancelled"
-    ? params.status
-    : undefined;
+  const status =
+    params.status === "confirmed" || params.status === "cancelled"
+      ? params.status
+      : undefined;
 
   // Compute date range based on view
   let dateFrom: string;
@@ -60,7 +61,7 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
 
     return (
       <CalendarView
-        appointments={result.data}
+        appointments={result.items}
         currentDate={dateStr}
         currentStatus={status}
         currentView={view}

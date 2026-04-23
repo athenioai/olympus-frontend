@@ -1,10 +1,10 @@
 import { authFetch } from "./auth-fetch";
 import { unwrapEnvelope } from "@/lib/api-envelope";
 import type {
+  ChatMessagesCursorPage,
+  GetMessagesParams,
   IChatService,
-  ListMessagesParams,
   ListSessionsParams,
-  PaginatedMessages,
   PaginatedSessions,
 } from "./interfaces/chat-service";
 
@@ -15,6 +15,18 @@ class ChatService implements IChatService {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.handoff !== undefined) {
+      searchParams.set("handoff", String(params.handoff));
+    }
+    if (params?.channel) searchParams.set("channel", params.channel);
+    if (params?.leadStatus) searchParams.set("leadStatus", params.leadStatus);
+    if (params?.createdAfter) {
+      searchParams.set("createdAfter", params.createdAfter);
+    }
+    if (params?.createdBefore) {
+      searchParams.set("createdBefore", params.createdBefore);
+    }
 
     const query = searchParams.toString();
     const path = query ? `/chats?${query}` : "/chats";
@@ -24,47 +36,47 @@ class ChatService implements IChatService {
   }
 
   async getMessages(
-    sessionId: string,
-    params?: ListMessagesParams,
-  ): Promise<PaginatedMessages> {
+    chatId: string,
+    params?: GetMessagesParams,
+  ): Promise<ChatMessagesCursorPage> {
     const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.before) searchParams.set("before", params.before);
     if (params?.limit) searchParams.set("limit", String(params.limit));
 
     const query = searchParams.toString();
     const path = query
-      ? `/chats/${sessionId}/messages?${query}`
-      : `/chats/${sessionId}/messages`;
+      ? `/chats/${chatId}/messages?${query}`
+      : `/chats/${chatId}/messages`;
 
     const response = await authFetch(path);
-    return unwrapEnvelope<PaginatedMessages>(response);
+    return unwrapEnvelope<ChatMessagesCursorPage>(response);
   }
 
-  async deleteSession(sessionId: string): Promise<void> {
-    const response = await authFetch(`/chats/${sessionId}`, {
+  async deleteSession(chatId: string): Promise<void> {
+    const response = await authFetch(`/chats/${chatId}`, {
       method: "DELETE",
     });
     await unwrapEnvelope<unknown>(response);
   }
 
-  async sendMessage(sessionId: string, message: string): Promise<void> {
-    const response = await authFetch("/chat", {
+  async sendMessage(chatId: string, message: string): Promise<void> {
+    const response = await authFetch("/chats", {
       method: "POST",
-      body: JSON.stringify({ session_id: sessionId, message }),
+      body: JSON.stringify({ chatId: chatId, message }),
     });
     await unwrapEnvelope<unknown>(response);
   }
 
-  async activateHandoff(sessionId: string): Promise<void> {
-    const response = await authFetch(`/chats/${sessionId}/handoff`, {
+  async activateHandoff(chatId: string): Promise<void> {
+    const response = await authFetch(`/chats/${chatId}/handoff`, {
       method: "POST",
       body: JSON.stringify({}),
     });
     await unwrapEnvelope<unknown>(response);
   }
 
-  async deactivateHandoff(sessionId: string): Promise<void> {
-    const response = await authFetch(`/chats/${sessionId}/handoff`, {
+  async deactivateHandoff(chatId: string): Promise<void> {
+    const response = await authFetch(`/chats/${chatId}/handoff`, {
       method: "DELETE",
     });
     await unwrapEnvelope<unknown>(response);

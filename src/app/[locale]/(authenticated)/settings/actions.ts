@@ -1,8 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { authService, calendarConfigService, channelAccountService, financeService } from "@/lib/services";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { captureUnexpected } from "@/lib/observability/capture";
 import type { CalendarConfig, ChannelAccount, PrepaymentSetting } from "@/lib/services";
 
@@ -122,6 +123,7 @@ export async function connectChannel(
       channel: channelParsed.data,
       accessToken: accessToken.trim(),
     });
+    revalidateTag(CACHE_TAGS.channels, "default");
     revalidatePath("/settings");
     return { success: true, data };
   } catch (err) {
@@ -164,6 +166,7 @@ export async function disconnectChannel(
 
   try {
     await channelAccountService.remove(id);
+    revalidateTag(CACHE_TAGS.channels, "default");
     revalidatePath("/settings");
     return { success: true };
   } catch (err) {

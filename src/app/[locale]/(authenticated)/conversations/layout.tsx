@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 async function fetchSessions(): Promise<ChatSession[]> {
   try {
     const result = await chatService.listSessions({ limit: 100 });
-    return result.data;
+    return [...result.items];
   } catch {
     return [];
   }

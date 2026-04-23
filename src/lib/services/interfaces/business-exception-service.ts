@@ -11,8 +11,26 @@ export interface BusinessException {
   readonly type: ExceptionType;
   readonly reason: string | null;
   readonly ranges: readonly BusinessExceptionRange[];
+  /** True when the row was seeded from the national-holiday dataset. */
+  readonly isDefault: boolean;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface PaginatedBusinessExceptions {
+  readonly items: BusinessException[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
+}
+
+export interface ListBusinessExceptionsParams {
+  readonly page?: number;
+  readonly limit?: number;
+  readonly type?: ExceptionType;
+  /** YYYY-MM-DD. */
+  readonly dateFrom?: string;
+  readonly dateTo?: string;
 }
 
 export interface CreateExceptionPayload {
@@ -30,7 +48,9 @@ export interface UpdateExceptionPayload {
 }
 
 export interface IBusinessExceptionService {
-  list(params?: { from?: string; to?: string }): Promise<BusinessException[]>;
+  list(
+    params?: ListBusinessExceptionsParams,
+  ): Promise<PaginatedBusinessExceptions>;
   create(payload: CreateExceptionPayload): Promise<BusinessException>;
   update(id: string, payload: UpdateExceptionPayload): Promise<BusinessException>;
   remove(id: string): Promise<void>;

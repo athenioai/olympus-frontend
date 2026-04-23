@@ -85,7 +85,16 @@ export async function authFetch(
     Authorization: `Bearer ${accessToken}`,
   };
 
-  if (!(fetchOptions.body instanceof FormData) && !headers["Content-Type"]) {
+  // Only advertise a JSON body when one is actually present. DELETE/GET
+  // requests have no body; sending `Content-Type: application/json` with
+  // empty payload makes strict backends reject the call with
+  // "Body cannot be empty when content-type is set to 'application/json'".
+  if (
+    fetchOptions.body !== undefined &&
+    fetchOptions.body !== null &&
+    !(fetchOptions.body instanceof FormData) &&
+    !headers["Content-Type"]
+  ) {
     headers["Content-Type"] = "application/json";
   }
 

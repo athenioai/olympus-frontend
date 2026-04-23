@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { WhatsAppIcon, TelegramIcon } from "@/components/icons/channel-icons";
+import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
 import { deleteChatSession } from "../actions";
@@ -38,6 +39,15 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
   const [sessions, setSessions] = useState(initialSessions);
   const [searchQuery, setSearchQuery] = useState("");
   const [handoffOnly, setHandoffOnly] = useState(false);
+  const [channelFilter, setChannelFilter] = useState<
+    "all" | "whatsapp" | "telegram"
+  >("all");
+  const [leadStatusFilter, setLeadStatusFilter] = useState<
+    "all" | "new" | "contacted" | "qualified" | "converted" | "lost"
+  >("all");
+  const [createdAfter, setCreatedAfter] = useState("");
+  const [createdBefore, setCreatedBefore] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [isDeleting, startDelete] = useTransition();
 
@@ -52,35 +62,78 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
 
     if (searchQuery.trim()) {
       const term = searchQuery.toLowerCase();
-      result = result.filter((s) =>
-        s.lead.name.toLowerCase().includes(term),
+      result = result.filter(
+        (s) =>
+          s.lead.name.toLowerCase().includes(term) ||
+          (s.lead.phone?.toLowerCase().includes(term) ?? false),
       );
     }
 
+    if (channelFilter !== "all") {
+      result = result.filter((s) => s.lead.channel === channelFilter);
+    }
+
+    if (leadStatusFilter !== "all") {
+      result = result.filter((s) => s.lead.status === leadStatusFilter);
+    }
+
+    if (createdAfter) {
+      result = result.filter((s) => s.createdAt >= createdAfter);
+    }
+
+    if (createdBefore) {
+      // dueDateBefore acts inclusive on the day — bump to end-of-day ISO prefix
+      const endOfDay = `${createdBefore}T23:59:59`;
+      result = result.filter((s) => s.createdAt <= endOfDay);
+    }
+
     return result;
-  }, [sessions, handoffOnly, searchQuery]);
+  }, [
+    sessions,
+    handoffOnly,
+    searchQuery,
+    channelFilter,
+    leadStatusFilter,
+    createdAfter,
+    createdBefore,
+  ]);
 
   const logicalPath = pathname.replace(/^\/(pt-BR|en-US|es)/, "");
-  const activeSessionId = logicalPath.startsWith("/conversations/")
+  const activeChatId = logicalPath.startsWith("/conversations/")
     ? logicalPath.split("/conversations/")[1]?.split("/")[0]
     : null;
 
-  function handleDelete(sessionId: string) {
+  function handleDelete(chatId: string) {
     startDelete(async () => {
-      const result = await deleteChatSession(sessionId);
+      const result = await deleteChatSession(chatId);
       if (result.success) {
         setSessions((prev) =>
-          prev.filter((s) => s.id !== sessionId),
+          prev.filter((s) => s.id !== chatId),
         );
         setDeleteTarget(null);
-        if (activeSessionId === sessionId) {
+        if (activeChatId === chatId) {
           router.push("/conversations");
         }
       }
     });
   }
 
-  const hasFilters = searchQuery || handoffOnly;
+  const hasFilters =
+    Boolean(searchQuery) ||
+    handoffOnly ||
+    channelFilter !== "all" ||
+    leadStatusFilter !== "all" ||
+    Boolean(createdAfter) ||
+    Boolean(createdBefore);
+
+  function resetFilters() {
+    setSearchQuery("");
+    setHandoffOnly(false);
+    setChannelFilter("all");
+    setLeadStatusFilter("all");
+    setCreatedAfter("");
+    setCreatedBefore("");
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -134,16 +187,68 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
           )}
         </button>
 
+        <button
+          className="flex h-8 w-full items-center justify-between rounded-lg text-[12px] font-medium text-on-surface-variant hover:text-on-surface"
+          onClick={() => setShowAdvanced((v) => !v)}
+          type="button"
+        >
+          <span>{t("advancedFilters")}</span>
+          <span className="text-[11px]">{showAdvanced ? "−" : "+"}</span>
+        </button>
+
+        {showAdvanced && (
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              className={FILTER_CONTROL_CLASS}
+              onChange={(e) =>
+                setChannelFilter(e.target.value as typeof channelFilter)
+              }
+              value={channelFilter}
+            >
+              <option value="all">{t("filters.allChannels")}</option>
+              <option value="whatsapp">{t("filters.channelWhatsapp")}</option>
+              <option value="telegram">{t("filters.channelTelegram")}</option>
+            </select>
+            <select
+              className={FILTER_CONTROL_CLASS}
+              onChange={(e) =>
+                setLeadStatusFilter(
+                  e.target.value as typeof leadStatusFilter,
+                )
+              }
+              value={leadStatusFilter}
+            >
+              <option value="all">{t("filters.allStatuses")}</option>
+              <option value="new">{t("filters.statusNew")}</option>
+              <option value="contacted">{t("filters.statusContacted")}</option>
+              <option value="qualified">{t("filters.statusQualified")}</option>
+              <option value="converted">{t("filters.statusConverted")}</option>
+              <option value="lost">{t("filters.statusLost")}</option>
+            </select>
+            <input
+              className={FILTER_CONTROL_CLASS}
+              onChange={(e) => setCreatedAfter(e.target.value)}
+              title={t("filters.createdAfter")}
+              type="date"
+              value={createdAfter}
+            />
+            <input
+              className={FILTER_CONTROL_CLASS}
+              onChange={(e) => setCreatedBefore(e.target.value)}
+              title={t("filters.createdBefore")}
+              type="date"
+              value={createdBefore}
+            />
+          </div>
+        )}
+
         {hasFilters && (
           <button
-            onClick={() => {
-              setHandoffOnly(false);
-              setSearchQuery("");
-            }}
             className="text-[11px] font-medium text-primary hover:underline"
+            onClick={resetFilters}
             type="button"
           >
-            {tc("search")} &times;
+            {t("filters.clearAll")} &times;
           </button>
         )}
       </div>
@@ -162,7 +267,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
         ) : (
           <div className="space-y-1">
             {filtered.map((session) => {
-              const isActive = session.id === activeSessionId;
+              const isActive = session.id === activeChatId;
               const isHot = session.lead.temperature === "hot";
 
               return (
@@ -176,11 +281,14 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       : "hover:bg-surface-container-high",
                   )}
                 >
-                  {/* Avatar */}
+                  {/* Lead avatar */}
                   <div className="relative">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant">
-                      <UserRound className="h-6 w-6" />
-                    </div>
+                    <Avatar
+                      id={session.lead.id}
+                      name={session.lead.name}
+                      size={48}
+                      src={session.lead.avatarUrl ?? null}
+                    />
                     {isHot && (
                       <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-surface-container-low bg-warning" />
                     )}
@@ -269,3 +377,6 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
     </div>
   );
 }
+
+const FILTER_CONTROL_CLASS =
+  "h-9 w-full rounded-lg bg-surface-container-high px-2.5 text-[12px] text-on-surface outline-none focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest";

@@ -21,9 +21,24 @@ interface ActionResult<T = undefined> {
 // ---------------------------------------------------------------------------
 
 const agentConfigSchema = z.object({
-  agentName: z.string().min(1).max(100),
-  tone: z.enum(["friendly", "formal", "casual"]),
-  customInstructions: z.string().max(2000).nullable(),
+  agentName: z
+    .string()
+    .min(1, "Nome do agente é obrigatório.")
+    .max(100, "Nome do agente deve ter no máximo 100 caracteres."),
+  tone: z.enum(["friendly", "formal", "casual"], {
+    message: "Tom de voz inválido.",
+  }),
+  // maxLength on the <textarea> can be bypassed via JS (QA Bug 34), so the
+  // server-side ceiling here is the authoritative one.
+  customInstructions: z
+    .string()
+    .max(2000, "As instruções devem ter no máximo 2000 caracteres.")
+    .nullable(),
+  profession: z
+    .string()
+    .max(100, "Profissão deve ter no máximo 100 caracteres.")
+    .nullable()
+    .optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -49,7 +64,6 @@ export async function updateAgentConfig(
     return { success: true, data };
   } catch (err) {
     captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: "Não foi possível salvar a configuração. Tente novamente." };
   }
 }

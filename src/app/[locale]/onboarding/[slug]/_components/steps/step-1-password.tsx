@@ -72,6 +72,7 @@ export function Step1Password({ slug, onAdvance, onBack }: StepProps) {
 
   function mapServerError(code?: string): string {
     if (code === "PASSWORD_WEAK") return t("errorPasswordWeak");
+    if (code === "SLUG_FORBIDDEN") return t("errorSlugForbidden");
     return tErr("genericError");
   }
 

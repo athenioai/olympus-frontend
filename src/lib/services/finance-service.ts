@@ -1,7 +1,10 @@
+import { cookies } from "next/headers";
 import { authFetch } from "./auth-fetch";
-import { unwrapEnvelope } from "@/lib/api-envelope";
+import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
 import { CACHE_TIMES, CACHE_TAGS } from "@/lib/cache-config";
+import { API_URL } from "@/lib/env";
 import type {
+  CreateCatalogPayload,
   FinanceDashboard,
   IFinanceService,
   ListProductsParams,
@@ -10,6 +13,7 @@ import type {
   PrepaymentSetting,
   Product,
   Service,
+  UpdateCatalogPayload,
 } from "./interfaces/finance-service";
 
 /**
@@ -24,6 +28,21 @@ function buildSearchQuery(
   if (params?.page) searchParams.set("page", String(params.page));
   if (params?.limit) searchParams.set("limit", String(params.limit));
   if (params?.search) searchParams.set("search", params.search);
+  if (params?.active !== undefined) {
+    searchParams.set("active", String(params.active));
+  }
+  if (params?.priceMin !== undefined) {
+    searchParams.set("priceMin", String(params.priceMin));
+  }
+  if (params?.priceMax !== undefined) {
+    searchParams.set("priceMax", String(params.priceMax));
+  }
+  if (params?.hasSpecialDiscount !== undefined) {
+    searchParams.set("hasSpecialDiscount", String(params.hasSpecialDiscount));
+  }
+  if (params?.hasImage !== undefined) {
+    searchParams.set("hasImage", String(params.hasImage));
+  }
   return searchParams.toString();
 }
 
@@ -47,48 +66,47 @@ class FinanceService implements IFinanceService {
     return unwrapEnvelope<PaginatedResponse<Service>>(response);
   }
 
-  /**
-   * Create a new service. Uses FormData for file upload support.
-   * @param formData - Service data as FormData (supports image upload)
-   * @returns The created service
-   * @throws Error if validation fails or request fails
-   */
-  async createService(formData: FormData): Promise<Service> {
+  async createService(
+    payload: CreateCatalogPayload,
+    file?: File,
+  ): Promise<Service> {
+    if (file) {
+      return createCatalogMultipart<Service>("services", payload, file);
+    }
     const response = await authFetch("/services", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(payload),
     });
     return unwrapEnvelope<Service>(response);
   }
 
-  /**
-   * Update an existing service. Uses FormData for file upload support.
-   * @param id - The service ID to update
-   * @param formData - Fields to update as FormData
-   * @returns The updated service
-   * @throws Error if the service is not found or request fails
-   */
   async updateService(
     id: string,
-    formData: FormData,
+    payload: UpdateCatalogPayload,
   ): Promise<Service> {
     const response = await authFetch(`/services/${id}`, {
       method: "PATCH",
-      body: formData,
+      body: JSON.stringify(payload),
     });
     return unwrapEnvelope<Service>(response);
   }
 
-  /**
-   * Delete a service by ID.
-   * @param id - The service ID to delete
-   * @throws Error if the service is not found or request fails
-   */
   async deleteService(id: string): Promise<void> {
     const response = await authFetch(`/services/${id}`, {
       method: "DELETE",
     });
     await unwrapEnvelope<unknown>(response);
+  }
+
+  async uploadServiceImage(id: string, file: File): Promise<Service> {
+    return uploadCatalogImage("services", id, file);
+  }
+
+  async deleteServiceImage(id: string): Promise<Service> {
+    const response = await authFetch(`/services/${id}/image`, {
+      method: "DELETE",
+    });
+    return unwrapEnvelope<Service>(response);
   }
 
   /**
@@ -110,48 +128,47 @@ class FinanceService implements IFinanceService {
     return unwrapEnvelope<PaginatedResponse<Product>>(response);
   }
 
-  /**
-   * Create a new product. Uses FormData for file upload support.
-   * @param formData - Product data as FormData (supports image upload)
-   * @returns The created product
-   * @throws Error if validation fails or request fails
-   */
-  async createProduct(formData: FormData): Promise<Product> {
+  async createProduct(
+    payload: CreateCatalogPayload,
+    file?: File,
+  ): Promise<Product> {
+    if (file) {
+      return createCatalogMultipart<Product>("products", payload, file);
+    }
     const response = await authFetch("/products", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(payload),
     });
     return unwrapEnvelope<Product>(response);
   }
 
-  /**
-   * Update an existing product. Uses FormData for file upload support.
-   * @param id - The product ID to update
-   * @param formData - Fields to update as FormData
-   * @returns The updated product
-   * @throws Error if the product is not found or request fails
-   */
   async updateProduct(
     id: string,
-    formData: FormData,
+    payload: UpdateCatalogPayload,
   ): Promise<Product> {
     const response = await authFetch(`/products/${id}`, {
       method: "PATCH",
-      body: formData,
+      body: JSON.stringify(payload),
     });
     return unwrapEnvelope<Product>(response);
   }
 
-  /**
-   * Delete a product by ID.
-   * @param id - The product ID to delete
-   * @throws Error if the product is not found or request fails
-   */
   async deleteProduct(id: string): Promise<void> {
     const response = await authFetch(`/products/${id}`, {
       method: "DELETE",
     });
     await unwrapEnvelope<unknown>(response);
+  }
+
+  async uploadProductImage(id: string, file: File): Promise<Product> {
+    return uploadCatalogImage("products", id, file);
+  }
+
+  async deleteProductImage(id: string): Promise<Product> {
+    const response = await authFetch(`/products/${id}/image`, {
+      method: "DELETE",
+    });
+    return unwrapEnvelope<Product>(response);
   }
 
   /**
@@ -195,6 +212,64 @@ class FinanceService implements IFinanceService {
     });
     return unwrapEnvelope<PrepaymentSetting>(response);
   }
+}
+
+/**
+ * Atomic create with image in a single multipart request. Every field of the
+ * JSON payload is serialized as a string — the backend coerces numeric and
+ * date fields on the way in. Same endpoint as the JSON path (POST /services
+ * or /products), switched by Content-Type.
+ */
+async function createCatalogMultipart<T>(
+  resource: "services" | "products",
+  payload: CreateCatalogPayload,
+  file: File,
+): Promise<T> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  if (!accessToken) {
+    throw new ApiError("NOT_AUTHENTICATED", "AUTH_TOKEN_003", 401);
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === undefined || value === null) continue;
+    formData.append(key, String(value));
+  }
+  const response = await fetch(`${API_URL}/${resource}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: formData,
+  });
+  return unwrapEnvelope<T>(response);
+}
+
+/**
+ * Multipart upload of a catalog item image. authFetch would force JSON
+ * Content-Type — multipart precludes that, so we attach the Bearer token
+ * manually and bypass the wrapper.
+ */
+async function uploadCatalogImage<T>(
+  resource: "services" | "products",
+  id: string,
+  file: File,
+): Promise<T> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  if (!accessToken) {
+    throw new ApiError("NOT_AUTHENTICATED", "AUTH_TOKEN_003", 401);
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(
+    `${API_URL}/${resource}/${encodeURIComponent(id)}/image`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: formData,
+    },
+  );
+  return unwrapEnvelope<T>(response);
 }
 
 export const financeService = new FinanceService();

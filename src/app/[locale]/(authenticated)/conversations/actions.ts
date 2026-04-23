@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { chatService } from "@/lib/services";
+import { ApiError } from "@/lib/api-envelope";
 import { captureUnexpected } from "@/lib/observability/capture";
 import type { ChatMessage } from "@/lib/services/interfaces/chat-service";
 
@@ -14,8 +15,8 @@ interface ActionResult {
 interface MessagesResult {
   readonly success: boolean;
   readonly data?: ChatMessage[];
-  readonly page?: number;
-  readonly total?: number;
+  readonly nextCursor?: string | null;
+  readonly hasMore?: boolean;
   readonly error?: string;
 }
 
@@ -26,14 +27,14 @@ const UUID_RE =
  * Delete a chat session and revalidate the conversations path.
  */
 export async function deleteChatSession(
-  sessionId: string,
+  chatId: string,
 ): Promise<ActionResult> {
-  if (!UUID_RE.test(sessionId)) {
-    return { success: false, error: "Invalid session ID." };
+  if (!UUID_RE.test(chatId)) {
+    return { success: false, error: "Invalid chat ID." };
   }
 
   try {
-    await chatService.deleteSession(sessionId);
+    await chatService.deleteSession(chatId);
     revalidatePath("/conversations");
     return { success: true };
   } catch (err) {
@@ -43,23 +44,27 @@ export async function deleteChatSession(
 }
 
 /**
- * Load a specific page of messages for pagination (scroll-up loading).
+ * Load older messages using cursor-based pagination. Pass the nextCursor
+ * returned by the previous page (or omit for the very first page).
  */
 export async function loadMoreMessages(
-  sessionId: string,
-  page: number,
+  chatId: string,
+  beforeCursor?: string,
 ): Promise<MessagesResult> {
-  if (!UUID_RE.test(sessionId)) {
-    return { success: false, error: "Invalid session ID." };
+  if (!UUID_RE.test(chatId)) {
+    return { success: false, error: "Invalid chat ID." };
   }
 
   try {
-    const result = await chatService.getMessages(sessionId, { page });
+    const result = await chatService.getMessages(chatId, {
+      limit: 50,
+      ...(beforeCursor ? { before: beforeCursor } : {}),
+    });
     return {
       success: true,
-      data: [...result.data].reverse(),
-      page: result.page,
-      total: result.total,
+      data: [...result.items].reverse(),
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
     };
   } catch (err) {
     captureUnexpected(err);
@@ -71,11 +76,11 @@ export async function loadMoreMessages(
  * Send a message to a lead in a chat session.
  */
 export async function sendMessageToLead(
-  sessionId: string,
+  chatId: string,
   message: string,
 ): Promise<ActionResult> {
-  if (!UUID_RE.test(sessionId)) {
-    return { success: false, error: "Invalid session ID." };
+  if (!UUID_RE.test(chatId)) {
+    return { success: false, error: "Invalid chat ID." };
   }
 
   const trimmed = message.trim();
@@ -84,11 +89,25 @@ export async function sendMessageToLead(
   }
 
   try {
-    await chatService.sendMessage(sessionId, trimmed);
+    await chatService.sendMessage(chatId, trimmed);
     return { success: true };
   } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.code === "CHAT_SESSION_NOT_FOUND_001") {
+        return { success: false, error: "Sessão de chat não encontrada." };
+      }
+      if (err.status === 429) {
+        return {
+          success: false,
+          error: "Muitas mensagens em pouco tempo. Aguarde um momento.",
+        };
+      }
+      if (err.status === 401) {
+        return { success: false, error: "Sessão expirada. Faça login novamente." };
+      }
+    }
     captureUnexpected(err);
-    return { success: false, error: "Failed to send message." };
+    return { success: false, error: "Falha ao enviar mensagem." };
   }
 }
 
@@ -96,14 +115,14 @@ export async function sendMessageToLead(
  * Activate human handoff for a chat session.
  */
 export async function activateHandoff(
-  sessionId: string,
+  chatId: string,
 ): Promise<ActionResult> {
-  if (!UUID_RE.test(sessionId)) {
-    return { success: false, error: "Invalid session ID." };
+  if (!UUID_RE.test(chatId)) {
+    return { success: false, error: "Invalid chat ID." };
   }
 
   try {
-    await chatService.activateHandoff(sessionId);
+    await chatService.activateHandoff(chatId);
     return { success: true };
   } catch (err) {
     captureUnexpected(err);
@@ -115,14 +134,14 @@ export async function activateHandoff(
  * Deactivate human handoff for a chat session.
  */
 export async function deactivateHandoff(
-  sessionId: string,
+  chatId: string,
 ): Promise<ActionResult> {
-  if (!UUID_RE.test(sessionId)) {
-    return { success: false, error: "Invalid session ID." };
+  if (!UUID_RE.test(chatId)) {
+    return { success: false, error: "Invalid chat ID." };
   }
 
   try {
-    await chatService.deactivateHandoff(sessionId);
+    await chatService.deactivateHandoff(chatId);
     return { success: true };
   } catch (err) {
     captureUnexpected(err);

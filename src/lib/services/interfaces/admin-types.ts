@@ -40,7 +40,18 @@ export interface PlanPublic {
 export interface SubscriptionPublic {
   readonly id: string;
   readonly userId: string;
+  /** Null until the user completes the onboarding wizard. */
+  readonly userName: string | null;
+  /** Null only when the user record was hard-deleted; normally present. */
+  readonly userEmail: string | null;
   readonly planId: string;
+  /**
+   * Denormalized plan name returned by the backend (commit 490856d, QA Bug 9)
+   * so admin views don't have to join against /admin/plans client-side. `null`
+   * when the underlying plan was soft-deleted and the backend chose not to
+   * backfill — callers should fall back to a neutral label in that case.
+   */
+  readonly planName: string | null;
   readonly status: SubscriptionStatus;
   readonly billingDay: number;
   readonly cancelledAt: string | null;
@@ -50,7 +61,17 @@ export interface SubscriptionPublic {
 export interface AdminInvoicePublic {
   readonly id: string;
   readonly userId: string;
+  /** Null until the user completes the onboarding wizard. */
+  readonly userName: string | null;
+  /** Null only when the user record was hard-deleted; normally present. */
+  readonly userEmail: string | null;
   readonly subscriptionId: string | null;
+  /**
+   * Denormalized plan name resolved via invoice → subscription → plan. Null
+   * for standalone invoices (subscriptionId=null) or when the plan was
+   * removed after the invoice was issued.
+   */
+  readonly planName: string | null;
   readonly amount: number;
   readonly description: string | null;
   readonly status: AdminInvoiceStatus;
@@ -65,13 +86,14 @@ export interface AdminInvoicePublic {
 
 export interface AgentAvatarAdmin {
   readonly id: string;
-  readonly name: string;
   readonly imageUrl: string;
   readonly sortOrder: number;
-  readonly isActive: boolean;
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly deletedAt: string | null;
 }
+
+export const ACTIVE_AVATAR_LIMIT = 10;
 
 export interface AdminAppointment {
   readonly id: string;

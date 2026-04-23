@@ -10,11 +10,33 @@ import type {
   WorkType,
 } from "./admin-types";
 
-export interface CreateAdminUserPayload {
-  readonly name: string;
+export type OnboardingStatus = "pending" | "completed";
+
+export interface AdminUserOption {
+  readonly id: string;
   readonly email: string;
+  readonly name: string | null;
+}
+
+export interface ListAdminUsersParams {
+  readonly page?: number;
+  readonly limit?: number;
+  readonly search?: string;
   readonly planId?: string;
-  readonly workType: WorkType;
+  readonly role?: UserRole;
+  readonly onboardingStatus?: OnboardingStatus;
+}
+
+export interface PaginatedAdminUsers {
+  readonly items: readonly AdminUserPublic[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
+}
+
+export interface CreateAdminUserPayload {
+  readonly email: string;
+  readonly planId: string;
 }
 
 export interface UpdateAdminUserPayload {
@@ -31,7 +53,8 @@ export interface SeedHolidaysPayload {
 
 export interface IAdminUserService {
   create(payload: CreateAdminUserPayload): Promise<AdminUserPublic>;
-  list(): Promise<readonly AdminUserPublic[]>;
+  list(params?: ListAdminUsersParams): Promise<PaginatedAdminUsers>;
+  listOptions(): Promise<readonly AdminUserOption[]>;
   getById(id: string): Promise<AdminUserPublic>;
   update(
     id: string,
@@ -43,7 +66,7 @@ export interface IAdminUserService {
   getChats(id: string): Promise<readonly AdminChat[]>;
   getChatMessages(
     id: string,
-    sessionId: string,
+    chatId: string,
   ): Promise<readonly AdminChatMessage[]>;
   getCalendarConfig(id: string): Promise<AdminCalendarConfig | null>;
   updateCalendarConfig(

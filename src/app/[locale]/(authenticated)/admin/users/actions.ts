@@ -20,10 +20,8 @@ const roleSchema = z.enum(["admin", "user"]);
 const idSchema = z.string().uuid();
 
 const createUserSchema = z.object({
-  name: z.string().trim().min(1).max(255),
   email: z.string().trim().email(),
-  workType: workTypeSchema,
-  planId: z.string().uuid().optional().or(z.literal("").transform(() => undefined)),
+  planId: z.string().uuid(),
 });
 
 const updateUserSchema = z.object({

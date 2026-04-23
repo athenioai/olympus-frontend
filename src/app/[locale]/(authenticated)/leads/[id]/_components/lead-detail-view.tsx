@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "motion/react";
 import {
@@ -40,7 +39,6 @@ export function LeadDetailView({
   lead,
   timeline,
 }: LeadDetailViewProps) {
-  const router = useRouter();
   const t = useTranslations("crm");
   const tc = useTranslations("common");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -50,11 +48,10 @@ export function LeadDetailView({
 
   function handleDelete() {
     startTransition(async () => {
+      // On success the server action redirects to /crm, so any defined envelope
+      // reaching the client is guaranteed to be an error.
       const result = await deleteLead(lead.id);
-      if (result.success) {
-        toast.success(tc("delete"));
-        router.push("/crm");
-      } else {
+      if (result && !result.success) {
         toast.error(result.error ?? tc("error"));
         setConfirmDelete(false);
       }

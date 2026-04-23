@@ -11,10 +11,15 @@ interface ActionResult<T = undefined> {
   readonly data?: T;
 }
 
-export async function fetchExceptions(params?: { from?: string; to?: string }): Promise<ActionResult<BusinessException[]>> {
+export async function fetchExceptions(
+  params?: { dateFrom?: string; dateTo?: string },
+): Promise<ActionResult<BusinessException[]>> {
   try {
-    const data = await businessExceptionService.list(params);
-    return { success: true, data };
+    const page = await businessExceptionService.list({
+      ...params,
+      limit: 100,
+    });
+    return { success: true, data: [...page.items] };
   } catch (err) {
     captureUnexpected(err);
     const msg = err instanceof Error ? err.message : "Unknown error";

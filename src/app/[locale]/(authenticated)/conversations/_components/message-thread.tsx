@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { API_URL } from "@/lib/env";
 import { formatTime } from "@/lib/format";
+import { Avatar } from "@/components/ui/avatar";
 import { WsManager } from "@/lib/ws-manager";
 import type { WsState } from "@/lib/ws-manager";
 import {
@@ -45,7 +46,11 @@ interface AgentVisual {
   readonly bubbleBg: string;
 }
 
-function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): AgentVisual {
+function getAgentVisual(
+  agent: string,
+  t: ReturnType<typeof useTranslations>,
+  operatorName?: string | null,
+): AgentVisual {
   switch (agent) {
     case "horos":
       return {
@@ -67,11 +72,16 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
         badgeText: "text-primary",
         bubbleBg: "bg-primary/8",
       };
+    // "user" is the backend sender tag for a human operator reply —
+    // the optimistic bubble uses "human" locally before the WS echo,
+    // so both map to the same visual. Show the logged-in operator's
+    // name when we have it; fall back to a generic "Humano" label.
     case "human":
+    case "user":
       return {
         bg: "bg-[#8b5cf6]/10",
         text: "text-[#8b5cf6]",
-        label: t("agents.human"),
+        label: operatorName?.trim() || t("agents.human"),
         icon: UserRound,
         badgeBg: "bg-[#E9D5FF]",
         badgeText: "text-[#6B21A8]",
@@ -93,37 +103,45 @@ function getAgentVisual(agent: string, t: ReturnType<typeof useTranslations>): A
 /* ---------- Component ---------- */
 
 interface MessageThreadProps {
-  readonly sessionId: string;
+  readonly chatId: string;
+  readonly leadId: string | null;
   readonly leadName: string | null;
+  readonly leadAvatarUrl: string | null;
+  readonly operatorName: string | null;
   readonly agent: string;
   readonly initialMessages: ChatMessage[];
-  readonly initialPagination: { page: number; limit: number; total: number };
+  readonly initialCursor: {
+    readonly nextCursor: string | null;
+    readonly hasMore: boolean;
+  };
   readonly initialHandoff: boolean;
 }
 
 export function MessageThread({
-  sessionId,
+  chatId,
+  leadId,
   leadName,
+  leadAvatarUrl,
+  operatorName,
   agent,
   initialMessages,
-  initialPagination,
+  initialCursor,
   initialHandoff,
 }: MessageThreadProps) {
   const t = useTranslations("conversations");
   const tc = useTranslations("common");
 
   const [messages, setMessages] = useState(initialMessages);
-  const [currentPage, setCurrentPage] = useState(initialPagination.page);
+  const [cursor, setCursor] = useState<string | null>(initialCursor.nextCursor);
+  const [hasMore, setHasMore] = useState(initialCursor.hasMore);
   const [isLoadingMore, startLoadMore] = useTransition();
   const [handoff, setHandoff] = useState(initialHandoff);
   const [wsState, setWsState] = useState<WsState>("disconnected");
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WsManager | null>(null);
-
-  const hasMore = currentPage > 1;
   const activeAgent = handoff ? "human" : agent;
-  const agentVisual = getAgentVisual(activeAgent, t);
+  const agentVisual = getAgentVisual(activeAgent, t, operatorName);
   const aiVisual = getAgentVisual(agent, t);
 
   /* -- Scroll helpers -- */
@@ -158,13 +176,30 @@ export function MessageThread({
         url: wsUrl,
         token,
         onMessage: (message) => {
-          if (message.chatId === sessionId) {
-            setMessages((prev) => {
-              if (prev.some((m) => m.id === message.id)) return prev;
-              return [...prev, message];
-            });
-            scrollToBottom();
-          }
+          if (message.chatId !== chatId) return;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === message.id)) return prev;
+            // Human sends are echoed back with sender="user" and a fresh
+            // backend id. Match an optimistic "human" bubble by content
+            // within a short window and swap it in place, so the user
+            // doesn't see the same message twice.
+            if (message.sender === "user") {
+              const arrivedAt = new Date(message.createdAt).getTime();
+              const idx = prev.findIndex(
+                (m) =>
+                  m.sender === "human" &&
+                  m.content === message.content &&
+                  Math.abs(new Date(m.createdAt).getTime() - arrivedAt) < 30_000,
+              );
+              if (idx !== -1) {
+                const next = [...prev];
+                next[idx] = message;
+                return next;
+              }
+            }
+            return [...prev, message];
+          });
+          scrollToBottom();
         },
         onStateChange: (state) => {
           if (!canceled) setWsState(state);
@@ -182,21 +217,21 @@ export function MessageThread({
       wsRef.current?.disconnect();
       wsRef.current = null;
     };
-  }, [sessionId, scrollToBottom]);
+  }, [chatId, scrollToBottom]);
 
-  /* -- Load more -- */
+  /* -- Load more (cursor-based) -- */
   const handleLoadMore = useCallback(() => {
-    const prevPage = currentPage - 1;
-    if (prevPage < 1) return;
+    if (!hasMore || !cursor) return;
 
     const container = scrollRef.current;
     const prevScrollHeight = container?.scrollHeight ?? 0;
 
     startLoadMore(async () => {
-      const result = await loadMoreMessages(sessionId, prevPage);
+      const result = await loadMoreMessages(chatId, cursor);
       if (result.success && result.data) {
         setMessages((prev) => [...result.data!, ...prev]);
-        setCurrentPage(prevPage);
+        setCursor(result.nextCursor ?? null);
+        setHasMore(result.hasMore ?? false);
 
         requestAnimationFrame(() => {
           if (container) {
@@ -205,7 +240,7 @@ export function MessageThread({
         });
       }
     });
-  }, [currentPage, sessionId]);
+  }, [cursor, hasMore, chatId]);
 
   /* -- Optimistic message -- */
   const handleMessageSent = useCallback(
@@ -235,10 +270,14 @@ export function MessageThread({
             </button>
           </Link>
 
-          {/* Avatar */}
-          <div className={cn("flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-container", agentVisual.bg)}>
-            <Bot className={cn("h-5 w-5", agentVisual.text)} />
-          </div>
+          {/* Lead avatar */}
+          <Avatar
+            className="border-2 border-primary-container"
+            id={leadId ?? chatId}
+            name={leadName ?? "?"}
+            size={44}
+            src={leadAvatarUrl}
+          />
 
           {/* Name + agent */}
           <div>
@@ -308,7 +347,11 @@ export function MessageThread({
           {/* Bubbles */}
           {messages.map((message) => {
             const isAssistant = message.sender !== "lead";
-            const msgVisual = getAgentVisual(isAssistant ? message.sender : "lead", t);
+            const msgVisual = getAgentVisual(
+              isAssistant ? message.sender : "lead",
+              t,
+              operatorName,
+            );
 
             // Split on [BREAK] for multi-bubble messages
             const parts = message.content
@@ -320,9 +363,12 @@ export function MessageThread({
               // Lead message — LEFT side
               return (
                 <div className="flex items-start gap-3" key={message.id} style={{ maxWidth: "70%" }}>
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-surface-container-high bg-surface-container-lowest shadow-sm">
-                    <UserRound className="h-4 w-4 text-on-surface-variant" />
-                  </div>
+                  <Avatar
+                    id={leadId ?? chatId}
+                    name={leadName ?? "?"}
+                    size={32}
+                    src={leadAvatarUrl}
+                  />
                   <div className="space-y-1.5">
                     {parts.map((part, i) => (
                       <div
@@ -374,7 +420,7 @@ export function MessageThread({
 
       {/* ── Input ─────────────────────────────────────────── */}
       <ChatInput
-        sessionId={sessionId}
+        chatId={chatId}
         agent={agent}
         handoff={handoff}
         onHandoffChange={handleHandoffChange}

@@ -1,5 +1,5 @@
 import { financeService } from "@/lib/services";
-import type { Service, FinancePagination } from "@/lib/services";
+import type { Service } from "@/lib/services";
 import { ServicesTable } from "./_components/services-table";
 
 interface ServicesPageProps {
@@ -19,7 +19,6 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
   const search = params.search ?? "";
 
   let services: readonly Service[] = [];
-  let pagination: FinancePagination = { page: 1, limit: 20, total: 0 };
 
   try {
     const result = await financeService.listServices({
@@ -27,8 +26,7 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
       limit: 20,
       search: search || undefined,
     });
-    services = result.data;
-    pagination = result.pagination;
+    services = result.items;
   } catch {
     return (
       <div className="flex min-h-[400px] items-center justify-center">

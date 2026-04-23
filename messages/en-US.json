@@ -12,7 +12,15 @@
     "confirm": "Confirm",
     "close": "Close",
     "noResults": "No results found.",
-    "pagination": "{from}-{to} of {total}"
+    "pagination": "{from}-{to} of {total}",
+    "fieldRequired": "Please fill out this field.",
+    "fileButton": "Choose file",
+    "fileEmpty": "No file selected",
+    "searchable": {
+      "search": "Search…",
+      "empty": "No results.",
+      "clear": "Clear"
+    }
   },
   "auth": {
     "login": "Sign in",
@@ -32,6 +40,12 @@
     "lastSession": "Last session",
     "lastSessionAgo": "9h ago, São Paulo",
     "signupCta": "Create account",
+    "rememberMe": "Remember me",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "capsLockOn": "Caps Lock is on",
+    "emailValid": "Valid email",
+    "tryAgainIn": "Try again in {seconds}s",
     "bulletin": {
       "live": "LIVE",
       "issuePrefix": "Nº",
@@ -286,7 +300,8 @@
       "strengthStrong": "Strong",
       "errorNameShort": "Name must be between 2 and 120 characters.",
       "errorPasswordWeak": "Password requires at least 8 characters, 1 letter and 1 number.",
-      "errorPasswordMismatch": "Passwords do not match."
+      "errorPasswordMismatch": "Passwords do not match.",
+      "errorSlugForbidden": "This onboarding belongs to another account. Sign out of the current one to continue."
     },
     "step2": {
       "title": "How do you work?",
@@ -415,11 +430,80 @@
     "emailPlaceholder": "email@example.com",
     "phonePlaceholder": "(11) 99999-9999",
     "deleteConfirm": "Are you sure you want to delete this lead?",
-    "timeline": "Timeline"
+    "dnd": {
+      "instructions": "To pick up a draggable item, press the space bar. While dragging, use the arrow keys to move the item. Press space again to drop the item in its new position, or press escape to cancel.",
+      "pickup": "Picked up lead {name}.",
+      "overColumn": "Lead {name} is over column {column}.",
+      "overNothing": "Lead {name} is not over any column.",
+      "dropped": "Lead {name} moved to column {column}.",
+      "droppedNowhere": "Lead {name} dropped.",
+      "cancelled": "Drag cancelled. Lead {name} returned to its original column.",
+      "invalidMove": "Leads can only advance to the next stage ({next}) or be marked as Lost.",
+      "invalidMoveTerminal": "This lead can only be marked as Lost."
+    },
+    "timeline": "Timeline",
+    "list": {
+      "title": "Leads",
+      "subtitle": "{count} {count, plural, =1 {lead found} other {leads found}}",
+      "searchPlaceholder": "Search by name, email or phone…",
+      "allStatuses": "All statuses",
+      "allTemperatures": "All temperatures",
+      "allChannels": "All channels",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "telegram": "Telegram"
+      },
+      "nameConfirmedAny": "Name (any)",
+      "nameConfirmedYes": "Name confirmed",
+      "nameConfirmedNo": "Name pending",
+      "hasEmailAny": "Email (any)",
+      "hasEmailYes": "With email",
+      "hasEmailNo": "Without email",
+      "hasPhoneAny": "Phone (any)",
+      "hasPhoneYes": "With phone",
+      "hasPhoneNo": "Without phone",
+      "createdAfter": "Created from",
+      "createdBefore": "Created until",
+      "empty": "No leads here.",
+      "emptyHint": "Adjust the filters or create a lead to start tracking.",
+      "emptyCta": "Create lead",
+      "columns": {
+        "name": "Name",
+        "status": "Status",
+        "temperature": "Temperature",
+        "contact": "Contact",
+        "updated": "Updated"
+      },
+      "pagination": {
+        "showing": "{from}–{to} of {total}",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "temperatures": {
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold"
+      }
+    }
   },
   "conversations": {
     "title": "Conversations",
-    "searchPlaceholder": "Search conversation...",
+    "searchPlaceholder": "Search by name or phone…",
+    "advancedFilters": "Advanced filters",
+    "filters": {
+      "allChannels": "All channels",
+      "channelWhatsapp": "WhatsApp",
+      "channelTelegram": "Telegram",
+      "allStatuses": "All statuses",
+      "statusNew": "New",
+      "statusContacted": "Contacted",
+      "statusQualified": "Qualified",
+      "statusConverted": "Converted",
+      "statusLost": "Lost",
+      "createdAfter": "Created from",
+      "createdBefore": "Created until",
+      "clearAll": "Clear filters"
+    },
     "activeCount": "{count} active {count, plural, =1 {conversation} other {conversations}}",
     "selectConversation": "Select a conversation",
     "selectConversationSubtitle": "Choose a conversation from the sidebar to view messages",
@@ -466,7 +550,18 @@
     },
     "status": {
       "confirmed": "Confirmed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "attended": "Attended",
+      "no_show": "No show"
+    },
+    "appointmentDetails": "Appointment details",
+    "detail": {
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "lead": "Customer",
+      "service": "Service",
+      "notes": "Notes"
     },
     "weekdays": {
       "mon": "mon",
@@ -507,7 +602,16 @@
     "deleteConfirm": "Are you sure you want to delete this item?",
     "searchPlaceholder": "Search by name...",
     "allStatuses": "All",
-    "filterStatus": "Status"
+    "filterStatus": "Status",
+    "priceMinPlaceholder": "Min price",
+    "priceMaxPlaceholder": "Max price",
+    "hasImageAny": "Image (any)",
+    "hasImageYes": "With image",
+    "hasImageNo": "Without image",
+    "hasPromoAny": "Promo (any)",
+    "hasPromoYes": "On promo",
+    "hasPromoNo": "Not on promo",
+    "requirePrepaymentNotice": "Items in this catalog require prepayment."
   },
   "settings": {
     "title": "Settings",
@@ -563,8 +667,7 @@
       "subscriptions": "Subscriptions",
       "billing": "Billing",
       "invoices": "Invoices",
-      "avatars": "Avatars",
-      "onboardingPreview": "Onboarding Preview"
+      "avatars": "Avatars"
     }
   },
   "admin": {
@@ -584,6 +687,21 @@
       "create": "New user",
       "seedHolidays": "Seed holidays",
       "empty": "No users yet.",
+      "emptyFiltered": "No users match these filters.",
+      "filters": {
+        "searchPlaceholder": "Search by email or name…",
+        "allPlans": "All plans",
+        "allRoles": "All roles",
+        "allOnboarding": "Any status",
+        "onboardingPending": "Onboarding pending",
+        "onboardingCompleted": "Onboarding completed"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "{page} / {total}",
+        "showing": "Showing {from}–{to} of {total}"
+      },
       "form": {
         "createTitle": "Create user",
         "editTitle": "Edit user",
@@ -591,6 +709,7 @@
         "email": "Email",
         "plan": "Plan",
         "noPlan": "No plan",
+        "selectPlan": "Select a plan",
         "workType": "Work type",
         "workTypeServices": "Services",
         "workTypeSales": "Sales",
@@ -673,6 +792,16 @@
       "subtitle": "Plan catalog.",
       "create": "New plan",
       "empty": "No plans yet.",
+      "emptyFiltered": "No plans match these filters.",
+      "filters": {
+        "searchPlaceholder": "Search by name…"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "{page} / {total}",
+        "showing": "Showing {from}–{to} of {total}"
+      },
       "form": {
         "createTitle": "Create plan",
         "editTitle": "Edit plan",
@@ -695,6 +824,19 @@
       "subtitle": "Active subscription management.",
       "create": "New subscription",
       "empty": "No subscriptions.",
+      "emptyFiltered": "No subscriptions match these filters.",
+      "filters": {
+        "allUsers": "All users",
+        "allPlans": "All plans",
+        "allStatuses": "All statuses",
+        "billingDayPlaceholder": "Day (1-28)"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "{page} / {total}",
+        "showing": "Showing {from}–{to} of {total}"
+      },
       "form": {
         "createTitle": "Create subscription",
         "editTitle": "Edit subscription",
@@ -725,8 +867,21 @@
       "subtitle": "Recurring billing.",
       "create": "New invoice",
       "empty": "No invoices.",
+      "emptyFiltered": "No invoices match these filters.",
+      "filters": {
+        "allUsers": "All users",
+        "dueDateFrom": "Due date from",
+        "dueDateTo": "Due date to"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "{page} / {total}",
+        "showing": "Showing {from}–{to} of {total}"
+      },
       "summary": {
         "mrr": "MRR",
+        "mrrHint": "Sum of plan costs across subscriptions with active status. Standalone invoices do not contribute.",
         "total": "Total invoices",
         "pending": "Pending",
         "paid": "Paid"
@@ -779,22 +934,19 @@
       "subtitle": "Images available for agents.",
       "upload": "Upload avatar",
       "empty": "No avatars yet.",
+      "limitReached": "Active avatar limit of 10 reached. Remove one before adding another.",
+      "avatarAlt": "Avatar #{sortOrder}",
       "form": {
         "createTitle": "Upload new avatar",
-        "editTitle": "Edit avatar",
         "file": "Image",
-        "name": "Name",
-        "sortOrder": "Order",
-        "isActive": "Active",
-        "submitUpload": "Upload",
-        "submitUpdate": "Save"
+        "submitUpload": "Upload"
       },
       "uploaded": "Avatar uploaded.",
-      "updated": "Avatar updated.",
       "deleted": "Avatar removed.",
       "deleteConfirm": "Remove this avatar?",
-      "inactive": "Inactive",
-      "fileTooLarge": "Image exceeds the 5 MB limit."
+      "fileTooLarge": "Image exceeds the 5 MB limit.",
+      "invalidImage": "Invalid image. Upload a PNG, JPEG or WebP up to 5MB.",
+      "selectedFile": "Selected file"
     },
     "common": {
       "edit": "Edit",

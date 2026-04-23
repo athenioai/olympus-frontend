@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type {
   AdminUserPublic,
-  PlanPublic,
+  PlanOption,
   UserRole,
   WorkType,
 } from "@/lib/services";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Modal } from "../../_components/modal";
 
 export interface UserFormValues {
-  readonly name: string;
+  readonly name?: string;
   readonly email: string;
-  readonly workType: WorkType;
+  readonly workType?: WorkType;
   readonly role?: UserRole;
   readonly planId?: string;
 }
@@ -22,7 +23,7 @@ interface UserFormModalProps {
   readonly open: boolean;
   readonly mode: "create" | "edit";
   readonly initialUser: AdminUserPublic | null;
-  readonly plans: readonly PlanPublic[];
+  readonly plans: readonly PlanOption[];
   readonly isPending: boolean;
   readonly onClose: () => void;
   readonly onSubmit: (values: UserFormValues) => void;
@@ -68,11 +69,16 @@ export function UserFormModal({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mode === "create") {
+      if (!planId) return;
+      onSubmit({ email: email.trim(), planId });
+      return;
+    }
     const values: UserFormValues = {
       name: name.trim(),
       email: email.trim(),
       workType,
-      ...(mode === "edit" ? { role } : {}),
+      role,
       ...(planId ? { planId } : {}),
     };
     onSubmit(values);
@@ -85,14 +91,16 @@ export function UserFormModal({
       title={mode === "create" ? t("createTitle") : t("editTitle")}
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <Field label={t("name")}>
-          <input
-            className={INPUT_CLASS}
-            onChange={(e) => setName(e.target.value)}
-            required
-            value={name}
-          />
-        </Field>
+        {mode === "edit" && (
+          <Field label={t("name")}>
+            <input
+              className={INPUT_CLASS}
+              onChange={(e) => setName(e.target.value)}
+              required
+              value={name}
+            />
+          </Field>
+        )}
         <Field label={t("email")}>
           <input
             className={INPUT_CLASS}
@@ -102,32 +110,30 @@ export function UserFormModal({
             value={email}
           />
         </Field>
-        <Field label={t("workType")}>
-          <select
-            className={INPUT_CLASS}
-            onChange={(e) => setWorkType(e.target.value as WorkType)}
-            value={workType}
-          >
-            {WORK_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {t(`workType${type.charAt(0).toUpperCase()}${type.slice(1)}`)}
-              </option>
-            ))}
-          </select>
-        </Field>
+        {mode === "edit" && (
+          <Field label={t("workType")}>
+            <select
+              className={INPUT_CLASS}
+              onChange={(e) => setWorkType(e.target.value as WorkType)}
+              value={workType}
+            >
+              {WORK_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {t(`workType${type.charAt(0).toUpperCase()}${type.slice(1)}`)}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
         <Field label={t("plan")}>
-          <select
-            className={INPUT_CLASS}
-            onChange={(e) => setPlanId(e.target.value)}
+          <SearchableSelect
+            allowClear={mode === "edit"}
+            clearLabel={mode === "edit" ? t("noPlan") : undefined}
+            onChange={setPlanId}
+            options={plans.map((p) => ({ value: p.id, label: p.name }))}
+            placeholder={mode === "create" ? t("selectPlan") : t("noPlan")}
             value={planId}
-          >
-            <option value="">{t("noPlan")}</option>
-            {plans.map((plan) => (
-              <option key={plan.id} value={plan.id}>
-                {plan.name}
-              </option>
-            ))}
-          </select>
+          />
         </Field>
         {mode === "edit" && (
           <Field label={t("role")}>
@@ -155,7 +161,7 @@ export function UserFormModal({
           </button>
           <button
             className="h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-5 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
-            disabled={isPending}
+            disabled={isPending || (mode === "create" && !planId)}
             type="submit"
           >
             {mode === "create" ? t("submitCreate") : t("submitUpdate")}

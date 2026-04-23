@@ -105,8 +105,25 @@ function invalidateInvoiceCaches() {
   updateTag(CACHE_TAGS.adminDashboard);
 }
 
+// INVOICE_STATUS_001 (409, shipped in 96b62aa) replaces the old 400 for an
+// illegal status transition. UI already hides markPaid/cancel on terminal
+// states (QA Bug 43), but if someone triggers it anyway we surface the
+// localized reason instead of the raw backend message.
+const FRIENDLY_ERRORS: Record<string, string> = {
+  INVOICE_STATUS_001: "Essa cobrança não pode mudar de status. Recarregue a lista e tente novamente.",
+  NOT_FOUND: "Cobrança não encontrada.",
+  FORBIDDEN: "Você não tem permissão para esta ação.",
+  DUE_DATE_IN_PAST: "A data de vencimento não pode estar no passado.",
+  INVALID_INPUT: "Dados inválidos. Revise e tente novamente.",
+};
+
 function mapErr(err: unknown): string {
   captureUnexpected(err);
-  if (err instanceof ApiError || err instanceof Error) return err.message;
-  return "UNKNOWN_ERROR";
+  if (err instanceof ApiError) {
+    return FRIENDLY_ERRORS[err.code] ?? "Não foi possível completar a operação. Tente novamente.";
+  }
+  if (err instanceof Error) {
+    return FRIENDLY_ERRORS[err.message] ?? "Não foi possível completar a operação. Tente novamente.";
+  }
+  return "Não foi possível completar a operação. Tente novamente.";
 }

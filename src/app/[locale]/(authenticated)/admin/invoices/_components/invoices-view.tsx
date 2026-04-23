@@ -1,36 +1,27 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Check, Plus, X as XIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BrlInput } from "@/components/ui/brl-input";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Tooltip } from "@/components/ui/tooltip";
 import type {
   AdminInvoicePublic,
   AdminInvoiceStatus,
   AdminInvoiceSummary,
-  AdminUserPublic,
+  AdminUserOption,
   LateInterestType,
+  PaginatedAdminInvoices,
   SubscriptionPublic,
 } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { Modal } from "../../_components/modal";
 import { endOfDayIsoInSaoPaulo } from "../../_lib/date";
 import { formatBRL, formatDate } from "../../_lib/format";
-import {
-  cancelInvoiceAction,
-  createInvoiceAction,
-  markInvoicePaidAction,
-} from "../actions";
-
-interface InvoicesViewProps {
-  readonly initialInvoices: readonly AdminInvoicePublic[];
-  readonly initialSummary: AdminInvoiceSummary | null;
-  readonly initialUsers: readonly AdminUserPublic[];
-  readonly initialSubscriptions: readonly SubscriptionPublic[];
-  readonly errorMessage: string | null;
-}
+import { createInvoiceAction } from "../actions";
 
 const FILTERS: readonly ("all" | AdminInvoiceStatus)[] = [
   "all",
@@ -43,23 +34,39 @@ const FILTERS: readonly ("all" | AdminInvoiceStatus)[] = [
 const MIN_AMOUNT_CENTS = 1;
 const MAX_AMOUNT_CENTS = 99_999_999;
 
+interface InvoicesViewFilters {
+  readonly status: string;
+  readonly userId: string;
+  readonly dueDateFrom: string;
+  readonly dueDateTo: string;
+}
+
+interface InvoicesViewProps {
+  readonly initialPage: PaginatedAdminInvoices;
+  readonly initialSummary: AdminInvoiceSummary | null;
+  readonly initialUsers: readonly AdminUserOption[];
+  readonly initialSubscriptions: readonly SubscriptionPublic[];
+  readonly filters: InvoicesViewFilters;
+  readonly errorMessage: string | null;
+}
+
 export function InvoicesView({
-  initialInvoices,
+  initialPage,
   initialSummary,
   initialUsers,
   initialSubscriptions,
+  filters,
   errorMessage,
 }: InvoicesViewProps) {
   const t = useTranslations("admin.invoices");
   const tc = useTranslations("common");
   const tCommon = useTranslations("admin.common");
 
-  const [invoices, setInvoices] = useState<readonly AdminInvoicePublic[]>(
-    initialInvoices,
-  );
-  const [filter, setFilter] = useState<"all" | AdminInvoiceStatus>("all");
-  const [formOpen, setFormOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  const [formOpen, setFormOpen] = useState(false);
   const [userId, setUserId] = useState("");
   const [subscriptionId, setSubscriptionId] = useState("");
   const [amountCents, setAmountCents] = useState(0);
@@ -71,31 +78,47 @@ export function InvoicesView({
     useState<LateInterestType>("simple");
   const [lateInterestPercent, setLateInterestPercent] = useState("1");
 
-  const [pendingAction, setPendingAction] = useState<
-    { kind: "markPaid" | "cancel"; invoice: AdminInvoicePublic } | null
-  >(null);
-  const [isPending, startTransition] = useTransition();
+  const [isMutating, startMutation] = useTransition();
+  const [isRefreshing, startRefresh] = useTransition();
 
-  const userMap = useMemo(
-    () => Object.fromEntries(initialUsers.map((u) => [u.id, u])),
-    [initialUsers],
-  );
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
 
   const userSubscriptions = useMemo(
-    () =>
-      initialSubscriptions.filter(
-        (s) => s.userId === userId && s.status === "active",
-      ),
+    () => initialSubscriptions.filter((s) => s.userId === userId),
     [initialSubscriptions, userId],
   );
 
-  const filtered = useMemo(() => {
-    if (filter === "all") return invoices;
-    return invoices.filter((i) => i.status === filter);
-  }, [invoices, filter]);
+  function pushParams(mutate: (p: URLSearchParams) => void) {
+    const next = new URLSearchParams(searchParamsRef.current.toString());
+    mutate(next);
+    const qs = next.toString();
+    startRefresh(() => {
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    });
+  }
+
+  function handleFilterChange(key: keyof InvoicesViewFilters, value: string) {
+    pushParams((p) => {
+      if (value) p.set(key, value);
+      else p.delete(key);
+      p.delete("page");
+    });
+  }
+
+  function handleStatusChange(value: "all" | AdminInvoiceStatus) {
+    handleFilterChange("status", value === "all" ? "" : value);
+  }
+
+  function goToPage(n: number) {
+    pushParams((p) => {
+      if (n <= 1) p.delete("page");
+      else p.set("page", String(n));
+    });
+  }
 
   function openCreate() {
-    setUserId(initialUsers[0]?.id ?? "");
+    setUserId("");
     setSubscriptionId("");
     setAmountCents(0);
     setDescription("");
@@ -108,11 +131,8 @@ export function InvoicesView({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // Guard against double-submit: isPending may not have flipped to true yet
-    // on a second rapid click within the same render frame.
-    if (isPending) return;
-    // Backend accepts 0.01..999999.99 — mirror as cents on the client to
-    // give a specific message instead of a generic INVALID_INPUT.
+    if (isMutating) return;
+    if (!userId) return;
     if (amountCents < MIN_AMOUNT_CENTS || amountCents > MAX_AMOUNT_CENTS) {
       toast.error(t("form.amountOutOfRange"));
       return;
@@ -143,45 +163,45 @@ export function InvoicesView({
       lateInterestPercent: interestPercent,
     };
 
-    startTransition(async () => {
+    startMutation(async () => {
       const result = await createInvoiceAction(payload);
       if (!result.success || !result.data) {
         toast.error(result.error ?? tCommon("loadError"));
         return;
       }
-      setInvoices((prev) => [result.data as AdminInvoicePublic, ...prev]);
       setFormOpen(false);
       toast.success(t("created"));
+      router.refresh();
     });
   }
 
-  function confirmPendingAction() {
-    if (!pendingAction) return;
-    const { kind, invoice } = pendingAction;
-    startTransition(async () => {
-      const result =
-        kind === "markPaid"
-          ? await markInvoicePaidAction(invoice.id)
-          : await cancelInvoiceAction(invoice.id);
-      if (!result.success || !result.data) {
-        toast.error(result.error ?? tCommon("loadError"));
-        return;
-      }
-      const updated = result.data;
-      setInvoices((prev) =>
-        prev.map((i) => (i.id === updated.id ? updated : i)),
-      );
-      setPendingAction(null);
-      toast.success(kind === "markPaid" ? t("marked") : t("cancelled"));
-    });
-  }
+  const invoices = initialPage.items;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(initialPage.total / initialPage.limit),
+  );
+  const currentPage = Math.min(Math.max(1, initialPage.page), totalPages);
+  const canPrev = currentPage > 1;
+  const canNext = currentPage < totalPages;
+  const rangeStart =
+    invoices.length === 0 ? 0 : (currentPage - 1) * initialPage.limit + 1;
+  const rangeEnd = rangeStart + invoices.length - (invoices.length === 0 ? 0 : 1);
+  const hasActiveFilters = Boolean(
+    filters.status ||
+      filters.userId ||
+      filters.dueDateFrom ||
+      filters.dueDateTo,
+  );
+
+  const activeStatus = (filters.status || "all") as "all" | AdminInvoiceStatus;
 
   return (
     <div className="space-y-6">
       <AdminHeader
         actions={
           <button
-            className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-4 text-sm font-bold text-on-primary shadow-lg shadow-primary/10"
+            className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-4 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
+            disabled={isMutating || isRefreshing}
             onClick={openCreate}
             type="button"
           >
@@ -202,6 +222,7 @@ export function InvoicesView({
       {initialSummary && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <SummaryTile
+            hint={t("summary.mrrHint")}
             label={t("summary.mrr")}
             value={formatBRL(initialSummary.mrr)}
           />
@@ -220,29 +241,66 @@ export function InvoicesView({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            className={`h-9 rounded-full px-4 text-xs font-semibold transition-colors ${
-              filter === f
-                ? "bg-primary/10 text-primary"
-                : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-            }`}
-            key={f}
-            onClick={() => setFilter(f)}
-            type="button"
-          >
-            {t(`filter.${f}`)}
-          </button>
-        ))}
+      <div className="grid gap-3 rounded-xl bg-surface-container-lowest p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <select
+          className={INPUT_CLASS}
+          onChange={(e) =>
+            handleStatusChange(e.target.value as "all" | AdminInvoiceStatus)
+          }
+          value={activeStatus}
+        >
+          {FILTERS.map((f) => (
+            <option key={f} value={f}>
+              {t(`filter.${f}`)}
+            </option>
+          ))}
+        </select>
+        <SearchableSelect
+          allowClear
+          clearLabel={t("filters.allUsers")}
+          onChange={(v) => handleFilterChange("userId", v)}
+          options={initialUsers.map((u) => ({
+            value: u.id,
+            label: u.name ?? u.email,
+            hint: u.name ? u.email : undefined,
+          }))}
+          placeholder={t("filters.allUsers")}
+          value={filters.userId}
+        />
+        <label className="block">
+          <span className="sr-only">{t("filters.dueDateFrom")}</span>
+          <input
+            className={INPUT_CLASS}
+            onChange={(e) => handleFilterChange("dueDateFrom", e.target.value)}
+            placeholder={t("filters.dueDateFrom")}
+            title={t("filters.dueDateFrom")}
+            type="date"
+            value={filters.dueDateFrom}
+          />
+        </label>
+        <label className="block">
+          <span className="sr-only">{t("filters.dueDateTo")}</span>
+          <input
+            className={INPUT_CLASS}
+            onChange={(e) => handleFilterChange("dueDateTo", e.target.value)}
+            placeholder={t("filters.dueDateTo")}
+            title={t("filters.dueDateTo")}
+            type="date"
+            value={filters.dueDateTo}
+          />
+        </label>
       </div>
 
-      {filtered.length === 0 ? (
+      {invoices.length === 0 ? (
         <div className="rounded-xl bg-surface-container-lowest p-8 text-center text-sm text-on-surface-variant">
-          {t("empty")}
+          {hasActiveFilters ? t("emptyFiltered") : t("empty")}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-ambient">
+        <div
+          aria-busy={isRefreshing}
+          className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-ambient transition-opacity"
+          style={{ opacity: isRefreshing ? 0.6 : 1 }}
+        >
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
@@ -250,25 +308,31 @@ export function InvoicesView({
                 <th className="px-5 py-3">{t("table.amount")}</th>
                 <th className="px-5 py-3">{t("table.status")}</th>
                 <th className="px-5 py-3">{t("table.dueDate")}</th>
-                <th className="px-5 py-3">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((invoice) => {
-                const user = userMap[invoice.userId];
-                const canTransition = invoice.status === "pending";
+              {invoices.map((invoice) => {
+                const displayName =
+                  invoice.userName ??
+                  invoice.userEmail ??
+                  invoice.userId.slice(0, 8);
                 return (
                   <tr
                     className="border-t border-surface-container-high"
                     key={invoice.id}
                   >
                     <td className="px-5 py-3 font-medium text-on-surface">
-                      {user?.name ?? user?.email ?? invoice.userId.slice(0, 8)}
-                      {invoice.description && (
+                      {displayName}
+                      {invoice.userName && invoice.userEmail ? (
+                        <p className="text-xs text-on-surface-variant">
+                          {invoice.userEmail}
+                        </p>
+                      ) : null}
+                      {invoice.description ? (
                         <p className="text-xs text-on-surface-variant">
                           {invoice.description}
                         </p>
-                      )}
+                      ) : null}
                     </td>
                     <td className="px-5 py-3 text-on-surface">
                       {formatBRL(invoice.amount)}
@@ -283,37 +347,46 @@ export function InvoicesView({
                     <td className="px-5 py-3 text-on-surface-variant">
                       {formatDate(invoice.dueDate)}
                     </td>
-                    <td className="px-5 py-3">
-                      <div className="flex gap-2">
-                        <button
-                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-40"
-                          disabled={!canTransition || isPending}
-                          onClick={() =>
-                            setPendingAction({ kind: "markPaid", invoice })
-                          }
-                          type="button"
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                          {t("markPaid")}
-                        </button>
-                        <button
-                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-40"
-                          disabled={!canTransition || isPending}
-                          onClick={() =>
-                            setPendingAction({ kind: "cancel", invoice })
-                          }
-                          type="button"
-                        >
-                          <XIcon className="h-3.5 w-3.5" />
-                          {t("cancel")}
-                        </button>
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {initialPage.total > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-on-surface-variant">
+          <span>
+            {t("pagination.showing", {
+              from: rangeStart,
+              to: rangeEnd,
+              total: initialPage.total,
+            })}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              aria-label={t("pagination.previous")}
+              className="flex size-9 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant transition-opacity hover:opacity-80 disabled:opacity-40"
+              disabled={!canPrev || isRefreshing}
+              onClick={() => goToPage(currentPage - 1)}
+              type="button"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span className="min-w-[5rem] text-center font-mono text-xs uppercase tracking-widest">
+              {t("pagination.pageOf", { page: currentPage, total: totalPages })}
+            </span>
+            <button
+              aria-label={t("pagination.next")}
+              className="flex size-9 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant transition-opacity hover:opacity-80 disabled:opacity-40"
+              disabled={!canNext || isRefreshing}
+              onClick={() => goToPage(currentPage + 1)}
+              type="button"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -326,21 +399,19 @@ export function InvoicesView({
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t("form.user")}>
-              <select
-                className={INPUT_CLASS}
-                onChange={(e) => {
-                  setUserId(e.target.value);
+              <SearchableSelect
+                onChange={(v) => {
+                  setUserId(v);
                   setSubscriptionId("");
                 }}
-                required
+                options={initialUsers.map((u) => ({
+                  value: u.id,
+                  label: u.name ?? u.email,
+                  hint: u.name ? u.email : undefined,
+                }))}
+                placeholder={t("form.user")}
                 value={userId}
-              >
-                {initialUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name ?? user.email}
-                  </option>
-                ))}
-              </select>
+              />
             </Field>
             <Field label={t("form.subscription")}>
               <select
@@ -370,6 +441,12 @@ export function InvoicesView({
                 className={INPUT_CLASS}
                 min={todayYmd}
                 onChange={(e) => setDueDate(e.target.value)}
+                onInput={(e) => e.currentTarget.setCustomValidity("")}
+                onInvalid={(e) => {
+                  if (e.currentTarget.validity.valueMissing) {
+                    e.currentTarget.setCustomValidity(tc("fieldRequired"));
+                  }
+                }}
                 required
                 type="date"
                 value={dueDate}
@@ -424,7 +501,7 @@ export function InvoicesView({
             </button>
             <button
               className="h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-5 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
-              disabled={isPending}
+              disabled={isMutating || !userId}
               type="submit"
             >
               {tc("save")}
@@ -433,25 +510,6 @@ export function InvoicesView({
         </form>
       </Modal>
 
-      <ConfirmDialog
-        cancelLabel={tc("cancel")}
-        confirmLabel={
-          pendingAction?.kind === "markPaid"
-            ? t("markPaid")
-            : t("cancel")
-        }
-        description={
-          pendingAction?.kind === "markPaid"
-            ? t("markPaidConfirm")
-            : t("cancelConfirm")
-        }
-        isPending={isPending}
-        onCancel={() => setPendingAction(null)}
-        onConfirm={confirmPendingAction}
-        open={pendingAction !== null}
-        title={tc("confirm")}
-        variant={pendingAction?.kind === "cancel" ? "danger" : "default"}
-      />
     </div>
   );
 }
@@ -469,15 +527,22 @@ const STATUS_STYLE: Record<AdminInvoiceStatus, string> = {
 function SummaryTile({
   label,
   value,
+  hint,
 }: {
   readonly label: string;
   readonly value: string;
+  readonly hint?: string;
 }) {
   return (
     <div className="rounded-xl bg-surface-container-lowest p-5 shadow-ambient">
-      <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
-        {label}
-      </p>
+      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
+        <span>{label}</span>
+        {hint && (
+          <Tooltip content={hint} side="top">
+            <Info className="h-3 w-3 cursor-help text-on-surface-variant/60" />
+          </Tooltip>
+        )}
+      </div>
       <p className="mt-2 font-display text-2xl font-extrabold text-on-surface">
         {value}
       </p>

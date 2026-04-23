@@ -74,7 +74,7 @@ export interface LeadBoardItem extends LeadPublic {
 }
 
 export interface PaginatedColumnResponse {
-  readonly data: LeadBoardItem[];
+  readonly items: LeadBoardItem[];
   readonly total: number;
   readonly page: number;
   readonly limit: number;
@@ -101,12 +101,46 @@ export interface ListLeadsParams {
   readonly page?: number;
   readonly limit?: number;
   readonly status?: LeadStatus;
-  readonly search?: string;
   readonly temperature?: LeadTemperature;
+  readonly channel?: "whatsapp" | "telegram";
+  readonly nameConfirmed?: boolean;
+  readonly hasEmail?: boolean;
+  readonly hasPhone?: boolean;
+  /** YYYY-MM-DD — lead created on or after this date. */
+  readonly createdAfter?: string;
+  /** YYYY-MM-DD — lead created on or before this date. */
+  readonly createdBefore?: string;
+  readonly search?: string;
+}
+
+/**
+ * Enriched lead item returned by GET /leads. Backend resolves tags,
+ * customFields and lastMessage in a single batch — callers no longer
+ * need to hit /leads/:id/timeline to render the list.
+ */
+export interface LeadWithLastMessage {
+  readonly id: string;
+  readonly ownerId: string;
+  readonly name: string;
+  readonly email: string | null;
+  readonly phone: string | null;
+  readonly channel: LeadChannel;
+  readonly contactId: string | null;
+  readonly status: LeadStatus;
+  readonly temperature: LeadTemperature;
+  readonly nameConfirmed: boolean;
+  readonly avatarUrl: string | null;
+  readonly metadata: Record<string, unknown>;
+  readonly tags: ReadonlyArray<LeadTag>;
+  /** Flat map `{fieldName: value}`. Empty object when there are no values. */
+  readonly customFields: Record<string, string>;
+  readonly lastMessage: LeadLastMessage | null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
 }
 
 export interface PaginatedLeadResponse {
-  readonly data: LeadPublic[];
+  readonly items: LeadWithLastMessage[];
   readonly total: number;
   readonly page: number;
   readonly limit: number;

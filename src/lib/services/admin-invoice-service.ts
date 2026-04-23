@@ -8,6 +8,8 @@ import type {
 import type {
   CreateInvoicePayload,
   IAdminInvoiceService,
+  ListAdminInvoicesParams,
+  PaginatedAdminInvoices,
 } from "./interfaces/admin-invoice-service";
 
 class AdminInvoiceService implements IAdminInvoiceService {
@@ -19,12 +21,25 @@ class AdminInvoiceService implements IAdminInvoiceService {
     return unwrapEnvelope<AdminInvoicePublic>(response);
   }
 
-  async list(): Promise<readonly AdminInvoicePublic[]> {
-    const response = await authFetch("/admin/invoices", {
-      revalidate: CACHE_TIMES.adminInvoices,
-      tags: [CACHE_TAGS.adminInvoices],
-    });
-    return unwrapEnvelope<readonly AdminInvoicePublic[]>(response);
+  async list(
+    params?: ListAdminInvoicesParams,
+  ): Promise<PaginatedAdminInvoices> {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.set("page", String(params.page));
+    if (params?.limit !== undefined) query.set("limit", String(params.limit));
+    if (params?.status) query.set("status", params.status);
+    if (params?.userId) query.set("userId", params.userId);
+    if (params?.dueDateFrom) query.set("dueDateFrom", params.dueDateFrom);
+    if (params?.dueDateTo) query.set("dueDateTo", params.dueDateTo);
+    const qs = query.toString();
+    const response = await authFetch(
+      qs ? `/admin/invoices?${qs}` : "/admin/invoices",
+      {
+        revalidate: CACHE_TIMES.adminInvoices,
+        tags: [CACHE_TAGS.adminInvoices],
+      },
+    );
+    return unwrapEnvelope<PaginatedAdminInvoices>(response);
   }
 
   async getById(id: string): Promise<AdminInvoicePublic> {

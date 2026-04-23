@@ -34,6 +34,7 @@ export async function loginAction(
 ): Promise<LoginActionResult> {
   const email = formData.get("email");
   const password = formData.get("password");
+  const remember = formData.get("remember") === "1";
 
   if (typeof email !== "string" || typeof password !== "string") {
     return { success: false, error: "Preencha todos os campos." };
@@ -59,19 +60,20 @@ export async function loginAction(
   }
 
   const cookieStore = await cookies();
-  cookieStore.set("access_token", tokens.accessToken, {
-    maxAge: 60 * 60,
+  const baseCookie = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
     secure: process.env.NODE_ENV === "production",
+  };
+
+  cookieStore.set("access_token", tokens.accessToken, {
+    ...baseCookie,
+    ...(remember ? { maxAge: 60 * 60 } : {}),
   });
   cookieStore.set("refresh_token", tokens.refreshToken, {
-    maxAge: 60 * 60 * 24 * 7,
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
+    ...baseCookie,
+    ...(remember ? { maxAge: 60 * 60 * 24 * 7 } : {}),
   });
 
   emitLoginAttempt("success");

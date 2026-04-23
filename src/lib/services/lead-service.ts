@@ -66,8 +66,26 @@ class LeadService implements ILeadService {
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
     if (params?.status) searchParams.set("status", params.status);
+    if (params?.temperature) {
+      searchParams.set("temperature", params.temperature);
+    }
+    if (params?.channel) searchParams.set("channel", params.channel);
+    if (params?.nameConfirmed !== undefined) {
+      searchParams.set("nameConfirmed", String(params.nameConfirmed));
+    }
+    if (params?.hasEmail !== undefined) {
+      searchParams.set("hasEmail", String(params.hasEmail));
+    }
+    if (params?.hasPhone !== undefined) {
+      searchParams.set("hasPhone", String(params.hasPhone));
+    }
+    if (params?.createdAfter) {
+      searchParams.set("createdAfter", params.createdAfter);
+    }
+    if (params?.createdBefore) {
+      searchParams.set("createdBefore", params.createdBefore);
+    }
     if (params?.search) searchParams.set("search", params.search);
-    if (params?.temperature) searchParams.set("temperature", params.temperature);
 
     const query = searchParams.toString();
     const path = query ? `/leads?${query}` : "/leads";

@@ -44,6 +44,7 @@ export type StepErrorCode =
   | "INVALID_INPUT"
   | "INVALID_SLUG"
   | "SLUG_CONSUMED"
+  | "SLUG_FORBIDDEN"
   | "PASSWORD_WEAK"
   | "NOT_AUTHENTICATED"
   | "GENERIC";
@@ -134,6 +135,12 @@ function mapSetPasswordError(err: unknown): StepErrorCode {
   if (err instanceof ApiError) {
     if (err.status === 404) return "INVALID_SLUG";
     if (err.status === 410) return "SLUG_CONSUMED";
+    // Shipped in 780caa7 — guards cross-user slug mutations. The step-1
+    // read-only guard already blocks the happy path, this covers attackers
+    // hitting the server action directly.
+    if (err.status === 403 || err.code === "ONBOARDING_SLUG_FORBIDDEN_001") {
+      return "SLUG_FORBIDDEN";
+    }
     if (err.status === 400) return "PASSWORD_WEAK";
   }
   return "GENERIC";

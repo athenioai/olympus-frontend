@@ -7,7 +7,7 @@ import type { AgentAvatarAdmin } from "./interfaces/admin-types";
 import type {
   CreateAgentAvatarPayload,
   IAdminAgentAvatarService,
-  UpdateAgentAvatarPayload,
+  ListAdminAgentAvatarsParams,
 } from "./interfaces/admin-agent-avatar-service";
 
 class AdminAgentAvatarService implements IAdminAgentAvatarService {
@@ -25,12 +25,8 @@ class AdminAgentAvatarService implements IAdminAgentAvatarService {
 
     const formData = new FormData();
     formData.append("file", payload.file);
-    formData.append("name", payload.name);
     if (payload.sortOrder !== undefined) {
       formData.append("sortOrder", String(payload.sortOrder));
-    }
-    if (payload.isActive !== undefined) {
-      formData.append("isActive", String(payload.isActive));
     }
 
     const response = await fetch(`${API_URL}/admin/agent-avatars`, {
@@ -41,26 +37,22 @@ class AdminAgentAvatarService implements IAdminAgentAvatarService {
     return unwrapEnvelope<AgentAvatarAdmin>(response);
   }
 
-  async list(): Promise<readonly AgentAvatarAdmin[]> {
-    const response = await authFetch("/admin/agent-avatars", {
-      revalidate: CACHE_TIMES.adminAvatars,
-      tags: [CACHE_TAGS.adminAvatars],
-    });
-    return unwrapEnvelope<readonly AgentAvatarAdmin[]>(response);
-  }
-
-  async update(
-    id: string,
-    payload: UpdateAgentAvatarPayload,
-  ): Promise<AgentAvatarAdmin> {
+  async list(
+    params?: ListAdminAgentAvatarsParams,
+  ): Promise<readonly AgentAvatarAdmin[]> {
+    const query = new URLSearchParams();
+    if (params?.includeDeleted !== undefined) {
+      query.set("includeDeleted", String(params.includeDeleted));
+    }
+    const qs = query.toString();
     const response = await authFetch(
-      `/admin/agent-avatars/${encodeURIComponent(id)}`,
+      qs ? `/admin/agent-avatars?${qs}` : "/admin/agent-avatars",
       {
-        method: "PATCH",
-        body: JSON.stringify(payload),
+        revalidate: CACHE_TIMES.adminAvatars,
+        tags: [CACHE_TAGS.adminAvatars],
       },
     );
-    return unwrapEnvelope<AgentAvatarAdmin>(response);
+    return unwrapEnvelope<readonly AgentAvatarAdmin[]>(response);
   }
 
   async remove(id: string): Promise<void> {

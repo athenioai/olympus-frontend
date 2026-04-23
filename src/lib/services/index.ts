@@ -34,9 +34,9 @@ export type {
   ChatSession,
   ChatMessage,
   PaginatedSessions,
-  PaginatedMessages,
+  ChatMessagesCursorPage,
   ListSessionsParams,
-  ListMessagesParams,
+  GetMessagesParams,
   IChatService,
 } from "./interfaces/chat-service";
 
@@ -72,21 +72,27 @@ export type {
   LeadToFollowUp,
   PendingInvoiceDueSoon,
   BestService,
+  ActiveSpecialDiscount,
+  CatalogItemPublic,
+  CreateCatalogPayload,
   Service,
   Product,
   Invoice,
   FinanceDashboard,
-  Pagination as FinancePagination,
   PaginatedResponse as FinancePaginatedResponse,
+  ListCatalogParams,
   ListServicesParams,
   ListProductsParams,
   PrepaymentSetting,
+  UpdateCatalogPayload,
   IFinanceService,
 } from "./interfaces/finance-service";
 
 // Appointment types
 export type {
   Appointment,
+  CalendarDaySummary,
+  CalendarMonthSummary,
   PaginatedAppointments,
   ListAppointmentsParams,
   IAppointmentService,
@@ -146,6 +152,8 @@ export type {
   ExceptionType,
   BusinessExceptionRange,
   BusinessException,
+  PaginatedBusinessExceptions,
+  ListBusinessExceptionsParams,
   CreateExceptionPayload,
   UpdateExceptionPayload,
   IBusinessExceptionService,
@@ -205,8 +213,12 @@ export type {
 
 // Admin service interfaces
 export type {
+  AdminUserOption,
   CreateAdminUserPayload,
   IAdminUserService,
+  ListAdminUsersParams,
+  OnboardingStatus,
+  PaginatedAdminUsers,
   SeedHolidaysPayload,
   UpdateAdminUserPayload,
 } from "./interfaces/admin-user-service";
@@ -214,19 +226,26 @@ export type { IAdminDashboardService } from "./interfaces/admin-dashboard-servic
 export type {
   CreatePlanPayload,
   IAdminPlanService,
+  ListAdminPlansParams,
+  PaginatedAdminPlans,
+  PlanOption,
   UpdatePlanPayload,
 } from "./interfaces/admin-plan-service";
 export type {
   CreateSubscriptionPayload,
   IAdminSubscriptionService,
+  ListAdminSubscriptionsParams,
+  PaginatedAdminSubscriptions,
   UpdateSubscriptionPayload,
 } from "./interfaces/admin-subscription-service";
 export type {
   CreateInvoicePayload,
   IAdminInvoiceService,
+  ListAdminInvoicesParams,
+  PaginatedAdminInvoices,
 } from "./interfaces/admin-invoice-service";
 export type {
   CreateAgentAvatarPayload,
   IAdminAgentAvatarService,
-  UpdateAgentAvatarPayload,
+  ListAdminAgentAvatarsParams,
 } from "./interfaces/admin-agent-avatar-service";

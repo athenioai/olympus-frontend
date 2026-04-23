@@ -12,7 +12,15 @@
     "confirm": "Confirmar",
     "close": "Cerrar",
     "noResults": "No se encontraron resultados.",
-    "pagination": "{from}-{to} de {total}"
+    "pagination": "{from}-{to} de {total}",
+    "fieldRequired": "Completa este campo.",
+    "fileButton": "Elegir archivo",
+    "fileEmpty": "Ningún archivo seleccionado",
+    "searchable": {
+      "search": "Buscar…",
+      "empty": "Sin resultados.",
+      "clear": "Limpiar"
+    }
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -32,6 +40,12 @@
     "lastSession": "Última sesión",
     "lastSessionAgo": "hace 9h, São Paulo",
     "signupCta": "Crear cuenta",
+    "rememberMe": "Recuérdame",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "capsLockOn": "Bloq Mayús activado",
+    "emailValid": "Correo válido",
+    "tryAgainIn": "Inténtalo en {seconds}s",
     "bulletin": {
       "live": "EN VIVO",
       "issuePrefix": "Nº",
@@ -286,7 +300,8 @@
       "strengthStrong": "Fuerte",
       "errorNameShort": "El nombre debe tener entre 2 y 120 caracteres.",
       "errorPasswordWeak": "La contraseña requiere al menos 8 caracteres, 1 letra y 1 número.",
-      "errorPasswordMismatch": "Las contraseñas no coinciden."
+      "errorPasswordMismatch": "Las contraseñas no coinciden.",
+      "errorSlugForbidden": "Este onboarding pertenece a otra cuenta. Cierra la sesión actual para continuar."
     },
     "step2": {
       "title": "¿Cómo trabajas?",
@@ -415,11 +430,80 @@
     "emailPlaceholder": "correo@ejemplo.com",
     "phonePlaceholder": "(11) 99999-9999",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este lead?",
-    "timeline": "Línea de tiempo"
+    "dnd": {
+      "instructions": "Para tomar un elemento arrastrable, presiona la barra espaciadora. Mientras arrastras, usa las flechas para mover el elemento. Presiona espacio de nuevo para soltarlo en la nueva posición, o escape para cancelar.",
+      "pickup": "Lead {name} seleccionado.",
+      "overColumn": "Lead {name} sobre la columna {column}.",
+      "overNothing": "Lead {name} no está sobre ninguna columna.",
+      "dropped": "Lead {name} movido a la columna {column}.",
+      "droppedNowhere": "Lead {name} soltado.",
+      "cancelled": "Arrastre cancelado. Lead {name} volvió a la columna original.",
+      "invalidMove": "El lead solo puede avanzar a la siguiente etapa ({next}) o ser marcado como Perdido.",
+      "invalidMoveTerminal": "Este lead solo puede ser marcado como Perdido."
+    },
+    "timeline": "Línea de tiempo",
+    "list": {
+      "title": "Lista de leads",
+      "subtitle": "{count} {count, plural, =1 {lead encontrado} other {leads encontrados}}",
+      "searchPlaceholder": "Buscar por nombre, email o teléfono…",
+      "allStatuses": "Todos los estados",
+      "allTemperatures": "Todas las temperaturas",
+      "allChannels": "Todos los canales",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "telegram": "Telegram"
+      },
+      "nameConfirmedAny": "Nombre (cualquiera)",
+      "nameConfirmedYes": "Nombre confirmado",
+      "nameConfirmedNo": "Nombre pendiente",
+      "hasEmailAny": "Email (cualquiera)",
+      "hasEmailYes": "Con email",
+      "hasEmailNo": "Sin email",
+      "hasPhoneAny": "Teléfono (cualquiera)",
+      "hasPhoneYes": "Con teléfono",
+      "hasPhoneNo": "Sin teléfono",
+      "createdAfter": "Creado desde",
+      "createdBefore": "Creado hasta",
+      "empty": "Ningún lead por aquí.",
+      "emptyHint": "Ajusta los filtros o crea un lead para empezar a hacer seguimiento.",
+      "emptyCta": "Crear lead",
+      "columns": {
+        "name": "Nombre",
+        "status": "Estado",
+        "temperature": "Temperatura",
+        "contact": "Contacto",
+        "updated": "Actualizado"
+      },
+      "pagination": {
+        "showing": "{from}–{to} de {total}",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
+      "temperatures": {
+        "hot": "Caliente",
+        "warm": "Tibio",
+        "cold": "Frío"
+      }
+    }
   },
   "conversations": {
     "title": "Conversaciones",
-    "searchPlaceholder": "Buscar conversación...",
+    "searchPlaceholder": "Buscar por nombre o teléfono…",
+    "advancedFilters": "Filtros avanzados",
+    "filters": {
+      "allChannels": "Todos los canales",
+      "channelWhatsapp": "WhatsApp",
+      "channelTelegram": "Telegram",
+      "allStatuses": "Todos los estados",
+      "statusNew": "Nuevo",
+      "statusContacted": "Contactado",
+      "statusQualified": "Calificado",
+      "statusConverted": "Convertido",
+      "statusLost": "Perdido",
+      "createdAfter": "Creada desde",
+      "createdBefore": "Creada hasta",
+      "clearAll": "Limpiar filtros"
+    },
     "activeCount": "{count} {count, plural, =1 {conversación activa} other {conversaciones activas}}",
     "selectConversation": "Selecciona una conversación",
     "selectConversationSubtitle": "Elige una conversación del panel para ver los mensajes",
@@ -466,7 +550,18 @@
     },
     "status": {
       "confirmed": "Confirmado",
-      "cancelled": "Cancelado"
+      "cancelled": "Cancelado",
+      "attended": "Asistió",
+      "no_show": "No asistió"
+    },
+    "appointmentDetails": "Detalles de la cita",
+    "detail": {
+      "date": "Fecha",
+      "time": "Horario",
+      "status": "Estado",
+      "lead": "Cliente",
+      "service": "Servicio",
+      "notes": "Notas"
     },
     "weekdays": {
       "mon": "lun",
@@ -500,7 +595,16 @@
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este artículo?",
     "searchPlaceholder": "Buscar por nombre...",
     "allStatuses": "Todos",
-    "filterStatus": "Estado"
+    "filterStatus": "Estado",
+    "priceMinPlaceholder": "Precio mínimo",
+    "priceMaxPlaceholder": "Precio máximo",
+    "hasImageAny": "Imagen (cualquiera)",
+    "hasImageYes": "Con imagen",
+    "hasImageNo": "Sin imagen",
+    "hasPromoAny": "Promoción (cualquiera)",
+    "hasPromoYes": "En promoción",
+    "hasPromoNo": "Sin promoción",
+    "requirePrepaymentNotice": "Los artículos de este catálogo requieren pago anticipado."
   },
   "settings": {
     "title": "Configuración",
@@ -556,8 +660,7 @@
       "subscriptions": "Suscripciones",
       "billing": "Facturación",
       "invoices": "Cobros",
-      "avatars": "Avatares",
-      "onboardingPreview": "Vista previa Onboarding"
+      "avatars": "Avatares"
     }
   },
   "admin": {
@@ -577,6 +680,21 @@
       "create": "Nuevo usuario",
       "seedHolidays": "Sembrar feriados",
       "empty": "Sin usuarios.",
+      "emptyFiltered": "Ningún usuario coincide con estos filtros.",
+      "filters": {
+        "searchPlaceholder": "Buscar por email o nombre…",
+        "allPlans": "Todos los planes",
+        "allRoles": "Todos los roles",
+        "allOnboarding": "Cualquier estado",
+        "onboardingPending": "Onboarding pendiente",
+        "onboardingCompleted": "Onboarding completado"
+      },
+      "pagination": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "{page} / {total}",
+        "showing": "Mostrando {from}–{to} de {total}"
+      },
       "form": {
         "createTitle": "Crear usuario",
         "editTitle": "Editar usuario",
@@ -584,6 +702,7 @@
         "email": "Email",
         "plan": "Plan",
         "noPlan": "Sin plan",
+        "selectPlan": "Selecciona un plan",
         "workType": "Modo",
         "workTypeServices": "Servicios",
         "workTypeSales": "Ventas",
@@ -666,6 +785,16 @@
       "subtitle": "Catálogo de planes.",
       "create": "Nuevo plan",
       "empty": "Sin planes.",
+      "emptyFiltered": "Ningún plan coincide con estos filtros.",
+      "filters": {
+        "searchPlaceholder": "Buscar por nombre…"
+      },
+      "pagination": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "{page} / {total}",
+        "showing": "Mostrando {from}–{to} de {total}"
+      },
       "form": {
         "createTitle": "Crear plan",
         "editTitle": "Editar plan",
@@ -688,6 +817,19 @@
       "subtitle": "Gestión de suscripciones activas.",
       "create": "Nueva suscripción",
       "empty": "Sin suscripciones.",
+      "emptyFiltered": "Ninguna suscripción coincide con estos filtros.",
+      "filters": {
+        "allUsers": "Todos los usuarios",
+        "allPlans": "Todos los planes",
+        "allStatuses": "Todos los estados",
+        "billingDayPlaceholder": "Día (1-28)"
+      },
+      "pagination": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "{page} / {total}",
+        "showing": "Mostrando {from}–{to} de {total}"
+      },
       "form": {
         "createTitle": "Crear suscripción",
         "editTitle": "Editar suscripción",
@@ -718,8 +860,21 @@
       "subtitle": "Cobros recurrentes.",
       "create": "Nueva factura",
       "empty": "Sin facturas.",
+      "emptyFiltered": "Ninguna factura coincide con estos filtros.",
+      "filters": {
+        "allUsers": "Todos los usuarios",
+        "dueDateFrom": "Vencimiento desde",
+        "dueDateTo": "Vencimiento hasta"
+      },
+      "pagination": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "{page} / {total}",
+        "showing": "Mostrando {from}–{to} de {total}"
+      },
       "summary": {
         "mrr": "MRR",
+        "mrrHint": "Suma del costo de los planes de las suscripciones con estado activo. Las facturas manuales no entran.",
         "total": "Total de facturas",
         "pending": "Pendientes",
         "paid": "Pagadas"
@@ -772,22 +927,19 @@
       "subtitle": "Imágenes disponibles para agentes.",
       "upload": "Subir avatar",
       "empty": "Sin avatares.",
+      "limitReached": "Límite de 10 avatares activos alcanzado. Elimina uno antes de agregar otro.",
+      "avatarAlt": "Avatar #{sortOrder}",
       "form": {
         "createTitle": "Subir nuevo avatar",
-        "editTitle": "Editar avatar",
         "file": "Imagen",
-        "name": "Nombre",
-        "sortOrder": "Orden",
-        "isActive": "Activo",
-        "submitUpload": "Subir",
-        "submitUpdate": "Guardar"
+        "submitUpload": "Subir"
       },
       "uploaded": "Avatar subido.",
-      "updated": "Avatar actualizado.",
       "deleted": "Avatar eliminado.",
       "deleteConfirm": "¿Eliminar este avatar?",
-      "inactive": "Inactivo",
-      "fileTooLarge": "La imagen supera el límite de 5 MB."
+      "fileTooLarge": "La imagen supera el límite de 5 MB.",
+      "invalidImage": "Imagen inválida. Sube un PNG, JPEG o WebP de hasta 5MB.",
+      "selectedFile": "Archivo seleccionado"
     },
     "common": {
       "edit": "Editar",

@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { leadService } from "@/lib/services";
 import type {
   LeadBoardItem,
-  LeadPublic,
   LeadStatus,
   LeadTemperature,
+  LeadWithLastMessage,
   PaginatedColumnResponse,
 } from "@/lib/services/interfaces/lead-service";
 import { CrmBoard } from "./_components/crm-board";
@@ -47,12 +47,14 @@ function parseSearch(value: string | string[] | undefined): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function toBoardItem(lead: LeadPublic): LeadBoardItem {
+function toBoardItem(lead: LeadWithLastMessage): LeadBoardItem {
   return {
     ...lead,
-    avatarUrl: null,
-    lastMessage: null,
-    tags: [],
+    metadata: lead.metadata,
+    deletedAt: null,
+    avatarUrl: lead.avatarUrl,
+    lastMessage: lead.lastMessage,
+    tags: lead.tags,
     customFields: [],
   };
 }
@@ -84,7 +86,7 @@ export default async function CrmPage({ searchParams }: CrmPageProps) {
                 limit: INITIAL_PAGE_SIZE,
               })
               .then((r) => ({
-                data: r.data.map(toBoardItem),
+                items: r.items.map(toBoardItem),
                 total: r.total,
                 page: r.page,
                 limit: r.limit,
@@ -106,8 +108,11 @@ export default async function CrmPage({ searchParams }: CrmPageProps) {
       count: columns[idx]!.total,
     }));
 
+    const filterKey = `${filters.search ?? ""}|${filters.temperature ?? ""}`;
+
     return (
       <CrmBoard
+        key={filterKey}
         filters={filters}
         initialColumns={initialColumns}
         initialCounters={initialCounters}

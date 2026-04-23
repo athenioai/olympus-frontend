@@ -19,7 +19,7 @@ interface CalendarViewProps {
   readonly appointments: readonly Appointment[];
   readonly currentDate: string;
   readonly currentView: ViewMode;
-  readonly currentStatus?: "confirmed" | "cancelled";
+  readonly currentStatus?: AppointmentStatusFilter;
 }
 
 // ---------------------------------------------------------------------------
@@ -85,15 +85,40 @@ function getMonthGrid(year: number, month: number): Date[][] {
 // Status badge
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { readonly status: "confirmed" | "cancelled" }) {
+type AppointmentStatusFilter =
+  | "confirmed"
+  | "cancelled"
+  | "attended"
+  | "no_show";
+
+const STATUS_BADGE_STYLE: Record<AppointmentStatusFilter, string> = {
+  confirmed: "bg-success-muted text-success",
+  cancelled: "bg-danger-muted text-danger",
+  attended: "bg-primary/10 text-primary",
+  no_show: "bg-warning-muted text-warning",
+};
+
+const STATUS_CARD_STYLE: Record<AppointmentStatusFilter, string> = {
+  confirmed: "bg-primary/8 text-on-surface",
+  cancelled: "bg-danger-muted text-on-surface-variant line-through",
+  attended: "bg-primary/12 text-primary",
+  no_show: "bg-warning-muted text-warning",
+};
+
+const STATUS_COMPACT_STYLE: Record<AppointmentStatusFilter, string> = {
+  confirmed: "bg-primary/8 text-primary",
+  cancelled: "bg-danger-muted text-danger",
+  attended: "bg-primary/12 text-primary",
+  no_show: "bg-warning-muted text-warning",
+};
+
+function StatusBadge({ status }: { readonly status: AppointmentStatusFilter }) {
   const t = useTranslations("calendar");
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium",
-        status === "confirmed"
-          ? "bg-success-muted text-success"
-          : "bg-danger-muted text-danger",
+        STATUS_BADGE_STYLE[status],
       )}
     >
       {t(`status.${status}`)}
@@ -112,13 +137,12 @@ function AppointmentCard({
   readonly appointment: Appointment;
   readonly onSelect: (appointment: Appointment) => void;
 }) {
+  const t = useTranslations("calendar");
   return (
     <button
       className={cn(
         "w-full rounded-lg p-2 text-left text-xs transition-colors hover:ring-1 hover:ring-primary/20",
-        appointment.status === "confirmed"
-          ? "bg-primary/8 text-on-surface"
-          : "bg-danger-muted text-on-surface-variant line-through",
+        STATUS_CARD_STYLE[appointment.status],
       )}
       onClick={() => onSelect(appointment)}
       type="button"
@@ -127,7 +151,7 @@ function AppointmentCard({
         {appointment.startTime.slice(0, 5)} - {appointment.endTime.slice(0, 5)}
       </div>
       <div className="text-on-surface-variant">
-        {appointment.status === "confirmed" ? "Confirmado" : "Cancelado"}
+        {t(`status.${appointment.status}`)}
       </div>
     </button>
   );
@@ -337,9 +361,7 @@ function MonthView({
                       <button
                         className={cn(
                           "w-full truncate rounded px-1 py-0.5 text-left text-[10px] font-medium hover:ring-1 hover:ring-primary/20",
-                          app.status === "confirmed"
-                            ? "bg-primary/8 text-primary"
-                            : "bg-danger-muted text-danger",
+                          STATUS_COMPACT_STYLE[app.status],
                         )}
                         key={app.id}
                         onClick={() => onSelect(app)}
@@ -472,7 +494,15 @@ export function CalendarView({
 
         {/* Status filter */}
         <div className="flex gap-1 rounded-xl bg-surface-container-high p-1">
-          {(["all", "confirmed", "cancelled"] as const).map((status) => (
+          {(
+            [
+              "all",
+              "confirmed",
+              "attended",
+              "no_show",
+              "cancelled",
+            ] as const
+          ).map((status) => (
             <button
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",

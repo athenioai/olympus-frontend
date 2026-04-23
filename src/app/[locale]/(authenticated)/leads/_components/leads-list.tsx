@@ -24,11 +24,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { STAGE_PAST_PILL, stageDotClass } from "@/lib/stage-palette";
 import type {
-  LeadPublic,
   LeadStatus,
   LeadTemperature,
+  LeadWithLastMessage,
   PaginatedLeadResponse,
 } from "@/lib/services/interfaces/lead-service";
+
+type LeadChannelFilter = "whatsapp" | "telegram";
+const CHANNELS: readonly LeadChannelFilter[] = ["whatsapp", "telegram"];
 
 const STATUSES: readonly LeadStatus[] = [
   "new",
@@ -56,6 +59,12 @@ interface Filters {
   readonly search?: string;
   readonly status?: LeadStatus;
   readonly temperature?: LeadTemperature;
+  readonly channel?: LeadChannelFilter;
+  readonly nameConfirmed?: boolean;
+  readonly hasEmail?: boolean;
+  readonly hasPhone?: boolean;
+  readonly createdAfter?: string;
+  readonly createdBefore?: string;
 }
 
 interface LeadsListProps {
@@ -77,12 +86,34 @@ export function LeadsList({ result, filters, page }: LeadsListProps) {
   }, [filters.search]);
 
   function pushWithParams(update: Record<string, string | undefined>) {
+    const base: Record<string, string | undefined> = {
+      search: filters.search,
+      status: filters.status,
+      temperature: filters.temperature,
+      channel: filters.channel,
+      nameConfirmed:
+        filters.nameConfirmed === undefined
+          ? undefined
+          : String(filters.nameConfirmed),
+      hasEmail:
+        filters.hasEmail === undefined
+          ? undefined
+          : String(filters.hasEmail),
+      hasPhone:
+        filters.hasPhone === undefined
+          ? undefined
+          : String(filters.hasPhone),
+      createdAfter: filters.createdAfter,
+      createdBefore: filters.createdBefore,
+      page: String(page),
+    };
+    const next = { ...base, ...update };
     const params = new URLSearchParams();
-    const next = { ...filters, page: String(page), ...update };
-    if (next.search) params.set("search", next.search);
-    if (next.status) params.set("status", next.status);
-    if (next.temperature) params.set("temperature", next.temperature);
-    if (next.page && next.page !== "1") params.set("page", next.page);
+    for (const [key, value] of Object.entries(next)) {
+      if (!value) continue;
+      if (key === "page" && value === "1") continue;
+      params.set(key, value);
+    }
 
     const qs = params.toString();
     startTransition(() => {
@@ -147,6 +178,63 @@ export function LeadsList({ result, filters, page }: LeadsListProps) {
           renderLabel={(temp) => t(`temperatures.${temp}`)}
         />
 
+        <ChannelSelect
+          onChange={(v) => pushWithParams({ channel: v, page: "1" })}
+          placeholder={t("allChannels")}
+          renderLabel={(c) => t(`channels.${c}`)}
+          value={filters.channel}
+        />
+
+        <TriStateSelect
+          onChange={(v) => pushWithParams({ nameConfirmed: v, page: "1" })}
+          options={{
+            placeholder: t("nameConfirmedAny"),
+            yes: t("nameConfirmedYes"),
+            no: t("nameConfirmedNo"),
+          }}
+          value={filters.nameConfirmed}
+        />
+
+        <TriStateSelect
+          onChange={(v) => pushWithParams({ hasEmail: v, page: "1" })}
+          options={{
+            placeholder: t("hasEmailAny"),
+            yes: t("hasEmailYes"),
+            no: t("hasEmailNo"),
+          }}
+          value={filters.hasEmail}
+        />
+
+        <TriStateSelect
+          onChange={(v) => pushWithParams({ hasPhone: v, page: "1" })}
+          options={{
+            placeholder: t("hasPhoneAny"),
+            yes: t("hasPhoneYes"),
+            no: t("hasPhoneNo"),
+          }}
+          value={filters.hasPhone}
+        />
+
+        <input
+          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          onChange={(e) =>
+            pushWithParams({ createdAfter: e.target.value || undefined, page: "1" })
+          }
+          title={t("createdAfter")}
+          type="date"
+          value={filters.createdAfter ?? ""}
+        />
+
+        <input
+          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          onChange={(e) =>
+            pushWithParams({ createdBefore: e.target.value || undefined, page: "1" })
+          }
+          title={t("createdBefore")}
+          type="date"
+          value={filters.createdBefore ?? ""}
+        />
+
         {isPending && (
           <Loader2 className="h-4 w-4 animate-spin text-on-surface-variant" />
         )}
@@ -154,7 +242,7 @@ export function LeadsList({ result, filters, page }: LeadsListProps) {
 
       {/* Table */}
       <div className="overflow-hidden rounded-2xl bg-surface-container-lowest">
-        {result.data.length === 0 ? (
+        {result.items.length === 0 ? (
           <EmptyState title={t("empty")} hint={t("emptyHint")} />
         ) : (
           <table className="w-full">
@@ -168,7 +256,7 @@ export function LeadsList({ result, filters, page }: LeadsListProps) {
               </tr>
             </thead>
             <tbody>
-              {result.data.map((lead, idx) => (
+              {result.items.map((lead, idx) => (
                 <LeadRow
                   idx={idx}
                   key={lead.id}
@@ -232,7 +320,7 @@ function LeadRow({
   idx,
   stageLabel,
 }: {
-  readonly lead: LeadPublic;
+  readonly lead: LeadWithLastMessage;
   readonly idx: number;
   readonly stageLabel: string;
 }) {
@@ -344,6 +432,70 @@ function TemperatureSelect({
           {renderLabel(t)}
         </option>
       ))}
+    </select>
+  );
+}
+
+function ChannelSelect({
+  value,
+  onChange,
+  placeholder,
+  renderLabel,
+}: {
+  readonly value?: LeadChannelFilter;
+  readonly onChange: (value: LeadChannelFilter | undefined) => void;
+  readonly placeholder: string;
+  readonly renderLabel: (channel: LeadChannelFilter) => string;
+}) {
+  return (
+    <select
+      className="h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      onChange={(e) =>
+        onChange((e.target.value || undefined) as LeadChannelFilter | undefined)
+      }
+      value={value ?? ""}
+    >
+      <option value="">{placeholder}</option>
+      {CHANNELS.map((c) => (
+        <option key={c} value={c}>
+          {renderLabel(c)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function TriStateSelect({
+  value,
+  onChange,
+  options,
+}: {
+  readonly value?: boolean;
+  readonly onChange: (value: "true" | "false" | undefined) => void;
+  readonly options: {
+    readonly placeholder: string;
+    readonly yes: string;
+    readonly no: string;
+  };
+}) {
+  const selected = value === undefined ? "" : String(value);
+  return (
+    <select
+      className="h-9 rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      onChange={(e) =>
+        onChange(
+          e.target.value === "true"
+            ? "true"
+            : e.target.value === "false"
+              ? "false"
+              : undefined,
+        )
+      }
+      value={selected}
+    >
+      <option value="">{options.placeholder}</option>
+      <option value="true">{options.yes}</option>
+      <option value="false">{options.no}</option>
     </select>
   );
 }

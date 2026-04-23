@@ -80,6 +80,15 @@ function maskCnpj(value: string): string {
     .replace(/(\d{4})(\d)/, "$1-$2");
 }
 
+function isValidUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Score card
 // ---------------------------------------------------------------------------
@@ -278,9 +287,14 @@ export function BusinessProfileSettings() {
   }
 
   function handleAddSocial() {
-    if (!newUrl.trim()) return;
+    const trimmed = newUrl.trim();
+    if (!trimmed) return;
+    if (!isValidUrl(trimmed)) {
+      toast.error(t("profile.errors.socialUrlInvalid"));
+      return;
+    }
     startTransition(async () => {
-      const result = await addBusinessSocialLink({ platform: newPlatform, url: newUrl.trim() });
+      const result = await addBusinessSocialLink({ platform: newPlatform, url: trimmed });
       if (result.success && result.data) {
         setSocialLinks((prev) => [...prev, result.data!]);
         setNewUrl("");

@@ -5,14 +5,21 @@ import type {
   BusinessException,
   CreateExceptionPayload,
   IBusinessExceptionService,
+  ListBusinessExceptionsParams,
+  PaginatedBusinessExceptions,
   UpdateExceptionPayload,
 } from "./interfaces/business-exception-service";
 
 class BusinessExceptionService implements IBusinessExceptionService {
-  async list(params?: { from?: string; to?: string }): Promise<BusinessException[]> {
+  async list(
+    params?: ListBusinessExceptionsParams,
+  ): Promise<PaginatedBusinessExceptions> {
     const searchParams = new URLSearchParams();
-    if (params?.from) searchParams.set("from", params.from);
-    if (params?.to) searchParams.set("to", params.to);
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    if (params?.type) searchParams.set("type", params.type);
+    if (params?.dateFrom) searchParams.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) searchParams.set("dateTo", params.dateTo);
 
     const query = searchParams.toString();
     const path = query ? `/business-exceptions?${query}` : "/business-exceptions";
@@ -21,7 +28,7 @@ class BusinessExceptionService implements IBusinessExceptionService {
       revalidate: CACHE_TIMES.settings,
       tags: [CACHE_TAGS.businessExceptions],
     });
-    return unwrapEnvelope<BusinessException[]>(response);
+    return unwrapEnvelope<PaginatedBusinessExceptions>(response);
   }
 
   async create(payload: CreateExceptionPayload): Promise<BusinessException> {

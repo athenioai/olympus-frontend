@@ -4,7 +4,14 @@ import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Appointment } from "@/lib/services";
+import type { Appointment, AppointmentStatus } from "@/lib/services";
+
+const STATUS_BADGE_STYLE: Record<AppointmentStatus, string> = {
+  confirmed: "bg-success-muted text-success",
+  cancelled: "bg-danger-muted text-danger",
+  attended: "bg-primary/10 text-primary",
+  no_show: "bg-warning-muted text-warning",
+};
 
 interface AppointmentDetailsModalProps {
   readonly appointment: Appointment | null;
@@ -75,23 +82,43 @@ export function AppointmentDetailsModal({
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                  appointment.status === "confirmed"
-                    ? "bg-success-muted text-success"
-                    : "bg-danger-muted text-danger",
+                  STATUS_BADGE_STYLE[appointment.status],
                 )}
               >
                 {t(`status.${appointment.status}`)}
               </span>
             }
           />
+          {appointment.leadName || appointment.leadPhone ? (
+            <Row
+              label={t("detail.lead")}
+              value={
+                <span className="text-right">
+                  {appointment.leadName ?? appointment.leadPhone}
+                  {appointment.leadName && appointment.leadPhone ? (
+                    <span className="block text-xs text-on-surface-variant">
+                      {appointment.leadPhone}
+                    </span>
+                  ) : null}
+                </span>
+              }
+            />
+          ) : null}
           <Row
-            label={t("detail.serviceId")}
+            label={t("detail.service")}
             value={
-              <span className="font-mono text-xs text-on-surface-variant">
-                {appointment.serviceId}
-              </span>
+              appointment.serviceName ? (
+                appointment.serviceName
+              ) : (
+                <span className="font-mono text-xs text-on-surface-variant">
+                  {appointment.serviceId}
+                </span>
+              )
             }
           />
+          {appointment.notes ? (
+            <Row label={t("detail.notes")} value={appointment.notes} />
+          ) : null}
         </dl>
       </div>
     </div>

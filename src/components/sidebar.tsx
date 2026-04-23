@@ -23,7 +23,6 @@ import {
   Receipt,
   Filter,
   Sparkles,
-  Eye,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -62,7 +61,6 @@ const ADMIN_NAV: NavItem[] = [
   { key: "admin-subscriptions", href: "/admin/subscriptions", icon: FileText, labelKey: "sidebar.admin.subscriptions" },
   { key: "admin-invoices", href: "/admin/invoices", icon: Receipt, labelKey: "sidebar.admin.invoices" },
   { key: "admin-avatars", href: "/admin/agent-avatars", icon: Sparkles, labelKey: "sidebar.admin.avatars" },
-  { key: "admin-onboarding-preview", href: "/onboarding-preview", icon: Eye, labelKey: "sidebar.admin.onboardingPreview", external: true },
 ];
 
 const STORAGE_KEY = "olympus-sidebar-collapsed";
@@ -254,13 +252,16 @@ export function Sidebar({ user }: SidebarProps) {
         />
       )}
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — only mounts `navContent` when open, otherwise both
+          aside copies coexist in the DOM and QA sees two "Sair" buttons
+          (mobile one hidden off-screen, desktop one visible). */}
       <aside
+        aria-hidden={!mobileOpen}
         className={`fixed inset-y-0 left-0 z-50 w-[300px] bg-surface-container-lowest transition-transform duration-300 lg:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {navContent}
+        {mobileOpen ? navContent : null}
       </aside>
 
       {/* Desktop sidebar */}

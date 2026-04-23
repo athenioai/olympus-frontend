@@ -21,6 +21,51 @@ const MAX_RECONNECT_DELAY_MS = 30_000;
 const INITIAL_RECONNECT_DELAY_MS = 1_000;
 
 /**
+ * Backend WS envelope for new chat messages:
+ * `{ type: "new_message", chatId: string, message: {...} }`.
+ *
+ * User (human operator) messages echo back the full persisted record.
+ * Lead messages arrive with only `{ sender, content }` — we fill the
+ * missing envelope-level fields locally so the UI can render them.
+ * Other event types are ignored here.
+ */
+function extractChatMessage(payload: unknown): ChatMessage | null {
+  if (!payload || typeof payload !== "object") return null;
+  const envelope = payload as {
+    type?: unknown;
+    chatId?: unknown;
+    message?: unknown;
+  };
+  if (envelope.type !== "new_message") return null;
+
+  const message = envelope.message;
+  if (!message || typeof message !== "object") return null;
+
+  const m = message as Partial<ChatMessage>;
+  if (typeof m.sender !== "string" || typeof m.content !== "string") {
+    return null;
+  }
+
+  const chatId =
+    typeof m.chatId === "string"
+      ? m.chatId
+      : typeof envelope.chatId === "string"
+        ? envelope.chatId
+        : null;
+  if (!chatId) return null;
+
+  return {
+    id: typeof m.id === "string" ? m.id : crypto.randomUUID(),
+    chatId,
+    sender: m.sender,
+    content: m.content,
+    createdAt:
+      typeof m.createdAt === "string" ? m.createdAt : new Date().toISOString(),
+    deletedAt: m.deletedAt ?? null,
+  };
+}
+
+/**
  * Client-side WebSocket manager for real-time chat messages.
  * Handles connection lifecycle, auth, and auto-reconnect with exponential backoff.
  */
@@ -74,8 +119,9 @@ export class WsManager {
 
     this.ws.onmessage = (event: MessageEvent) => {
       try {
-        const message: ChatMessage = JSON.parse(String(event.data));
-        this.onMessage(message);
+        const payload = JSON.parse(String(event.data)) as unknown;
+        const message = extractChatMessage(payload);
+        if (message) this.onMessage(message);
       } catch {
         // Ignore non-JSON messages (e.g. ping/pong frames)
       }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CalendarDays, Bot, Building2, Radio, ExternalLink, Loader2, Trash2, Zap, HelpCircle, CalendarOff } from "lucide-react";
 import { WhatsAppIcon, TelegramIcon, InstagramIcon, SmsIcon } from "@/components/icons/channel-icons";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TelegramWizard } from "./telegram-wizard";
 import { BusinessProfileSettings } from "./business-profile-settings";
 import { BusinessFaqSettings } from "./business-faq-settings";
@@ -790,6 +791,7 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
   const [missingCount, setMissingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
+  const [accountToDisconnect, setAccountToDisconnect] = useState<ChannelAccount | null>(null);
 
   const loadChannels = useCallback(async () => {
     const [channelsResult, profileResult] = await Promise.all([
@@ -834,10 +836,19 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
   const telegramAccount = channels.find((c) => c.channel === "telegram");
 
   async function handleConnectWhatsApp() {
+    // Open the popup synchronously on the click — opening it after the
+    // async `await` below would trip most browser popup blockers.
+    const popup = window.open("about:blank", "whatsapp-oauth", "width=600,height=720");
+    if (!popup) {
+      toast.error(t("channels.whatsapp.popupBlocked"));
+      return;
+    }
+
     // Backend issues a signed one-shot state token; the popup callback
     // rejects any other value, so we must fetch it before redirecting.
     const result = await initWhatsAppOAuthAction();
     if (!result.success || !result.data) {
+      popup.close();
       toast.error(t("channels.whatsapp.initFailed"));
       return;
     }
@@ -847,15 +858,27 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
       `&redirect_uri=${encodeURIComponent(WHATSAPP_REDIRECT_URI)}` +
       `&scope=${WHATSAPP_SCOPES}` +
       `&state=${encodeURIComponent(result.data.state)}`;
-    window.location.href = url;
+    popup.location.href = url;
+
+    const timer = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(timer);
+        loadChannels();
+      }
+    }, 500);
   }
 
-  function handleDisconnect(id: string) {
+  function handleConfirmDisconnect() {
+    if (!accountToDisconnect) return;
+    const target = accountToDisconnect;
     startTransition(async () => {
-      const result = await disconnectChannel(id);
+      const result = await disconnectChannel(target.id);
       if (result.success) {
-        setChannels((prev) => prev.filter((c) => c.id !== id));
+        setChannels((prev) => prev.filter((c) => c.id !== target.id));
+        setAccountToDisconnect(null);
+        return;
       }
+      toast.error(result.error ?? "Erro ao desconectar canal.");
     });
   }
 
@@ -879,7 +902,7 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
           <button
             className="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-danger-muted hover:text-danger"
             disabled={isPending}
-            onClick={() => handleDisconnect(account.id)}
+            onClick={() => setAccountToDisconnect(account)}
             title={t("channels.telegram.disconnect")}
             type="button"
           >
@@ -1014,6 +1037,18 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
           }
         />
       </div>
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={t("channels.telegram.disconnect")}
+        description={t("channels.disconnectConfirm")}
+        isPending={isPending}
+        onCancel={() => setAccountToDisconnect(null)}
+        onConfirm={handleConfirmDisconnect}
+        open={accountToDisconnect !== null}
+        title={t("channels.disconnectConfirmTitle")}
+        variant="danger"
+      />
     </div>
   );
 }

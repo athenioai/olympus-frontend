@@ -11,8 +11,11 @@ import type {
   UserDashboardSummary,
 } from "./interfaces/admin-types";
 import type {
+  AdminUserOption,
   CreateAdminUserPayload,
   IAdminUserService,
+  ListAdminUsersParams,
+  PaginatedAdminUsers,
   SeedHolidaysPayload,
   UpdateAdminUserPayload,
 } from "./interfaces/admin-user-service";
@@ -26,12 +29,30 @@ class AdminUserService implements IAdminUserService {
     return unwrapEnvelope<AdminUserPublic>(response);
   }
 
-  async list(): Promise<readonly AdminUserPublic[]> {
-    const response = await authFetch("/admin/users", {
+  async list(params?: ListAdminUsersParams): Promise<PaginatedAdminUsers> {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.set("page", String(params.page));
+    if (params?.limit !== undefined) query.set("limit", String(params.limit));
+    if (params?.search) query.set("search", params.search);
+    if (params?.planId) query.set("planId", params.planId);
+    if (params?.role) query.set("role", params.role);
+    if (params?.onboardingStatus) {
+      query.set("onboardingStatus", params.onboardingStatus);
+    }
+    const qs = query.toString();
+    const response = await authFetch(qs ? `/admin/users?${qs}` : "/admin/users", {
       revalidate: CACHE_TIMES.adminUsers,
       tags: [CACHE_TAGS.adminUsers],
     });
-    return unwrapEnvelope<readonly AdminUserPublic[]>(response);
+    return unwrapEnvelope<PaginatedAdminUsers>(response);
+  }
+
+  async listOptions(): Promise<readonly AdminUserOption[]> {
+    const response = await authFetch("/admin/users/options", {
+      revalidate: CACHE_TIMES.adminUsers,
+      tags: [CACHE_TAGS.adminUsers],
+    });
+    return unwrapEnvelope<readonly AdminUserOption[]>(response);
   }
 
   async getById(id: string): Promise<AdminUserPublic> {
@@ -102,12 +123,12 @@ class AdminUserService implements IAdminUserService {
 
   async getChatMessages(
     id: string,
-    sessionId: string,
+    chatId: string,
   ): Promise<readonly AdminChatMessage[]> {
     // Messages stay uncached: admins expect the freshest thread when they
     // click into a chat, and stale messages undermine moderation reviews.
     const response = await authFetch(
-      `/admin/users/${encodeURIComponent(id)}/chats/${encodeURIComponent(sessionId)}/messages`,
+      `/admin/users/${encodeURIComponent(id)}/chats/${encodeURIComponent(chatId)}/messages`,
       { cache: "no-store" },
     );
     return unwrapEnvelope<readonly AdminChatMessage[]>(response);

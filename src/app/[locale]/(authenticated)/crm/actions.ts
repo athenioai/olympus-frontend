@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { leadService } from "@/lib/services";
+import { ApiError } from "@/lib/api-envelope";
 import { captureUnexpected } from "@/lib/observability/capture";
 import { counter } from "@/lib/observability/sentry-metrics";
 import type {
@@ -10,6 +12,7 @@ import type {
   LeadPublic,
   LeadStatus,
   LeadTemperature,
+  LeadWithLastMessage,
   PaginatedColumnResponse,
   TimelineEntry,
   TimelineEntryType,
@@ -54,12 +57,14 @@ function isValidTemperature(v: unknown): v is LeadTemperature {
  * into a LeadBoardItem with null/empty enrichment. The board card renders
  * gracefully when enrichment is absent.
  */
-function toBoardItem(lead: LeadPublic): LeadBoardItem {
+function toBoardItem(lead: LeadWithLastMessage): LeadBoardItem {
   return {
     ...lead,
-    avatarUrl: null,
-    lastMessage: null,
-    tags: [],
+    metadata: lead.metadata,
+    deletedAt: null,
+    avatarUrl: lead.avatarUrl,
+    lastMessage: lead.lastMessage,
+    tags: lead.tags,
     customFields: [],
   };
 }
@@ -144,7 +149,7 @@ export async function fetchColumnLeads(
       return {
         success: true,
         data: {
-          data: r.data.map(toBoardItem),
+          items: r.items.map(toBoardItem),
           total: r.total,
           page: r.page,
           limit: r.limit,
@@ -257,6 +262,21 @@ export async function updateLeadStatus(
     revalidatePath("/crm");
     return { success: true, data };
   } catch (error) {
+    console.error("[updateLeadStatus] error", {
+      id,
+      requestedStatus: status,
+      err:
+        error instanceof ApiError
+          ? {
+              kind: "ApiError",
+              code: error.code,
+              message: error.message,
+              status: error.status,
+            }
+          : error instanceof Error
+            ? { kind: "Error", name: error.name, message: error.message }
+            : { kind: "unknown", value: error },
+    });
     return {
       success: false,
       error: safeError(error, "Erro ao mover lead."),
@@ -265,9 +285,11 @@ export async function updateLeadStatus(
 }
 
 /**
- * Delete a lead by ID.
+ * Delete a lead by ID, revalidate the board, and redirect the caller to /crm.
+ * On success the function never returns: `redirect()` throws and the Server
+ * Action framework streams a navigation instruction to the client. Failures
+ * return a `{ success: false, error }` envelope so the caller can toast it.
  * @param id - UUID of the lead
- * @returns Success or error
  */
 export async function deleteLead(
   id: string,
@@ -276,14 +298,17 @@ export async function deleteLead(
 
   try {
     await leadService.deleteLead(id);
-    revalidatePath("/crm");
-    return { success: true };
   } catch (error) {
     return {
       success: false,
       error: safeError(error, "Erro ao deletar lead."),
     };
   }
+
+  revalidatePath("/crm");
+  revalidatePath(`/leads/${id}`);
+  revalidatePath("/leads");
+  redirect("/crm");
 }
 
 /**
@@ -295,7 +320,7 @@ export async function deleteLead(
 export async function searchLeadsQuick(
   query: string,
   limit = 8,
-): Promise<{ success: boolean; data?: LeadPublic[]; error?: string }> {
+): Promise<{ success: boolean; data?: LeadWithLastMessage[]; error?: string }> {
   const q = typeof query === "string" ? query.trim() : "";
   if (q.length === 0) return { success: true, data: [] };
 
@@ -305,7 +330,7 @@ export async function searchLeadsQuick(
 
   try {
     const r = await leadService.listLeads({ search: q, limit });
-    return { success: true, data: r.data };
+    return { success: true, data: r.items };
   } catch (error) {
     return {
       success: false,

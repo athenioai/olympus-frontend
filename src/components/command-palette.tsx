@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/format";
 import { STAGE_PAST_PILL, stageDotClass } from "@/lib/stage-palette";
 import { searchLeadsQuick } from "@/app/[locale]/(authenticated)/crm/actions";
-import type { LeadPublic } from "@/lib/services/interfaces/lead-service";
+import type { LeadWithLastMessage } from "@/lib/services/interfaces/lead-service";
 
 interface NavEntry {
   readonly href: string;
@@ -47,7 +47,7 @@ export function CommandPalette() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [leads, setLeads] = useState<LeadPublic[]>([]);
+  const [leads, setLeads] = useState<LeadWithLastMessage[]>([]);
   const [searching, setSearching] = useState(false);
   const debounceRef = useRef<number | null>(null);
 
@@ -201,7 +201,7 @@ function LeadItem({
   lead,
   onSelect,
 }: {
-  readonly lead: LeadPublic;
+  readonly lead: LeadWithLastMessage;
   readonly onSelect: () => void;
 }) {
   return (

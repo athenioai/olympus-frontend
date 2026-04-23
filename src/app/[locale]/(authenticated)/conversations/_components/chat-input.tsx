@@ -49,7 +49,7 @@ function getAiTextColor(agent: string) {
 /* ---------- Component ---------- */
 
 interface ChatInputProps {
-  readonly sessionId: string;
+  readonly chatId: string;
   readonly agent: string;
   readonly handoff: boolean;
   readonly onHandoffChange: (active: boolean) => void;
@@ -58,7 +58,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({
-  sessionId,
+  chatId,
   agent,
   handoff,
   onHandoffChange,
@@ -97,7 +97,7 @@ export function ChatInput({
 
     const optimisticMessage: ChatMessage = {
       id: crypto.randomUUID(),
-      chatId: sessionId,
+      chatId: chatId,
       sender: "human",
       content,
       createdAt: new Date().toISOString(),
@@ -112,7 +112,7 @@ export function ChatInput({
     onMessageSent(optimisticMessage);
     setIsSending(true);
 
-    const result = await sendMessageToLead(sessionId, content);
+    const result = await sendMessageToLead(chatId, content);
     setIsSending(false);
 
     if (!result.success) {
@@ -121,7 +121,7 @@ export function ChatInput({
   }
 
   async function handleTakeover() {
-    const result = await activateHandoff(sessionId);
+    const result = await activateHandoff(chatId);
     if (result.success) {
       onHandoffChange(true);
       requestAnimationFrame(() => textareaRef.current?.focus());
@@ -129,7 +129,7 @@ export function ChatInput({
   }
 
   async function handleReturn() {
-    const result = await deactivateHandoff(sessionId);
+    const result = await deactivateHandoff(chatId);
     if (result.success) {
       onHandoffChange(false);
     }

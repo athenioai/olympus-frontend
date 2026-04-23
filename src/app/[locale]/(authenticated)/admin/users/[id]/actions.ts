@@ -65,19 +65,30 @@ export async function updateCalendarConfigAction(
     return { success: false, error: firstError };
   }
 
+  let data: AdminCalendarConfig;
   try {
-    const data = await adminUserService.updateCalendarConfig(userId, parsed.data);
-    updateTag(CACHE_TAGS.adminUserDetail);
-    revalidatePath(`/admin/users/${userId}`);
-    return { success: true, data };
+    data = await adminUserService.updateCalendarConfig(userId, parsed.data);
   } catch (err) {
     return { success: false, error: mapErr(err) };
   }
+
+  // Revalidation is best-effort: the backend already persisted the new
+  // config, so a failure here (e.g. `updateTag` throwing when the work store
+  // shape changes between Next releases) should NOT turn a successful save
+  // into a red toast. QA Bug 38 flagged exactly that false-negative.
+  try {
+    updateTag(CACHE_TAGS.adminUserDetail);
+    revalidatePath(`/admin/users/${userId}`, "page");
+  } catch (revalidateErr) {
+    captureUnexpected(revalidateErr);
+  }
+
+  return { success: true, data };
 }
 
 export async function loadChatMessagesAction(
   userId: string,
-  sessionId: string,
+  chatId: string,
 ): Promise<ChatMessagesResult> {
   const guard = await requireAdmin();
   if (!guard.ok) return { success: false, error: guard.error };
@@ -85,20 +96,33 @@ export async function loadChatMessagesAction(
   if (!idSchema.safeParse(userId).success) {
     return { success: false, error: "INVALID_ID" };
   }
-  if (!idSchema.safeParse(sessionId).success) {
-    return { success: false, error: "INVALID_SESSION_ID" };
+  if (!idSchema.safeParse(chatId).success) {
+    return { success: false, error: "INVALID_CHAT_ID" };
   }
 
   try {
-    const data = await adminUserService.getChatMessages(userId, sessionId);
+    const data = await adminUserService.getChatMessages(userId, chatId);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: mapErr(err) };
   }
 }
 
+const FRIENDLY_ERRORS: Record<string, string> = {
+  NOT_FOUND: "Usuário não encontrado.",
+  FORBIDDEN: "Você não tem permissão para esta ação.",
+  INVALID_INPUT: "Dados inválidos. Revise e tente novamente.",
+  INVALID_TIME_FORMAT: "Formato de horário inválido. Use HH:MM.",
+  TIME_RANGE_INVERTED: "Horário final deve ser após o inicial.",
+};
+
 function mapErr(err: unknown): string {
   captureUnexpected(err);
-  if (err instanceof ApiError || err instanceof Error) return err.message;
-  return "UNKNOWN_ERROR";
+  if (err instanceof ApiError) {
+    return FRIENDLY_ERRORS[err.code] ?? "Não foi possível salvar. Tente novamente.";
+  }
+  if (err instanceof Error) {
+    return FRIENDLY_ERRORS[err.message] ?? "Não foi possível salvar. Tente novamente.";
+  }
+  return "Não foi possível salvar. Tente novamente.";
 }

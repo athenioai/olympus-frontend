@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useTransition, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
@@ -13,6 +14,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { BrlInput } from "@/components/ui/brl-input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { FileInput } from "@/components/ui/file-input";
 import { cn } from "@/lib/utils";
 import { formatBRL } from "@/lib/format";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
@@ -52,6 +55,16 @@ function ProductFormModal({
     product ? Math.round(product.price * 100) : 0,
   );
 
+  // Override the browser-localized "Please fill out this field" tooltip so
+  // pt-BR users don't see English copy on required-field validation.
+  function setLocalizedValidity(el: HTMLInputElement): void {
+    if (el.validity.valueMissing) {
+      el.setCustomValidity(tc("fieldRequired"));
+    } else {
+      el.setCustomValidity("");
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
@@ -80,7 +93,10 @@ function ProductFormModal({
               id="prod-name"
               maxLength={255}
               name="name"
+              onInput={(e) => setLocalizedValidity(e.currentTarget)}
+              onInvalid={(e) => setLocalizedValidity(e.currentTarget)}
               required
+              type="text"
             />
           </div>
           <div className="space-y-1.5">
@@ -129,12 +145,10 @@ function ProductFormModal({
             <label className="text-sm font-medium text-on-surface" htmlFor="prod-image">
               {t("image")}
             </label>
-            <input
+            <FileInput
               accept="image/jpeg,image/png,image/webp"
-              className="h-10 w-full rounded-xl bg-surface-container-high px-4 text-sm text-on-surface-variant file:mr-4 file:rounded-lg file:border-0 file:bg-primary/8 file:px-3 file:py-1 file:text-sm file:font-medium file:text-primary"
               id="prod-image"
               name="image"
-              type="file"
             />
             <p className="text-xs text-on-surface-variant">{t("imageRequirements")}</p>
           </div>
@@ -265,13 +279,14 @@ function StatusToggle({ active, onToggle, disabled }: StatusToggleProps) {
 
 interface ProductRowProps {
   readonly product: Product;
+  readonly active: boolean;
   readonly onEdit: (product: Product) => void;
-  readonly onDelete: (id: string) => void;
+  readonly onDelete: () => void;
   readonly onToggleStatus: (id: string, active: boolean) => void;
   readonly isPending: boolean;
 }
 
-function ProductRow({ product, onEdit, onDelete, onToggleStatus, isPending }: ProductRowProps) {
+function ProductRow({ product, active, onEdit, onDelete, onToggleStatus, isPending }: ProductRowProps) {
   return (
     <motion.div
       className="grid items-center rounded-xl bg-surface-container-lowest px-5 py-4 transition-colors hover:bg-surface-container-low/50 sm:grid-cols-[2fr_1fr_1fr_48px]"
@@ -314,9 +329,8 @@ function ProductRow({ product, onEdit, onDelete, onToggleStatus, isPending }: Pr
       {/* Status */}
       <div className="hidden justify-center sm:flex">
         <StatusToggle
-          active={product.active}
-          disabled={isPending}
-          onToggle={() => onToggleStatus(product.id, !product.active)}
+          active={active}
+          onToggle={() => onToggleStatus(product.id, !active)}
         />
       </div>
 
@@ -324,7 +338,7 @@ function ProductRow({ product, onEdit, onDelete, onToggleStatus, isPending }: Pr
       <div className="hidden justify-end sm:flex">
         <ActionsMenu
           isPending={isPending}
-          onDelete={() => onDelete(product.id)}
+          onDelete={onDelete}
           onEdit={() => onEdit(product)}
         />
       </div>
@@ -337,15 +351,37 @@ function ProductRow({ product, onEdit, onDelete, onToggleStatus, isPending }: Pr
 // ---------------------------------------------------------------------------
 
 type StatusFilter = "all" | "active" | "inactive";
+type TriState = "all" | "yes" | "no";
 
 export function ProductsTable({ products }: ProductsTableProps) {
   const t = useTranslations("catalog");
   const tc = useTranslations("common");
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [hasImageFilter, setHasImageFilter] = useState<TriState>("all");
+  const [hasPromoFilter, setHasPromoFilter] = useState<TriState>("all");
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  // Optimistic override for toggles in flight, keyed by product id. Cleared
+  // once the revalidation from the server action refreshes the `products` prop.
+  const [optimisticActive, setOptimisticActive] = useState<
+    Record<string, boolean>
+  >({});
+
+  const requirePrepayment = products[0]?.requirePrepayment ?? false;
+
+  function resolveActive(product: Product): boolean {
+    const override = optimisticActive[product.id];
+    if (typeof override === "boolean") return override;
+    // Backend hoje não expõe `active` no shape público, mas a listagem
+    // padrão só devolve itens ativos — default pra true quando ausente.
+    return product.active ?? true;
+  }
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
@@ -355,16 +391,45 @@ export function ProductsTable({ products }: ProductsTableProps) {
     }
     if (statusFilter !== "all") {
       const isActive = statusFilter === "active";
-      result = result.filter((p) => p.active === isActive);
+      // Coerce null/undefined active to false so "Inativo" matches legacy rows
+      // whose status column was never explicitly set.
+      result = result.filter((p) => resolveActive(p) === isActive);
+    }
+    const minNum = Number.parseFloat(priceMin);
+    if (Number.isFinite(minNum) && minNum >= 0) {
+      result = result.filter((p) => p.price >= minNum);
+    }
+    const maxNum = Number.parseFloat(priceMax);
+    if (Number.isFinite(maxNum) && maxNum >= 0) {
+      result = result.filter((p) => p.price <= maxNum);
+    }
+    if (hasImageFilter !== "all") {
+      const want = hasImageFilter === "yes";
+      result = result.filter((p) => Boolean(p.imageUrl) === want);
+    }
+    if (hasPromoFilter !== "all") {
+      const want = hasPromoFilter === "yes";
+      result = result.filter((p) => Boolean(p.specialDiscount) === want);
     }
     return result;
-  }, [products, searchQuery, statusFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    products,
+    searchQuery,
+    statusFilter,
+    priceMin,
+    priceMax,
+    hasImageFilter,
+    hasPromoFilter,
+    optimisticActive,
+  ]);
 
   function handleCreate(formData: FormData) {
     startTransition(async () => {
       const result = await createProduct(formData);
       if (result.success) {
         setShowCreateModal(false);
+        router.refresh();
       } else {
         toast.error(result.error ?? tc("error"));
       }
@@ -377,28 +442,41 @@ export function ProductsTable({ products }: ProductsTableProps) {
       const result = await updateProduct(editingProduct.id, formData);
       if (result.success) {
         setEditingProduct(null);
+        router.refresh();
       } else {
         toast.error(result.error ?? tc("error"));
       }
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm(t("deleteConfirm"))) return;
+  function handleConfirmDelete() {
+    if (!productToDelete) return;
+    const target = productToDelete;
     startTransition(async () => {
-      const result = await deleteProduct(id);
-      if (!result.success) {
+      const result = await deleteProduct(target.id);
+      if (result.success) {
+        setProductToDelete(null);
+        router.refresh();
+      } else {
         toast.error(result.error ?? tc("error"));
       }
     });
   }
 
   function handleToggleStatus(id: string, active: boolean) {
+    setOptimisticActive((prev) => ({ ...prev, [id]: active }));
     startTransition(async () => {
       const result = await toggleProductStatus(id, active);
+      setOptimisticActive((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       if (!result.success) {
         toast.error(result.error ?? tc("error"));
+        return;
       }
+      router.refresh();
     });
   }
 
@@ -425,6 +503,15 @@ export function ProductsTable({ products }: ProductsTableProps) {
           </button>
         </div>
       </motion.div>
+
+      {requirePrepayment && (
+        <motion.div
+          className="mb-4 rounded-xl bg-primary/10 px-4 py-3 text-[13px] font-medium text-primary"
+          variants={fadeInUp}
+        >
+          {t("requirePrepaymentNotice")}
+        </motion.div>
+      )}
 
       {/* Filters */}
       <motion.div
@@ -464,6 +551,45 @@ export function ProductsTable({ products }: ProductsTableProps) {
         </div>
       </motion.div>
 
+      {/* Advanced filters */}
+      <motion.div
+        className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4"
+        variants={fadeInUp}
+      >
+        <input
+          className={FILTER_INPUT_CLASS}
+          inputMode="decimal"
+          onChange={(e) => setPriceMin(e.target.value.replace(/[^\d.,]/g, ""))}
+          placeholder={t("priceMinPlaceholder")}
+          value={priceMin}
+        />
+        <input
+          className={FILTER_INPUT_CLASS}
+          inputMode="decimal"
+          onChange={(e) => setPriceMax(e.target.value.replace(/[^\d.,]/g, ""))}
+          placeholder={t("priceMaxPlaceholder")}
+          value={priceMax}
+        />
+        <select
+          className={FILTER_INPUT_CLASS}
+          onChange={(e) => setHasImageFilter(e.target.value as TriState)}
+          value={hasImageFilter}
+        >
+          <option value="all">{t("hasImageAny")}</option>
+          <option value="yes">{t("hasImageYes")}</option>
+          <option value="no">{t("hasImageNo")}</option>
+        </select>
+        <select
+          className={FILTER_INPUT_CLASS}
+          onChange={(e) => setHasPromoFilter(e.target.value as TriState)}
+          value={hasPromoFilter}
+        >
+          <option value="all">{t("hasPromoAny")}</option>
+          <option value="yes">{t("hasPromoYes")}</option>
+          <option value="no">{t("hasPromoNo")}</option>
+        </select>
+      </motion.div>
+
       {/* Column headers */}
       <motion.div
         className="mb-3 hidden grid-cols-[2fr_1fr_1fr_48px] items-center px-5 sm:grid"
@@ -498,9 +624,10 @@ export function ProductsTable({ products }: ProductsTableProps) {
         <motion.div className="space-y-2" variants={staggerContainer}>
           {filteredProducts.map((product) => (
             <ProductRow
+              active={resolveActive(product)}
               isPending={isPending}
               key={product.id}
-              onDelete={handleDelete}
+              onDelete={() => setProductToDelete(product)}
               onEdit={setEditingProduct}
               onToggleStatus={handleToggleStatus}
               product={product}
@@ -525,6 +652,20 @@ export function ProductsTable({ products }: ProductsTableProps) {
           product={editingProduct}
         />
       )}
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setProductToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        open={productToDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </motion.div>
   );
 }
+
+const FILTER_INPUT_CLASS =
+  "h-10 w-full rounded-xl bg-surface-container-lowest px-3 text-sm text-on-surface shadow-[inset_0_0_0_1px_rgba(175,179,176,0.15)] outline-none transition-all placeholder:text-on-surface-variant/50 focus:shadow-[inset_0_0_0_1px_rgba(137,81,0,0.3)]";

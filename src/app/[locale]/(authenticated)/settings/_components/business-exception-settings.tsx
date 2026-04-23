@@ -15,15 +15,18 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 import { fetchExceptions, createException, updateException, deleteException } from "../business-exception-actions";
 import type { BusinessException, ExceptionType, BusinessExceptionRange } from "@/lib/services";
 
 export function BusinessExceptionSettings() {
   const t = useTranslations("settings");
+  const tc = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(true);
   const [exceptions, setExceptions] = useState<BusinessException[]>([]);
+  const [exceptionToDelete, setExceptionToDelete] = useState<BusinessException | null>(null);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -62,7 +65,10 @@ export function BusinessExceptionSettings() {
   }
 
   function handleSave() {
-    if (!date) return;
+    if (!date) {
+      toast.error(t("exceptions.validationDateRequired"));
+      return;
+    }
     if (type === "special_hours" && ranges.length === 0) {
       toast.error("Adicione pelo menos um horário");
       return;
@@ -98,12 +104,15 @@ export function BusinessExceptionSettings() {
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm(t("exceptions.deleteConfirm"))) return;
+  function handleConfirmDelete() {
+    if (!exceptionToDelete) return;
+    const target = exceptionToDelete;
     startTransition(async () => {
-      const result = await deleteException(id);
+      const result = await deleteException(target.id);
       if (result.success) {
-        setExceptions((prev) => prev.filter((e) => e.id !== id));
+        setExceptions((prev) => prev.filter((e) => e.id !== target.id));
+        setExceptionToDelete(null);
+        toast.success(tc("delete"));
       } else {
         toast.error(result.error ?? "Erro ao excluir");
       }
@@ -237,7 +246,7 @@ export function BusinessExceptionSettings() {
                 </button>
                 <button
                   className="rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-40"
-                  disabled={isPending || !date}
+                  disabled={isPending}
                   onClick={handleSave}
                   type="button"
                 >
@@ -314,7 +323,7 @@ export function BusinessExceptionSettings() {
                 <button
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant/40 transition-colors hover:bg-danger-muted hover:text-danger"
                   disabled={isPending}
-                  onClick={() => handleDelete(ex.id)}
+                  onClick={() => setExceptionToDelete(ex)}
                   type="button"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -324,6 +333,18 @@ export function BusinessExceptionSettings() {
           ))}
         </motion.div>
       )}
+
+      <ConfirmDialog
+        cancelLabel={tc("cancel")}
+        confirmLabel={tc("delete")}
+        description={t("exceptions.deleteConfirm")}
+        isPending={isPending}
+        onCancel={() => setExceptionToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        open={exceptionToDelete !== null}
+        title={tc("confirm")}
+        variant="danger"
+      />
     </motion.div>
   );
 }

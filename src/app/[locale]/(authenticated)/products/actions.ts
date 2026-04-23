@@ -1,10 +1,42 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { ApiError } from "@/lib/api-envelope";
+import { CACHE_TAGS } from "@/lib/cache-config";
 import { financeService } from "@/lib/services";
 import { captureUnexpected } from "@/lib/observability/capture";
-import type { Service, Product } from "@/lib/services";
+import type {
+  CreateCatalogPayload,
+  Service,
+  Product,
+} from "@/lib/services";
+
+function invalidateCatalogCaches(): void {
+  updateTag(CACHE_TAGS.services);
+  updateTag(CACHE_TAGS.products);
+}
+
+const FRIENDLY_ERRORS: Record<string, string> = {
+  CATALOG_ACCESS_001: "Seu plano não dá acesso a esta área.",
+  CATALOG_DUPLICATE_001: "Já existe um item com este nome.",
+  CATALOG_NOT_FOUND_001: "Item não encontrado.",
+  AVATAR_MIME_001: "Formato de imagem não suportado. Envie um PNG, JPEG ou WebP.",
+  AVATAR_SIZE_001: "Imagem muito grande. O limite é 5MB.",
+  AVATAR_CONTENT_001: "Arquivo corrompido ou não condiz com o tipo declarado.",
+  AVATAR_UPLOAD_001: "Falha ao enviar imagem. Tente novamente.",
+};
+
+const GENERIC_ERROR =
+  "Não foi possível completar a operação. Tente novamente.";
+
+function catalogErrorMessage(err: unknown): string {
+  captureUnexpected(err);
+  if (err instanceof ApiError) {
+    return FRIENDLY_ERRORS[err.code] ?? GENERIC_ERROR;
+  }
+  return GENERIC_ERROR;
+}
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -46,12 +78,24 @@ async function validateImageMagicBytes(file: File): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 const serviceSchema = z.object({
-  name: z.string().min(1).max(255),
-  description: z.string().max(2000).optional(),
+  name: z
+    .string()
+    .min(1, "Nome é obrigatório.")
+    .max(255, "Nome deve ter no máximo 255 caracteres."),
+  description: z
+    .string()
+    .max(2000, "Descrição deve ter no máximo 2000 caracteres.")
+    .optional(),
   // Must be a positive value — 0 would let an operator publish a "free"
   // item by mistake and the backend accepts it silently.
-  price: z.coerce.number().min(0.01).max(999_999.99),
-  agentInstructions: z.string().max(2000).optional(),
+  price: z.coerce
+    .number({ message: "Preço inválido." })
+    .min(0.01, "O preço mínimo é R$ 0,01.")
+    .max(999_999.99, "O preço máximo é R$ 999.999,99."),
+  agentInstructions: z
+    .string()
+    .max(2000, "Instruções devem ter no máximo 2000 caracteres.")
+    .optional(),
 });
 
 const productSchema = serviceSchema;
@@ -76,41 +120,41 @@ async function validateImageFromFormData(
   }
 
   if (image.size > MAX_IMAGE_SIZE) {
-    return "Image must be under 5MB.";
+    return "A imagem deve ter no máximo 5MB.";
   }
 
   const validMagic = await validateImageMagicBytes(image);
   if (!validMagic) {
-    return "Image must be JPEG, PNG, or WebP.";
+    return "A imagem deve ser JPEG, PNG ou WebP.";
   }
 
   return null;
 }
 
 /**
- * Build a FormData payload for the finance service from validated fields.
- * @param fields - Validated schema fields
- * @param rawFormData - Original FormData (for the image file)
- * @returns FormData ready for the finance service
+ * Build a JSON payload for the catalog service from validated fields.
  */
-function buildServiceFormData(
+function buildCatalogPayload(
   fields: z.infer<typeof serviceSchema>,
-  rawFormData: FormData,
-): FormData {
-  const fd = new FormData();
-  fd.set("name", fields.name);
-  if (fields.description) fd.set("description", fields.description);
-  fd.set("price", String(fields.price));
-  if (fields.agentInstructions) {
-    fd.set("agentInstructions", fields.agentInstructions);
-  }
+): CreateCatalogPayload {
+  return {
+    name: fields.name,
+    price: fields.price,
+    ...(fields.description ? { description: fields.description } : {}),
+    ...(fields.agentInstructions
+      ? { agentInstructions: fields.agentInstructions }
+      : {}),
+  };
+}
 
-  const image = rawFormData.get("image");
-  if (image instanceof File && image.size > 0) {
-    fd.set("image", image);
-  }
-
-  return fd;
+/**
+ * Extract the image file from FormData when the user picked one. Returns null
+ * when the "image" field is absent or empty so callers can skip the upload.
+ */
+function getImageFile(formData: FormData): File | null {
+  const image = formData.get("image");
+  if (!(image instanceof File) || image.size === 0) return null;
+  return image;
 }
 
 // ---------------------------------------------------------------------------
@@ -143,14 +187,16 @@ export async function createService(
   }
 
   try {
-    const fd = buildServiceFormData(parsed.data, formData);
-    const data = await financeService.createService(fd);
+    const imageFile = getImageFile(formData);
+    const data = await financeService.createService(
+      buildCatalogPayload(parsed.data),
+      imageFile ?? undefined,
+    );
+    invalidateCatalogCaches();
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -166,7 +212,7 @@ export async function updateService(
 ): Promise<ActionResult<Service>> {
   const idResult = uuidSchema.safeParse(id);
   if (!idResult.success) {
-    return { success: false, error: "Invalid service ID." };
+    return { success: false, error: "ID de serviço inválido." };
   }
 
   const raw = {
@@ -187,14 +233,19 @@ export async function updateService(
   }
 
   try {
-    const fd = buildServiceFormData(parsed.data, formData);
-    const data = await financeService.updateService(id, fd);
+    let data = await financeService.updateService(
+      id,
+      buildCatalogPayload(parsed.data),
+    );
+    const imageFile = getImageFile(formData);
+    if (imageFile) {
+      data = await financeService.uploadServiceImage(id, imageFile);
+    }
+    invalidateCatalogCaches();
     revalidatePath("/services");
     return { success: true, data };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -208,17 +259,16 @@ export async function deleteService(
 ): Promise<ActionResult> {
   const idResult = uuidSchema.safeParse(id);
   if (!idResult.success) {
-    return { success: false, error: "Invalid service ID." };
+    return { success: false, error: "ID de serviço inválido." };
   }
 
   try {
     await financeService.deleteService(id);
+    invalidateCatalogCaches();
     revalidatePath("/services");
     return { success: true };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -252,14 +302,16 @@ export async function createProduct(
   }
 
   try {
-    const fd = buildServiceFormData(parsed.data, formData);
-    const data = await financeService.createProduct(fd);
+    const imageFile = getImageFile(formData);
+    const data = await financeService.createProduct(
+      buildCatalogPayload(parsed.data),
+      imageFile ?? undefined,
+    );
+    invalidateCatalogCaches();
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -275,7 +327,7 @@ export async function updateProduct(
 ): Promise<ActionResult<Product>> {
   const idResult = uuidSchema.safeParse(id);
   if (!idResult.success) {
-    return { success: false, error: "Invalid product ID." };
+    return { success: false, error: "ID de produto inválido." };
   }
 
   const raw = {
@@ -296,14 +348,19 @@ export async function updateProduct(
   }
 
   try {
-    const fd = buildServiceFormData(parsed.data, formData);
-    const data = await financeService.updateProduct(id, fd);
+    let data = await financeService.updateProduct(
+      id,
+      buildCatalogPayload(parsed.data),
+    );
+    const imageFile = getImageFile(formData);
+    if (imageFile) {
+      data = await financeService.uploadProductImage(id, imageFile);
+    }
+    invalidateCatalogCaches();
     revalidatePath("/products");
     return { success: true, data };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -317,17 +374,16 @@ export async function deleteProduct(
 ): Promise<ActionResult> {
   const idResult = uuidSchema.safeParse(id);
   if (!idResult.success) {
-    return { success: false, error: "Invalid product ID." };
+    return { success: false, error: "ID de produto inválido." };
   }
 
   try {
     await financeService.deleteProduct(id);
+    invalidateCatalogCaches();
     revalidatePath("/products");
     return { success: true };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
 
@@ -343,18 +399,15 @@ export async function toggleProductStatus(
 ): Promise<ActionResult> {
   const idResult = uuidSchema.safeParse(id);
   if (!idResult.success) {
-    return { success: false, error: "Invalid product ID." };
+    return { success: false, error: "ID de produto inválido." };
   }
 
   try {
-    const fd = new FormData();
-    fd.set("active", String(active));
-    await financeService.updateProduct(id, fd);
+    await financeService.updateProduct(id, { active });
+    invalidateCatalogCaches();
     revalidatePath("/products");
     return { success: true };
   } catch (err) {
-    captureUnexpected(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return { success: false, error: message };
+    return { success: false, error: catalogErrorMessage(err) };
   }
 }
