@@ -188,7 +188,6 @@ export function BusinessProfileSettings() {
   const [paymentPolicy, setPaymentPolicy] = useState("");
   const [cancellationPolicy, setCancellationPolicy] = useState("");
   const [differentials, setDifferentials] = useState("");
-  const [escalationRules, setEscalationRules] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [legalName, setLegalName] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
@@ -225,7 +224,6 @@ export function BusinessProfileSettings() {
         setPaymentPolicy(pv.profile.paymentPolicy ?? "");
         setCancellationPolicy(pv.profile.cancellationPolicy ?? "");
         setDifferentials(pv.profile.differentials ?? "");
-        setEscalationRules(pv.profile.escalationRules ?? "");
         setCnpj(pv.profile.cnpj ? maskCnpj(pv.profile.cnpj) : "");
         setLegalName(pv.profile.legalName ?? "");
         setFoundedYear(pv.profile.foundedYear ? String(pv.profile.foundedYear) : "");
@@ -253,7 +251,6 @@ export function BusinessProfileSettings() {
     const trimmedPayment = paymentPolicy.trim();
     const trimmedCancellation = cancellationPolicy.trim();
     const trimmedDifferentials = differentials.trim();
-    const trimmedEscalation = escalationRules.trim();
     const trimmedLegalName = legalName.trim();
     const cnpjDigits = cnpj.replace(/\D/g, "");
 
@@ -296,7 +293,6 @@ export function BusinessProfileSettings() {
         paymentPolicy: trimmedPayment,
         cancellationPolicy: trimmedCancellation,
         differentials: trimmedDifferentials || null,
-        escalationRules: trimmedEscalation || null,
         cnpj: cnpjDigits || null,
         legalName: trimmedLegalName || null,
         foundedYear: parsedYear,
@@ -545,10 +541,6 @@ export function BusinessProfileSettings() {
           <div>
             <label className={labelCls}>{t("profile.fields.differentials")}</label>
             <textarea className={textareaCls} maxLength={2000} onChange={(e) => setDifferentials(e.target.value)} placeholder={t("profile.fields.differentialsPlaceholder")} value={differentials} />
-          </div>
-          <div>
-            <label className={labelCls}>{t("profile.fields.escalationRules")}</label>
-            <textarea className={textareaCls} maxLength={2000} onChange={(e) => setEscalationRules(e.target.value)} placeholder={t("profile.fields.escalationRulesPlaceholder")} value={escalationRules} />
           </div>
         </div>
       </motion.section>

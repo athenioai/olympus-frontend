@@ -12,7 +12,6 @@ function buildProfile(overrides: Partial<BusinessProfile> = {}): BusinessProfile
     paymentPolicy: "Accept pix",
     cancellationPolicy: "Up to 24h",
     differentials: null,
-    escalationRules: null,
     cnpj: null,
     legalName: null,
     foundedYear: null,

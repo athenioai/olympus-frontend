@@ -12,7 +12,6 @@ export interface BusinessProfile {
   readonly paymentPolicy: string;
   readonly cancellationPolicy: string;
   readonly differentials: string | null;
-  readonly escalationRules: string | null;
   readonly cnpj: string | null;
   readonly legalName: string | null;
   readonly foundedYear: number | null;
@@ -64,7 +63,6 @@ export interface UpdateBusinessProfilePayload {
   readonly paymentPolicy?: string;
   readonly cancellationPolicy?: string;
   readonly differentials?: string | null;
-  readonly escalationRules?: string | null;
   readonly cnpj?: string | null;
   readonly legalName?: string | null;
   readonly foundedYear?: number | null;
