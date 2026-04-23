@@ -243,24 +243,48 @@ export function BusinessProfileSettings() {
   useEffect(() => { loadProfile(); }, [loadProfile]);
 
   function handleSave() {
+    const trimmedName = businessName.trim();
+    const trimmedDescription = businessDescription.trim();
+    const trimmedPayment = paymentPolicy.trim();
+    const trimmedCancellation = cancellationPolicy.trim();
+    const trimmedDifferentials = differentials.trim();
+    const trimmedEscalation = escalationRules.trim();
+    const trimmedLegalName = legalName.trim();
     const cnpjDigits = cnpj.replace(/\D/g, "");
+
+    const missing: string[] = [];
+    if (!trimmedName) missing.push(t("profile.fields.businessName"));
+    if (!trimmedDescription) missing.push(t("profile.fields.businessDescription"));
+    if (!trimmedPayment) missing.push(t("profile.fields.paymentPolicy"));
+    if (!trimmedCancellation) missing.push(t("profile.fields.cancellationPolicy"));
+    if (missing.length > 0) {
+      toast.error(t("profile.errors.missingRequired", { fields: missing.join(", ") }));
+      return;
+    }
+
     if (cnpjDigits && !isValidCNPJ(cnpjDigits)) {
       toast.error(t("profile.errors.cnpjInvalid"));
       return;
     }
 
+    const parsedYear = foundedYear ? Number(foundedYear) : null;
+    if (parsedYear !== null && (!Number.isFinite(parsedYear) || parsedYear < 1800 || parsedYear > new Date().getFullYear())) {
+      toast.error(t("profile.errors.foundedYearInvalid"));
+      return;
+    }
+
     startTransition(async () => {
       const profileResult = await saveBusinessProfile({
-        businessName: businessName.trim(),
-        businessDescription: businessDescription.trim(),
+        businessName: trimmedName,
+        businessDescription: trimmedDescription,
         serviceModality,
-        paymentPolicy: paymentPolicy.trim(),
-        cancellationPolicy: cancellationPolicy.trim(),
-        differentials: differentials.trim() || null,
-        escalationRules: escalationRules.trim() || null,
+        paymentPolicy: trimmedPayment,
+        cancellationPolicy: trimmedCancellation,
+        differentials: trimmedDifferentials || null,
+        escalationRules: trimmedEscalation || null,
         cnpj: cnpjDigits || null,
-        legalName: legalName.trim() || null,
-        foundedYear: foundedYear ? Number(foundedYear) : null,
+        legalName: trimmedLegalName || null,
+        foundedYear: parsedYear,
       });
 
       if (!profileResult.success) {

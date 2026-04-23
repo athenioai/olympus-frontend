@@ -758,7 +758,9 @@
       "discard": "Descartar",
       "errors": {
         "cnpjInvalid": "CNPJ inválido. Verifique os 14 dígitos.",
-        "socialUrlInvalid": "URL inválida. Use um endereço completo (ex: https://exemplo.com)."
+        "socialUrlInvalid": "URL inválida. Use um endereço completo (ex: https://exemplo.com).",
+        "missingRequired": "Preencha os campos obrigatórios: {fields}.",
+        "foundedYearInvalid": "Ano de fundação inválido."
       },
       "sections": {
         "required": "Dados obrigatórios",
