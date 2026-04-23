@@ -503,8 +503,6 @@ const TONE_CONFIG = {
   },
 } as const;
 
-const MAX_INSTRUCTIONS = 2000;
-
 function AgentSettings({ config }: { readonly config: AgentConfig }) {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
@@ -513,19 +511,12 @@ function AgentSettings({ config }: { readonly config: AgentConfig }) {
   const [agentName, setAgentName] = useState(config.agentName);
   const [profession, setProfession] = useState(config.profession ?? "");
   const [tone, setTone] = useState<"friendly" | "formal" | "casual">(config.tone);
-  const [customInstructions, setCustomInstructions] = useState(
-    config.customInstructions ?? "",
-  );
-
-  const charCount = customInstructions.length;
-  const charPercent = Math.min((charCount / MAX_INSTRUCTIONS) * 100, 100);
 
   function handleSave() {
     startTransition(async () => {
       const result = await updateAgentConfig({
         agentName,
         tone,
-        customInstructions: customInstructions.trim() || null,
         profession: profession.trim() || null,
       });
 
@@ -541,7 +532,6 @@ function AgentSettings({ config }: { readonly config: AgentConfig }) {
     setAgentName(config.agentName);
     setProfession(config.profession ?? "");
     setTone(config.tone);
-    setCustomInstructions(config.customInstructions ?? "");
   }
 
   return (
@@ -676,42 +666,6 @@ function AgentSettings({ config }: { readonly config: AgentConfig }) {
               </button>
             );
           })}
-        </div>
-      </section>
-
-      {/* ── Operational Directives ────────────────────────── */}
-      <section className="space-y-5 rounded-xl bg-surface-container-low p-8">
-        <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg font-bold tracking-tight text-on-surface">
-            {t("agent.directives")}
-          </h3>
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-on-surface-variant">
-              {charCount} / {MAX_INSTRUCTIONS} {t("agent.characters")}
-            </span>
-            <div className="h-1 w-28 overflow-hidden rounded-full bg-surface-container-high">
-              <div
-                className={cn("h-full rounded-full transition-all", charPercent > 90 ? "bg-danger" : "bg-teal")}
-                style={{ width: `${charPercent}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <textarea
-          className="w-full rounded-xl bg-surface-container-lowest border-none p-8 text-[15px] leading-relaxed text-on-surface-variant outline-none transition-all placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary/20 resize-none"
-          maxLength={MAX_INSTRUCTIONS}
-          onChange={(e) => setCustomInstructions(e.target.value)}
-          placeholder={t("agent.directivesPlaceholder")}
-          rows={8}
-          value={customInstructions}
-        />
-
-        <div className="flex items-center gap-3 rounded-lg bg-teal/5 p-4">
-          <span className="text-teal">ℹ️</span>
-          <p className="text-xs font-medium text-on-surface-variant">
-            {t("agent.directivesHint")}
-          </p>
         </div>
       </section>
 

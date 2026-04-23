@@ -620,9 +620,7 @@
         "friendly": "Amigable",
         "formal": "Formal",
         "casual": "Casual"
-      },
-      "customInstructions": "Instrucciones personalizadas",
-      "customInstructionsPlaceholder": "Instrucciones adicionales para el agente..."
+      }
     },
     "calendar": {
       "businessHours": "Horarios de atención",

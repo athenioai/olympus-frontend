@@ -28,12 +28,6 @@ const agentConfigSchema = z.object({
   tone: z.enum(["friendly", "formal", "casual"], {
     message: "Tom de voz inválido.",
   }),
-  // maxLength on the <textarea> can be bypassed via JS (QA Bug 34), so the
-  // server-side ceiling here is the authoritative one.
-  customInstructions: z
-    .string()
-    .max(2000, "As instruções devem ter no máximo 2000 caracteres.")
-    .nullable(),
   profession: z
     .string()
     .max(100, "Profissão deve ter no máximo 100 caracteres.")

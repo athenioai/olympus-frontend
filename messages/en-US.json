@@ -627,9 +627,7 @@
         "friendly": "Friendly",
         "formal": "Formal",
         "casual": "Casual"
-      },
-      "customInstructions": "Custom instructions",
-      "customInstructionsPlaceholder": "Additional instructions for the agent..."
+      }
     },
     "calendar": {
       "businessHours": "Business hours",

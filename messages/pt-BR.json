@@ -726,10 +726,6 @@
       },
       "selectTone": "Selecionar",
       "activeTone": "Ativo",
-      "directives": "Instruções Operacionais",
-      "directivesPlaceholder": "Defina a lógica e restrições do comportamento do agente...",
-      "directivesHint": "Essas instruções são a camada principal do prompt e não podem ser ignoradas pelo usuário final.",
-      "characters": "caracteres",
       "discard": "Descartar",
       "save": "Salvar configuração"
     },
