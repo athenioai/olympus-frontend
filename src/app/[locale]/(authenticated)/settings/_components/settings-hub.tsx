@@ -860,10 +860,36 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
       `&state=${encodeURIComponent(result.data.state)}`;
     popup.location.href = url;
 
+    const appOrigin = window.location.origin;
     const timer = window.setInterval(() => {
       if (popup.closed) {
         window.clearInterval(timer);
         loadChannels();
+        return;
+      }
+      // Reading popup.location throws a DOMException while the popup is
+      // cross-origin (on Facebook). The moment the backend redirects the
+      // popup back to our domain, the read succeeds — that's our signal
+      // that the OAuth handshake has finished.
+      try {
+        const href = popup.location.href;
+        if (!href || href === "about:blank") return;
+        const popupUrl = new URL(href);
+        if (popupUrl.origin !== appOrigin) return;
+
+        window.clearInterval(timer);
+        const error = popupUrl.searchParams.get("whatsapp_error");
+        popup.close();
+        if (error === "state_expired" || error === "invalid_state") {
+          toast.error(t("channels.whatsapp.stateExpired"));
+        } else if (error) {
+          toast.error(t("channels.whatsapp.connectFailed"));
+        } else {
+          toast.success(t("channels.whatsapp.connectSuccess"));
+        }
+        loadChannels();
+      } catch {
+        // Still on Facebook or mid-redirect — keep polling.
       }
     }, 500);
   }
