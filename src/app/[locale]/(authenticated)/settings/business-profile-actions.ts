@@ -30,6 +30,10 @@ function revalidate() {
 
 function describeError(err: unknown, fallback = "Unknown error"): string {
   if (err instanceof ApiError) {
+    if (err.details.length > 0) {
+      const [first] = err.details;
+      return `${first.field}: ${first.message}`;
+    }
     return `[${err.code}] ${err.message}`;
   }
   return err instanceof Error ? err.message : fallback;

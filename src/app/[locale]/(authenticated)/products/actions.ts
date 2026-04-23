@@ -31,10 +31,16 @@ const GENERIC_ERROR =
   "Não foi possível completar a operação. Tente novamente.";
 
 function catalogErrorMessage(err: unknown): string {
-  captureUnexpected(err);
   if (err instanceof ApiError) {
-    return FRIENDLY_ERRORS[err.code] ?? GENERIC_ERROR;
+    const friendly = FRIENDLY_ERRORS[err.code];
+    if (friendly) return friendly;
+    if (err.details.length > 0) {
+      const [first] = err.details;
+      return `${first.field}: ${first.message}`;
+    }
+    return GENERIC_ERROR;
   }
+  captureUnexpected(err);
   return GENERIC_ERROR;
 }
 

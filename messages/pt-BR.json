@@ -676,12 +676,31 @@
   "settings": {
     "title": "Meu Negócio",
     "tabs": {
+      "account": "Meus Dados",
       "profile": "Perfil",
       "agent": "Agente",
       "calendar": "Agenda",
       "faqs": "FAQs",
       "exceptions": "Datas Especiais",
       "channels": "Canais"
+    },
+    "account": {
+      "title": "Meus Dados",
+      "subtitle": "Dados da sua conta pessoal. Use para login e comunicações da plataforma.",
+      "name": "Nome",
+      "namePlaceholder": "Como devemos te chamar?",
+      "email": "E-mail",
+      "emailPlaceholder": "voce@exemplo.com",
+      "emailHint": "Se trocar o e-mail, ele também vira o novo login da plataforma.",
+      "save": "Salvar",
+      "saved": "Dados atualizados com sucesso.",
+      "nothingChanged": "Nenhuma alteração para salvar.",
+      "errors": {
+        "nameTooShort": "O nome precisa ter pelo menos 2 caracteres.",
+        "emailInvalid": "Informe um e-mail válido.",
+        "emailTaken": "Este e-mail já está em uso por outra conta.",
+        "generic": "Não foi possível salvar. Tente novamente."
+      }
     },
     "agent": {
       "title": "Identidade do Agente",
@@ -787,6 +806,12 @@
         "businessNamePlaceholder": "Ex: Barbearia do Lucas",
         "businessDescription": "Descrição",
         "businessDescriptionPlaceholder": "Descreva o que seu negócio faz...",
+        "workType": "Tipo de operação",
+        "workTypes": {
+          "services": "Serviços",
+          "sales": "Produtos",
+          "hybrid": "Híbrido"
+        },
         "serviceModality": "Modalidade de atendimento",
         "modalities": {
           "presencial": "Presencial",

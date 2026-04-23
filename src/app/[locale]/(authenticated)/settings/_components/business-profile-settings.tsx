@@ -39,6 +39,7 @@ import type {
   SocialPlatform,
   BusinessSocialLink,
   BusinessServiceArea,
+  WorkType,
 } from "@/lib/services";
 
 // ---------------------------------------------------------------------------
@@ -58,6 +59,8 @@ const TIER_THRESHOLDS: Record<ScoreTier, number> = {
 };
 
 const MODALITIES: ServiceModality[] = ["presencial", "remoto", "domicilio", "hibrido"];
+
+const WORK_TYPES: WorkType[] = ["services", "sales", "hybrid"];
 
 const ALL_PLATFORMS: SocialPlatform[] = ["website", "instagram", "google_reviews", "facebook", "linkedin", "youtube", "tiktok"];
 const SCORABLE_PLATFORMS: SocialPlatform[] = ["website", "instagram", "google_reviews"];
@@ -180,6 +183,7 @@ export function BusinessProfileSettings() {
   // Form state
   const [businessName, setBusinessName] = useState("");
   const [businessDescription, setBusinessDescription] = useState("");
+  const [workType, setWorkType] = useState<WorkType>("services");
   const [serviceModality, setServiceModality] = useState<ServiceModality>("presencial");
   const [paymentPolicy, setPaymentPolicy] = useState("");
   const [cancellationPolicy, setCancellationPolicy] = useState("");
@@ -216,6 +220,7 @@ export function BusinessProfileSettings() {
       if (pv.profile) {
         setBusinessName(pv.profile.businessName ?? "");
         setBusinessDescription(pv.profile.businessDescription ?? "");
+        setWorkType(pv.profile.workType ?? "services");
         setServiceModality(pv.profile.serviceModality ?? "presencial");
         setPaymentPolicy(pv.profile.paymentPolicy ?? "");
         setCancellationPolicy(pv.profile.cancellationPolicy ?? "");
@@ -286,6 +291,7 @@ export function BusinessProfileSettings() {
       const profileResult = await saveBusinessProfile({
         businessName: trimmedName,
         businessDescription: trimmedDescription,
+        workType,
         serviceModality,
         paymentPolicy: trimmedPayment,
         cancellationPolicy: trimmedCancellation,
@@ -438,6 +444,14 @@ export function BusinessProfileSettings() {
           <div>
             <label className={labelCls}>{t("profile.fields.businessDescription")} <RequiredBadge field="businessDescription" /></label>
             <textarea className={textareaCls} maxLength={2000} onChange={(e) => setBusinessDescription(e.target.value)} placeholder={t("profile.fields.businessDescriptionPlaceholder")} value={businessDescription} />
+          </div>
+          <div>
+            <label className={labelCls}>{t("profile.fields.workType")} <RequiredBadge field="workType" /></label>
+            <select className={inputCls} onChange={(e) => setWorkType(e.target.value as WorkType)} value={workType}>
+              {WORK_TYPES.map((w) => (
+                <option key={w} value={w}>{t(`profile.fields.workTypes.${w}`)}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className={labelCls}>{t("profile.fields.serviceModality")} <RequiredBadge field="serviceModality" /></label>

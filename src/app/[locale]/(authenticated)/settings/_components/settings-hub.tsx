@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useTransition, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarDays, Bot, Building2, Radio, ExternalLink, Loader2, Trash2, Zap, HelpCircle, CalendarOff } from "lucide-react";
+import { CalendarDays, Bot, Building2, Radio, ExternalLink, Loader2, Trash2, Zap, HelpCircle, CalendarOff, User } from "lucide-react";
 import { WhatsAppIcon, TelegramIcon, InstagramIcon, SmsIcon } from "@/components/icons/channel-icons";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TelegramWizard } from "./telegram-wizard";
+import { AccountSettings } from "./account-settings";
 import { BusinessProfileSettings } from "./business-profile-settings";
 import { BusinessFaqSettings } from "./business-faq-settings";
 import { BusinessExceptionSettings } from "./business-exception-settings";
@@ -33,7 +34,7 @@ import type {
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "profile" | "agent" | "calendar" | "faqs" | "exceptions" | "channels";
+type Tab = "account" | "profile" | "agent" | "calendar" | "faqs" | "exceptions" | "channels";
 
 interface SettingsHubProps {
   readonly calendarConfig: CalendarConfig;
@@ -1087,6 +1088,7 @@ function ChannelsSettings({ userId }: { readonly userId: string }) {
 // ---------------------------------------------------------------------------
 
 const TABS: { key: Tab; icon: React.ComponentType<{ className?: string }>; labelKey: string }[] = [
+  { key: "account", icon: User, labelKey: "tabs.account" },
   { key: "profile", icon: Building2, labelKey: "tabs.profile" },
   { key: "agent", icon: Bot, labelKey: "tabs.agent" },
   { key: "calendar", icon: CalendarDays, labelKey: "tabs.calendar" },
@@ -1143,6 +1145,9 @@ export function SettingsHub({
       {/* Content — scrollable */}
       <div className="min-w-0 flex-1 overflow-y-auto rounded-xl bg-surface-container-lowest">
         <div className="mx-auto max-w-5xl p-6 lg:p-8">
+          {activeTab === "account" && (
+            <AccountSettings />
+          )}
           {activeTab === "profile" && (
             <BusinessProfileSettings />
           )}
