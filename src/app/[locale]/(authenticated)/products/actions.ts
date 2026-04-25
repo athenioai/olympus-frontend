@@ -92,11 +92,9 @@ const serviceSchema = z.object({
     .string()
     .max(2000, "Descrição deve ter no máximo 2000 caracteres.")
     .optional(),
-  // Must be a positive value — 0 would let an operator publish a "free"
-  // item by mistake and the backend accepts it silently.
   price: z.coerce
     .number({ message: "Preço inválido." })
-    .min(0.01, "O preço mínimo é R$ 0,01.")
+    .min(0, "O preço não pode ser negativo.")
     .max(999_999.99, "O preço máximo é R$ 999.999,99."),
   agentInstructions: z
     .string()

@@ -17,12 +17,12 @@ export interface PlanActionResult {
 
 const createSchema = z.object({
   name: z.string().trim().min(1).max(100),
-  cost: z.number().min(0.01).max(999999.99),
+  cost: z.number().min(0).max(999999.99),
 });
 
 const updateSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
-  cost: z.number().min(0.01).max(999999.99).optional(),
+  cost: z.number().min(0).max(999999.99).optional(),
 });
 
 const idSchema = z.string().uuid();

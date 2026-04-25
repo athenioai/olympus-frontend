@@ -658,7 +658,6 @@
     },
     "image": "Imagem",
     "imageRequirements": "JPEG, PNG ou WebP. Máx 5MB.",
-    "priceMinHint": "O preço precisa ser maior que R$ 0,00.",
     "deleteConfirm": "Tem certeza que deseja excluir este item?",
     "searchPlaceholder": "Buscar por nome...",
     "allStatuses": "Todos",

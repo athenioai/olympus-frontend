@@ -128,9 +128,6 @@ function ServiceFormModal({
               type="hidden"
               value={(priceCents / 100).toFixed(2)}
             />
-            {priceCents === 0 && (
-              <p className="text-xs text-danger">{t("priceMinHint")}</p>
-            )}
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-on-surface" htmlFor="svc-instructions">
@@ -166,7 +163,7 @@ function ServiceFormModal({
             </button>
             <button
               className="h-10 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-60"
-              disabled={isPending || priceCents === 0}
+              disabled={isPending}
               type="submit"
             >
               {isPending ? tc("loading") : tc("save")}

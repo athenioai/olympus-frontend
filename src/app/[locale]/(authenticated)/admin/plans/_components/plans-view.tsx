@@ -122,10 +122,6 @@ export function PlansView({
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!formState) return;
-    if (costCents <= 0) {
-      toast.error(tCommon("loadError"));
-      return;
-    }
     const parsedCost = costCents / 100;
 
     startMutation(async () => {
