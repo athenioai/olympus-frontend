@@ -22,6 +22,7 @@ import {
   CreditCard,
   FileText,
   Receipt,
+  RotateCcw,
   Filter,
   Sparkles,
 } from "lucide-react";
@@ -71,6 +72,7 @@ const ADMIN_NAV: NavItem[] = [
   { key: "admin-plans", href: "/admin/plans", icon: CreditCard, labelKey: "sidebar.admin.plans" },
   { key: "admin-subscriptions", href: "/admin/subscriptions", icon: FileText, labelKey: "sidebar.admin.subscriptions" },
   { key: "admin-invoices", href: "/admin/invoices", icon: Receipt, labelKey: "sidebar.admin.invoices" },
+  { key: "admin-refunds", href: "/admin/refunds", icon: RotateCcw, labelKey: "sidebar.admin.refunds" },
   { key: "admin-avatars", href: "/admin/agent-avatars", icon: Sparkles, labelKey: "sidebar.admin.avatars" },
 ];
 
