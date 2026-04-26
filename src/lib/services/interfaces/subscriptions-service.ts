@@ -48,7 +48,11 @@ export interface SubscribeResponse {
 export interface ISubscriptionsService {
   getMe(): Promise<MySubscription>;
   listMyPayments(): Promise<readonly MyPayment[]>;
-  subscribe(planId: string): Promise<SubscribeResponse>;
+  /**
+   * `cpfCnpj` is required by the backend (Asaas needs a tax document for the
+   * payer). 11 digits = CPF, 14 digits = CNPJ. Send unmasked.
+   */
+  subscribe(planId: string, cpfCnpj: string): Promise<SubscribeResponse>;
   upgrade(planId: string): Promise<MySubscription>;
   downgrade(planId: string): Promise<MySubscription>;
   cancel(reason?: string): Promise<MySubscription>;

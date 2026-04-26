@@ -730,6 +730,11 @@
       "operador": { "name": "Operador", "features": "Volume médio" },
       "estrategico": { "name": "Estratégico", "features": "Alta escala" }
     },
+    "cpfCnpj": {
+      "label": "CPF ou CNPJ",
+      "placeholder": "Apenas números",
+      "helpText": "CPF (11 dígitos) ou CNPJ (14 dígitos). Aceita com ou sem máscara."
+    },
     "subscribe": "Assinar",
     "subscribeProcessing": "Aguardando pagamento — pague o PIX e volte aqui.",
     "subscribeOpenInvoice": "Abrir cobrança PIX",

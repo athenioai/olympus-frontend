@@ -56,10 +56,10 @@ class AdminSubscriptionService implements IAdminSubscriptionService {
     return unwrapEnvelope<SubscriptionPublic>(response);
   }
 
-  async subscribe(userId: string, planId: string): Promise<SubscriptionPublic> {
+  async subscribe(userId: string, planId: string, cpfCnpj: string): Promise<SubscriptionPublic> {
     const response = await authFetch(
       `/admin/subscriptions/${encodeURIComponent(userId)}/subscribe`,
-      { method: "POST", body: JSON.stringify({ planId }) },
+      { method: "POST", body: JSON.stringify({ planId, cpfCnpj }) },
     );
     return unwrapEnvelope<SubscriptionPublic>(response);
   }

@@ -24,11 +24,16 @@ export function PlanGrid({ plans }: PlanGridProps) {
   const [subscribingPlanId, setSubscribingPlanId] = useState<string | null>(
     null,
   );
+  const [cpfCnpj, setCpfCnpj] = useState("");
+
+  const cpfCnpjDigits = cpfCnpj.replace(/\D/g, "");
+  const cpfCnpjValid =
+    cpfCnpjDigits.length === 11 || cpfCnpjDigits.length === 14;
 
   function handleSubscribe(planId: string) {
     setSubscribingPlanId(planId);
     startTransition(async () => {
-      const result = await subscribePlan(planId);
+      const result = await subscribePlan(planId, cpfCnpj);
       if (result.success && result.data) {
         setInvoiceUrl(result.data.asaasInvoiceUrl);
         window.open(result.data.asaasInvoiceUrl, "_blank");
@@ -77,6 +82,29 @@ export function PlanGrid({ plans }: PlanGridProps) {
         </p>
       </motion.div>
 
+      <motion.div className="mb-6 max-w-md" variants={fadeInUp}>
+        <label
+          className="mb-1.5 block text-sm font-medium text-on-surface"
+          htmlFor="cpfCnpj"
+        >
+          {t("cpfCnpj.label")}
+        </label>
+        <input
+          autoComplete="off"
+          className="h-10 w-full rounded-xl bg-surface-container-high px-4 text-sm text-on-surface outline-none transition-colors focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
+          id="cpfCnpj"
+          inputMode="numeric"
+          maxLength={18}
+          onChange={(e) => setCpfCnpj(e.target.value)}
+          placeholder={t("cpfCnpj.placeholder")}
+          type="text"
+          value={cpfCnpj}
+        />
+        <p className="mt-1 text-xs text-on-surface-variant">
+          {t("cpfCnpj.helpText")}
+        </p>
+      </motion.div>
+
       <motion.div
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         variants={staggerContainer}
@@ -120,12 +148,12 @@ export function PlanGrid({ plans }: PlanGridProps) {
                 <button
                   className={cn(
                     "flex h-10 w-full items-center justify-center rounded-xl text-sm font-bold transition-opacity",
-                    disabled
+                    disabled || !cpfCnpjValid
                       ? "cursor-not-allowed bg-surface-container-high text-on-surface-variant/50"
                       : "bg-primary text-on-primary hover:opacity-90",
                     isLoading && "opacity-60",
                   )}
-                  disabled={disabled || isPending}
+                  disabled={disabled || !cpfCnpjValid || isPending}
                   onClick={() => plan.id && handleSubscribe(plan.id)}
                   title={
                     disabled

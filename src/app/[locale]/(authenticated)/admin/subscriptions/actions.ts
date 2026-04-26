@@ -20,6 +20,8 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   PLAN_NOT_FOUND_001: "Plano não encontrado.",
   BILLING_GATEWAY_001: "Falha temporária no gateway. Tente novamente.",
   BILLING_GATEWAY_002: "O gateway rejeitou os dados.",
+  BUSINESS_DOCUMENT_REQUIRED_001: "Preencha seu CPF ou CNPJ.",
+  BUSINESS_DOCUMENT_INVALID_001: "CPF ou CNPJ inválido.",
 };
 
 const GENERIC_ERROR =
@@ -54,9 +56,17 @@ function invalidate(): void {
   revalidatePath("/admin/subscriptions");
 }
 
+function normalizeCpfCnpj(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length !== 11 && digits.length !== 14) return null;
+  return digits;
+}
+
 export async function subscribeUserAction(
   userId: string,
   planId: string,
+  cpfCnpj: string,
 ): Promise<SubscriptionActionResult<SubscriptionPublic>> {
   const guard = await requireAdmin();
   if (!guard.ok) return { success: false, error: guard.error };
@@ -67,8 +77,12 @@ export async function subscribeUserAction(
   if (!uuid.safeParse(planId).success) {
     return { success: false, error: "ID de plano inválido." };
   }
+  const normalized = normalizeCpfCnpj(cpfCnpj);
+  if (normalized === null) {
+    return { success: false, error: "CPF ou CNPJ inválido." };
+  }
   try {
-    const data = await adminSubscriptionService.subscribe(userId, planId);
+    const data = await adminSubscriptionService.subscribe(userId, planId, normalized);
     invalidate();
     return { success: true, data };
   } catch (err) {

@@ -22,10 +22,10 @@ class SubscriptionsService implements ISubscriptionsService {
     return unwrapEnvelope<readonly MyPayment[]>(response);
   }
 
-  async subscribe(planId: string): Promise<SubscribeResponse> {
+  async subscribe(planId: string, cpfCnpj: string): Promise<SubscribeResponse> {
     const response = await authFetch("/subscriptions/subscribe", {
       method: "POST",
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ planId, cpfCnpj }),
     });
     return unwrapEnvelope<SubscribeResponse>(response);
   }

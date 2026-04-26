@@ -73,18 +73,18 @@ describe("subscriptionsService", () => {
     });
   });
 
-  it("subscribe POSTs planId and returns asaasInvoiceUrl", async () => {
+  it("subscribe POSTs planId + cpfCnpj and returns asaasInvoiceUrl", async () => {
     fetchMock.mockResolvedValueOnce(
       successEnvelope({
         subscriptionId: "s1",
         asaasInvoiceUrl: "https://asaas/invoice/abc",
       }),
     );
-    const result = await subscriptionsService.subscribe("p1");
+    const result = await subscriptionsService.subscribe("p1", "12345678901");
     const [url, init] = fetchMock.mock.calls[0];
     expect(String(url)).toBe("https://api.test/subscriptions/subscribe");
     expect(init.method).toBe("POST");
-    expect(JSON.parse(init.body)).toEqual({ planId: "p1" });
+    expect(JSON.parse(init.body)).toEqual({ planId: "p1", cpfCnpj: "12345678901" });
     expect(result.asaasInvoiceUrl).toBe("https://asaas/invoice/abc");
   });
 

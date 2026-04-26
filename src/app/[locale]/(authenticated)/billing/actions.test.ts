@@ -40,9 +40,60 @@ describe("billing actions", () => {
   });
 
   it("subscribePlan rejects bad UUID", async () => {
-    const res = await subscribePlan("not-uuid");
+    const res = await subscribePlan("not-uuid", "12345678901");
     expect(res.success).toBe(false);
     expect(subscriptionsServiceMock.subscribe).not.toHaveBeenCalled();
+  });
+
+  it("subscribePlan rejects empty cpfCnpj", async () => {
+    const res = await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "",
+    );
+    expect(res.success).toBe(false);
+    expect(res.error).toMatch(/CPF/i);
+    expect(subscriptionsServiceMock.subscribe).not.toHaveBeenCalled();
+  });
+
+  it("subscribePlan rejects cpfCnpj with wrong digit count", async () => {
+    const res = await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "123",
+    );
+    expect(res.success).toBe(false);
+    expect(res.error).toMatch(/CPF/i);
+    expect(subscriptionsServiceMock.subscribe).not.toHaveBeenCalled();
+  });
+
+  it("subscribePlan strips mask and forwards 11-digit CPF", async () => {
+    subscriptionsServiceMock.subscribe.mockResolvedValueOnce({
+      subscriptionId: "s1",
+      asaasInvoiceUrl: "https://asaas/x",
+    });
+    const res = await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "123.456.789-01",
+    );
+    expect(res.success).toBe(true);
+    expect(subscriptionsServiceMock.subscribe).toHaveBeenCalledWith(
+      "11111111-1111-1111-1111-111111111111",
+      "12345678901",
+    );
+  });
+
+  it("subscribePlan accepts unmasked 14-digit CNPJ", async () => {
+    subscriptionsServiceMock.subscribe.mockResolvedValueOnce({
+      subscriptionId: "s1",
+      asaasInvoiceUrl: "https://asaas/x",
+    });
+    await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "12345678000190",
+    );
+    expect(subscriptionsServiceMock.subscribe).toHaveBeenCalledWith(
+      "11111111-1111-1111-1111-111111111111",
+      "12345678000190",
+    );
   });
 
   it("subscribePlan returns asaasInvoiceUrl on success", async () => {
@@ -50,7 +101,10 @@ describe("billing actions", () => {
       subscriptionId: "s1",
       asaasInvoiceUrl: "https://asaas/x",
     });
-    const res = await subscribePlan("11111111-1111-1111-1111-111111111111");
+    const res = await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "12345678901",
+    );
     expect(res).toMatchObject({
       success: true,
       data: { asaasInvoiceUrl: "https://asaas/x" },
@@ -61,7 +115,10 @@ describe("billing actions", () => {
     subscriptionsServiceMock.subscribe.mockRejectedValueOnce(
       new ApiError("active", "SUB_ACTIVE_001", 409),
     );
-    const res = await subscribePlan("11111111-1111-1111-1111-111111111111");
+    const res = await subscribePlan(
+      "11111111-1111-1111-1111-111111111111",
+      "12345678901",
+    );
     expect(res).toEqual({
       success: false,
       error: "Você já possui uma assinatura ativa.",

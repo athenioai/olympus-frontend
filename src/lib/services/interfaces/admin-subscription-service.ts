@@ -39,7 +39,11 @@ export interface IAdminSubscriptionService {
     id: string,
     payload: UpdateSubscriptionStatusPayload,
   ): Promise<SubscriptionPublic>;
-  subscribe(userId: string, planId: string): Promise<SubscriptionPublic>;
+  /**
+   * `cpfCnpj` is the target tenant's tax document. Same digit rules as the
+   * user-facing endpoint.
+   */
+  subscribe(userId: string, planId: string, cpfCnpj: string): Promise<SubscriptionPublic>;
   upgrade(userId: string, planId: string): Promise<SubscriptionPublic>;
   downgrade(userId: string, planId: string): Promise<SubscriptionPublic>;
   cancel(userId: string): Promise<SubscriptionPublic>;

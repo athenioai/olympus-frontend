@@ -19,6 +19,8 @@ const FRIENDLY_ERRORS: Record<string, string> = {
     "Falha temporária no gateway de cobrança. Tente novamente em instantes.",
   BILLING_GATEWAY_002:
     "O gateway de cobrança rejeitou os dados. Verifique e tente de novo.",
+  BUSINESS_DOCUMENT_REQUIRED_001: "Preencha seu CPF ou CNPJ.",
+  BUSINESS_DOCUMENT_INVALID_001: "CPF ou CNPJ inválido.",
   REFUND_WINDOW_EXPIRED_001:
     "A janela de 15 dias para reembolso já expirou.",
   REFUND_REQUEST_PENDING_001:
@@ -61,14 +63,26 @@ function invalidate(): void {
   revalidatePath("/billing");
 }
 
+function normalizeCpfCnpj(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length !== 11 && digits.length !== 14) return null;
+  return digits;
+}
+
 export async function subscribePlan(
   planId: string,
+  cpfCnpj: string,
 ): Promise<ActionResult<SubscribeResponse>> {
   if (!uuid.safeParse(planId).success) {
     return { success: false, error: "ID de plano inválido." };
   }
+  const normalized = normalizeCpfCnpj(cpfCnpj);
+  if (normalized === null) {
+    return { success: false, error: "CPF ou CNPJ inválido." };
+  }
   try {
-    const data = await subscriptionsService.subscribe(planId);
+    const data = await subscriptionsService.subscribe(planId, normalized);
     invalidate();
     return { success: true, data };
   } catch (err) {

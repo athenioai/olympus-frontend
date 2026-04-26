@@ -671,6 +671,11 @@
       "operador": { "name": "Operador", "features": "Mid-volume" },
       "estrategico": { "name": "Estratégico", "features": "High scale" }
     },
+    "cpfCnpj": {
+      "label": "CPF or CNPJ",
+      "placeholder": "Numbers only",
+      "helpText": "CPF (11 digits) or CNPJ (14 digits). With or without mask."
+    },
     "subscribe": "Subscribe",
     "subscribeProcessing": "Waiting for payment — pay the PIX invoice and come back.",
     "subscribeOpenInvoice": "Open PIX invoice",
