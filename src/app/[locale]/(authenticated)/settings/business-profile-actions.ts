@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api-envelope";
 import {
   businessProfileService,
+  businessVerticalService,
 } from "@/lib/services";
 import { captureUnexpected } from "@/lib/observability/capture";
 import type {
@@ -11,6 +12,7 @@ import type {
   BusinessProfile,
   BusinessSocialLink,
   BusinessServiceArea,
+  BusinessVertical,
   UpdateBusinessProfilePayload,
   UpdateAddressPayload,
   CreateSocialLinkPayload,
@@ -37,6 +39,25 @@ function describeError(err: unknown, fallback = "Unknown error"): string {
     return `[${err.code}] ${err.message}`;
   }
   return err instanceof Error ? err.message : fallback;
+}
+
+/**
+ * List the static catalog of business verticals (used by the required-fields
+ * section to let the user pick a segment — backend marks businessVertical
+ * required for canConnectChannel even though the onboarding wizard treats
+ * it as optional).
+ */
+export async function listBusinessVerticals(): Promise<
+  ActionResult<readonly BusinessVertical[]>
+> {
+  try {
+    const verticals = await businessVerticalService.list();
+    return { success: true, data: verticals };
+  } catch (err) {
+    captureUnexpected(err);
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: msg };
+  }
 }
 
 /**

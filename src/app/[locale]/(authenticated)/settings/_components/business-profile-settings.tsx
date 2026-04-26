@@ -24,6 +24,7 @@ import { isValidCNPJ } from "@/lib/format";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
 import {
   fetchBusinessProfile,
+  listBusinessVerticals,
   saveBusinessProfile,
   saveBusinessAddress,
   removeBusinessAddress,
@@ -34,6 +35,7 @@ import {
 } from "../business-profile-actions";
 import type {
   BusinessProfileView,
+  BusinessVertical,
   ScoreTier,
   ServiceModality,
   SocialPlatform,
@@ -213,6 +215,8 @@ export function BusinessProfileSettings() {
   const [cnpj, setCnpj] = useState("");
   const [legalName, setLegalName] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
+  const [businessVertical, setBusinessVertical] = useState<string>("");
+  const [verticals, setVerticals] = useState<readonly BusinessVertical[]>([]);
 
   // Address
   const [showAddress, setShowAddress] = useState(false);
@@ -249,6 +253,7 @@ export function BusinessProfileSettings() {
         setCnpj(pv.profile.cnpj ? maskCnpj(pv.profile.cnpj) : "");
         setLegalName(pv.profile.legalName ?? "");
         setFoundedYear(pv.profile.foundedYear ? String(pv.profile.foundedYear) : "");
+        setBusinessVertical(pv.profile.businessVertical ?? "");
       }
 
       if (pv.address) {
@@ -266,6 +271,19 @@ export function BusinessProfileSettings() {
   }, []);
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+    listBusinessVerticals().then((result) => {
+      if (cancelled) return;
+      if (result.success && result.data) {
+        setVerticals(result.data);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleSave() {
     const trimmedName = businessName.trim();
@@ -318,6 +336,7 @@ export function BusinessProfileSettings() {
         cnpj: cnpjDigits || null,
         legalName: trimmedLegalName || null,
         foundedYear: parsedYear,
+        ...(businessVertical ? { businessVertical } : {}),
       });
 
       if (!profileResult.success) {
@@ -476,6 +495,21 @@ export function BusinessProfileSettings() {
             <select className={inputCls} onChange={(e) => setServiceModality(e.target.value as ServiceModality)} value={serviceModality}>
               {MODALITIES.map((m) => (
                 <option key={m} value={m}>{t(`profile.fields.modalities.${m}`)}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>{t("profile.fields.businessVertical")} <RequiredBadge field="businessVertical" /></label>
+            <select
+              className={inputCls}
+              onChange={(e) => setBusinessVertical(e.target.value)}
+              value={businessVertical}
+            >
+              <option value="">{t("profile.fields.businessVerticalPlaceholder")}</option>
+              {verticals.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                </option>
               ))}
             </select>
           </div>

@@ -983,6 +983,8 @@
           "domicilio": "A domicílio",
           "hibrido": "Híbrido"
         },
+        "businessVertical": "Segmento do negócio",
+        "businessVerticalPlaceholder": "Selecione um segmento",
         "paymentPolicy": "Política de pagamento",
         "paymentPolicyPlaceholder": "Descreva as formas de pagamento aceitas...",
         "cancellationPolicy": "Política de cancelamento",
