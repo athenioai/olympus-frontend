@@ -150,24 +150,46 @@ function ScoreCard({ score, t }: {
         "flex flex-col justify-between rounded-xl p-6 lg:col-span-4",
         score.canConnectChannel ? "bg-success/8" : "bg-danger/6",
       )}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           {score.canConnectChannel ? (
-            <CheckCircle2 className="h-6 w-6 text-success" />
+            <CheckCircle2 className="h-6 w-6 shrink-0 text-success" />
           ) : (
-            <AlertTriangle className="h-6 w-6 text-danger" />
+            <AlertTriangle className="h-6 w-6 shrink-0 text-danger" />
           )}
-          <p className={cn("text-[13px] font-semibold leading-snug", score.canConnectChannel ? "text-success" : "text-danger")}>
-            {score.canConnectChannel
-              ? t("profile.score.canConnect")
-              : score.missingRequired.length > 0
-                ? t("profile.score.missingFields", { count: score.missingRequired.length })
-                : t("profile.score.nextTier", { points: Math.ceil(0.3 * score.maxScore) - score.score, tier: "Bronze" })
-            }
-          </p>
+          <div className="flex-1">
+            <p className={cn("text-[13px] font-semibold leading-snug", score.canConnectChannel ? "text-success" : "text-danger")}>
+              {score.canConnectChannel
+                ? t("profile.score.canConnect")
+                : score.missingRequired.length > 0
+                  ? t("profile.score.missingFields", { count: score.missingRequired.length })
+                  : t("profile.score.nextTier", { points: Math.ceil(0.3 * score.maxScore) - score.score, tier: "Bronze" })
+              }
+            </p>
+            {!score.canConnectChannel && score.missingRequired.length > 0 && (
+              <p className="mt-1 text-[12px] text-on-surface">
+                {score.missingRequired
+                  .map((field) => translateRequiredField(t, field))
+                  .join(", ")}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
   );
+}
+
+/**
+ * Map a backend-reported required-field key to a user-facing label. Falls
+ * back to the raw key when no translation exists so we can surface the bug
+ * (backend reporting a field the UI doesn't render) instead of hiding it.
+ */
+function translateRequiredField(
+  t: ReturnType<typeof useTranslations>,
+  field: string,
+): string {
+  const i18nKey = `profile.fields.${field}`;
+  return t.has(i18nKey) ? t(i18nKey) : field;
 }
 
 // ---------------------------------------------------------------------------
