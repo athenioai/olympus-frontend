@@ -134,7 +134,9 @@ export async function removeBusinessAddress(): Promise<ActionResult> {
 }
 
 /**
- * Add a social link.
+ * Add a social link. Returns "CONFLICT" sentinel when the backend says the
+ * platform is already registered — UI uses this to refetch the profile so
+ * the user sees the existing record (or detects backend↔frontend desync).
  */
 export async function addBusinessSocialLink(
   payload: CreateSocialLinkPayload,
@@ -144,6 +146,9 @@ export async function addBusinessSocialLink(
     revalidate();
     return { success: true, data };
   } catch (err) {
+    if (err instanceof ApiError && err.status === 409) {
+      return { success: false, error: "CONFLICT" };
+    }
     const msg = err instanceof Error ? err.message : "Unknown error";
     if (msg.includes("CONFLICT")) {
       return { success: false, error: "CONFLICT" };
@@ -181,6 +186,9 @@ export async function addBusinessServiceArea(
     revalidate();
     return { success: true, data };
   } catch (err) {
+    if (err instanceof ApiError && err.status === 409) {
+      return { success: false, error: "CONFLICT" };
+    }
     const msg = err instanceof Error ? err.message : "Unknown error";
     if (msg.includes("CONFLICT")) {
       return { success: false, error: "CONFLICT" };

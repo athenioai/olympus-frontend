@@ -375,9 +375,20 @@ export function BusinessProfileSettings() {
         setSocialLinks((prev) => [...prev, result.data!]);
         setNewUrl("");
         toast.success(t("saved"));
-      } else {
-        toast.error(result.error === "CONFLICT" ? "Plataforma já cadastrada" : result.error ?? "Erro");
+        return;
       }
+      if (result.error === "CONFLICT") {
+        // Backend says the platform is already registered. Refetch so the
+        // existing record appears in the list (and the dropdown hides the
+        // platform). If the record stays absent after refetch, that's a
+        // genuine backend↔frontend desync — surface a clearer hint.
+        await loadProfile();
+        toast.error(
+          "Esta plataforma já está cadastrada no backend. A lista foi atualizada.",
+        );
+        return;
+      }
+      toast.error(result.error ?? "Erro");
     });
   }
 
@@ -398,9 +409,14 @@ export function BusinessProfileSettings() {
         setServiceAreas((prev) => [...prev, result.data!]);
         setNewArea("");
         toast.success(t("saved"));
-      } else {
-        toast.error(result.error === "CONFLICT" ? "Área já cadastrada" : result.error ?? "Erro");
+        return;
       }
+      if (result.error === "CONFLICT") {
+        await loadProfile();
+        toast.error("Esta área já está cadastrada no backend. A lista foi atualizada.");
+        return;
+      }
+      toast.error(result.error ?? "Erro");
     });
   }
 
