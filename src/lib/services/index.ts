@@ -4,6 +4,7 @@ export { authFetch } from "./auth-fetch";
 export { chatService } from "./chat-service";
 export { leadService } from "./lead-service";
 export { financeService } from "./finance-service";
+export { adsService } from "./ads-service";
 export { appointmentService } from "./appointment-service";
 export { agentConfigService } from "./agent-config-service";
 export { calendarConfigService } from "./calendar-config-service";
@@ -87,6 +88,20 @@ export type {
   UpdateCatalogPayload,
   IFinanceService,
 } from "./interfaces/finance-service";
+
+// Ads types
+export type {
+  Ad,
+  AdItem,
+  AdItemRef,
+  AdItemType,
+  AdPublic,
+  CreateAdPayload,
+  IAdsService,
+  ListAdsParams,
+  PaginatedAds,
+  UpdateAdPayload,
+} from "./interfaces/ads-service";
 
 // Appointment types
 export type {

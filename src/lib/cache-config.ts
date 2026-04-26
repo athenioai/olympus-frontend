@@ -10,6 +10,7 @@ export const CACHE_TIMES = {
   conversations: 0,     // no cache — real-time data via WebSocket
   services: 120,        // 2 min — catalog changes rarely
   products: 120,        // 2 min — catalog changes rarely
+  ads: 60,             // 1 min — campaigns change moderately
   businessVerticals: 60 * 60 * 24, // 24h — catalog is static
   adminDashboard: 60,   // 1 min — platform metrics
   adminUsers: 30,       // 30s — list changes on create/edit
@@ -28,6 +29,7 @@ export const CACHE_TAGS = {
   conversations: "conversations",
   services: "services",
   products: "products",
+  ads: "ads",
   businessVerticals: "business-verticals",
   adminDashboard: "admin-dashboard",
   adminUsers: "admin-users",
