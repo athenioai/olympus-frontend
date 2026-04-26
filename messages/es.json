@@ -649,6 +649,126 @@
     "empty": "Aún no hay anuncios.",
     "loadFailed": "No se pudieron cargar los anuncios. Inténtalo de nuevo más tarde."
   },
+  "billing": {
+    "title": "Suscripción",
+    "subtitle": "Administra tu plan, pagos y cancelaciones.",
+    "loadFailed": "No se pudo cargar tu suscripción. Inténtalo de nuevo más tarde.",
+    "choosePlan": {
+      "title": "Elige tu plan",
+      "subtitle": "Empieza con cualquier plan. Puedes cambiar cuando quieras."
+    },
+    "plans": {
+      "solo": { "name": "Solo", "features": "Para profesionales independientes" },
+      "fundador": { "name": "Fundador", "features": "Para equipos pequeños" },
+      "essencial": { "name": "Essencial", "features": "Operación completa" },
+      "operador": { "name": "Operador", "features": "Volumen medio" },
+      "estrategico": { "name": "Estratégico", "features": "Alta escala" }
+    },
+    "subscribe": "Suscribirme",
+    "subscribeProcessing": "Esperando el pago — paga el PIX y vuelve aquí.",
+    "subscribeOpenInvoice": "Abrir cobro PIX",
+    "currentPlan": "Plan actual",
+    "nextPaymentAt": "Próximo cobro el {date}",
+    "noNextPayment": "Sin próximo cobro programado",
+    "monthly": "/mes",
+    "status": {
+      "active": "Activa",
+      "past_due": "Vencida",
+      "suspended": "Suspendida",
+      "cancelled": "Cancelada — acceso hasta {date}",
+      "ended": "Finalizada",
+      "refunded": "Reembolsada el {date}"
+    },
+    "banners": {
+      "pendingChange": "Downgrade a {planName} se aplicará el {date}.",
+      "cancelAtPeriodEnd": "Cancelación programada. Tienes acceso hasta {date}.",
+      "refundEligible": "🔁 Puedes solicitar reembolso hasta {date}."
+    },
+    "actions": {
+      "changePlan": "Cambiar plan",
+      "cancel": "Cancelar suscripción",
+      "requestRefund": "Solicitar reembolso"
+    },
+    "payments": {
+      "title": "Facturas",
+      "empty": "Aún no hay facturas emitidas.",
+      "dueDate": "Vencimiento",
+      "amount": "Monto",
+      "statusLabel": "Estado",
+      "paidAt": "Pagado el",
+      "actions": "Acciones",
+      "viewInvoice": "Ver factura",
+      "status": {
+        "pending": "Pendiente",
+        "confirmed": "Pagado",
+        "overdue": "Vencido",
+        "refunded": "Reembolsado"
+      }
+    },
+    "changePlanModal": {
+      "title": "Cambiar plan",
+      "current": "Plan actual",
+      "upgrade": "Hacer upgrade",
+      "downgrade": "Hacer downgrade",
+      "confirmUpgrade": {
+        "title": "Confirmar upgrade",
+        "body": "Upgrade aplicado de inmediato. Sigues con el ciclo actual hasta {date}, ahora en el plan superior. La ventana de reembolso de 15 días **no** se reinicia.",
+        "confirm": "Confirmar upgrade"
+      },
+      "confirmDowngrade": {
+        "title": "Confirmar downgrade",
+        "body": "El downgrade se aplicará el {date}. Hasta entonces sigues en el plan actual.",
+        "confirm": "Confirmar downgrade"
+      }
+    },
+    "cancelModal": {
+      "title": "¿Cancelar suscripción?",
+      "body": "Tendrás acceso hasta {date}. Después esa fecha, tu suscripción terminará y perderás acceso a las funciones pagas.",
+      "reasonLabel": "Motivo (opcional)",
+      "reasonPlaceholder": "Cuéntanos qué motivó la cancelación — nos ayuda a mejorar.",
+      "confirm": "Confirmar cancelación"
+    },
+    "refundModal": {
+      "title": "Solicitar reembolso",
+      "body": "Estás dentro de la ventana de garantía de 15 días. Tras enviar, nuestro equipo responde en hasta 24h.",
+      "reasonLabel": "Motivo",
+      "reasonPlaceholder": "Cuéntanos por qué pides el reembolso (mínimo 10 caracteres).",
+      "confirm": "Enviar solicitud"
+    },
+    "refundStatus": {
+      "pending": "🕐 Solicitud en revisión — respuesta en hasta 24h.",
+      "approved": "✅ Reembolso aprobado.",
+      "rejected": "❌ Reembolso rechazado: {reason}"
+    },
+    "globalSuspended": {
+      "title": "Tu suscripción está suspendida.",
+      "body": "Regulariza el pago para reactivar la operación automatizada.",
+      "payNow": "Pagar ahora",
+      "goToBilling": "Ir a Suscripción"
+    },
+    "toasts": {
+      "planUpdated": "Plan actualizado.",
+      "subscriptionCancelled": "Suscripción cancelada — acceso hasta {date}.",
+      "refundRequested": "Solicitud de reembolso enviada.",
+      "wsPaymentConfirmed": "Pago confirmado.",
+      "wsPastDue": "Cobro atrasado — paga en hasta 3 días para evitar la suspensión.",
+      "wsSuspended": "Suscripción suspendida por falta de pago.",
+      "wsRefunded": "Reembolso aprobado — llega en hasta 5 días hábiles.",
+      "wsActivated": "Suscripción reactivada."
+    },
+    "errors": {
+      "SUB_NOT_FOUND_001": "Suscripción no encontrada.",
+      "SUB_ACTIVE_001": "Ya tienes una suscripción activa.",
+      "SUBSCRIPTION_NOT_ACTIVE_001": "Tu suscripción debe estar activa para esta operación.",
+      "INVALID_PLAN_CHANGE_001": "Cambio de plan inválido para esta operación.",
+      "BILLING_GATEWAY_001": "Falla temporal del gateway de cobro. Intenta de nuevo en un momento.",
+      "BILLING_GATEWAY_002": "El gateway de cobro rechazó los datos. Revisa e intenta de nuevo.",
+      "REFUND_WINDOW_EXPIRED_001": "La ventana de 15 días para reembolso ya expiró.",
+      "REFUND_REQUEST_PENDING_001": "Ya tienes una solicitud de reembolso en revisión.",
+      "REFUND_REQUEST_NOT_FOUND_001": "Solicitud de reembolso no encontrada.",
+      "PLAN_NOT_FOUND_001": "Plan no encontrado."
+    }
+  },
   "settings": {
     "title": "Configuración",
     "tabs": {
@@ -693,6 +813,7 @@
     "services": "Servicios",
     "products": "Productos",
     "ads": "Anuncios",
+    "billing": "Suscripción",
     "settings": "Configuración",
     "admin": {
       "title": "Admin",
@@ -702,6 +823,7 @@
       "subscriptions": "Suscripciones",
       "billing": "Facturación",
       "invoices": "Cobros",
+      "refunds": "Reembolsos",
       "avatars": "Avatares"
     }
   },
@@ -854,6 +976,56 @@
       "updated": "Plan actualizado.",
       "deleted": "Plan eliminado."
     },
+    "refunds": {
+      "title": "Solicitudes de reembolso",
+      "subtitle": "Aprueba o rechaza reembolsos solicitados por los usuarios.",
+      "loadFailed": "No se pudieron cargar las solicitudes.",
+      "empty": "No hay solicitudes para revisar.",
+      "filters": {
+        "pending": "Pendientes",
+        "approved": "Aprobadas",
+        "rejected": "Rechazadas"
+      },
+      "columns": {
+        "user": "Usuario",
+        "reason": "Motivo",
+        "createdAt": "Solicitado el",
+        "statusLabel": "Estado",
+        "actions": "Acciones"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "rejected": "Rechazado"
+      },
+      "actions": {
+        "approve": "Aprobar",
+        "reject": "Rechazar"
+      },
+      "approveModal": {
+        "title": "¿Aprobar reembolso de {userName}?",
+        "body": "Se cobrará a Asaas para estornar el último pago confirmado. La suscripción se cancelará (sin nuevos cobros).",
+        "notesLabel": "Notas internas (opcional)",
+        "confirm": "Confirmar aprobación"
+      },
+      "rejectModal": {
+        "title": "¿Rechazar reembolso de {userName}?",
+        "body": "El usuario verá tu motivo en la notificación.",
+        "notesLabel": "Motivo del rechazo",
+        "confirm": "Confirmar rechazo"
+      },
+      "toasts": {
+        "approved": "Reembolso aprobado.",
+        "rejected": "Reembolso rechazado."
+      },
+      "errors": {
+        "REFUND_REQUEST_NOT_FOUND_001": "Solicitud no encontrada.",
+        "REFUND_REQUEST_PENDING_001": "Esta solicitud ya no está pendiente.",
+        "BILLING_GATEWAY_001": "Falla temporal de Asaas. Inténtalo de nuevo.",
+        "BILLING_GATEWAY_002": "Asaas rechazó el estorno.",
+        "GENERAL_VALIDATION_001": "No hay pago confirmado para estornar."
+      }
+    },
     "subscriptions": {
       "title": "Suscripciones",
       "subtitle": "Gestión de suscripciones activas.",
@@ -895,7 +1067,32 @@
         "actions": "Acciones"
       },
       "created": "Suscripción creada.",
-      "updated": "Suscripción actualizada."
+      "updated": "Suscripción actualizada.",
+      "statusLabels": {
+        "active": "Activa",
+        "past_due": "Vencida",
+        "suspended": "Suspendida",
+        "cancelled": "Cancelada",
+        "ended": "Finalizada",
+        "refunded": "Reembolsada"
+      },
+      "columns": {
+        "currentPeriodEnd": "Próximo ciclo",
+        "asaasSubscriptionId": "ID Asaas"
+      },
+      "actions": {
+        "subscribe": "Suscribir",
+        "upgrade": "Upgrade",
+        "downgrade": "Downgrade",
+        "cancel": "Cancelar",
+        "forceStatus": "Forzar estado"
+      },
+      "forceStatusModal": {
+        "title": "Forzar estado",
+        "body": "Úsalo solo después de reconciliar manualmente con Asaas. Esta acción no dispara cobro ni estorno en el gateway.",
+        "statusLabel": "Nuevo estado",
+        "confirm": "Aplicar"
+      }
     },
     "invoices": {
       "title": "Facturas",

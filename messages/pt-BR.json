@@ -715,6 +715,126 @@
     "empty": "Nenhum anúncio cadastrado ainda.",
     "loadFailed": "Não foi possível carregar os anúncios. Tente novamente mais tarde."
   },
+  "billing": {
+    "title": "Assinatura",
+    "subtitle": "Gerencie seu plano, pagamentos e cancelamentos.",
+    "loadFailed": "Não foi possível carregar sua assinatura. Tente novamente mais tarde.",
+    "choosePlan": {
+      "title": "Escolha seu plano",
+      "subtitle": "Comece com qualquer plano. Você pode mudar a qualquer momento."
+    },
+    "plans": {
+      "solo": { "name": "Solo", "features": "Para profissionais autônomos" },
+      "fundador": { "name": "Fundador", "features": "Para times pequenos" },
+      "essencial": { "name": "Essencial", "features": "Operação completa" },
+      "operador": { "name": "Operador", "features": "Volume médio" },
+      "estrategico": { "name": "Estratégico", "features": "Alta escala" }
+    },
+    "subscribe": "Assinar",
+    "subscribeProcessing": "Aguardando pagamento — pague o PIX e volte aqui.",
+    "subscribeOpenInvoice": "Abrir cobrança PIX",
+    "currentPlan": "Plano atual",
+    "nextPaymentAt": "Próxima cobrança em {date}",
+    "noNextPayment": "Sem próxima cobrança agendada",
+    "monthly": "/mês",
+    "status": {
+      "active": "Ativa",
+      "past_due": "Atrasada",
+      "suspended": "Suspensa",
+      "cancelled": "Cancelada — acesso até {date}",
+      "ended": "Encerrada",
+      "refunded": "Reembolsada em {date}"
+    },
+    "banners": {
+      "pendingChange": "Downgrade para {planName} será aplicado em {date}.",
+      "cancelAtPeriodEnd": "Cancelamento agendado. Você tem acesso até {date}.",
+      "refundEligible": "🔁 Você pode solicitar reembolso até {date}."
+    },
+    "actions": {
+      "changePlan": "Mudar plano",
+      "cancel": "Cancelar assinatura",
+      "requestRefund": "Solicitar reembolso"
+    },
+    "payments": {
+      "title": "Faturas",
+      "empty": "Nenhuma fatura emitida ainda.",
+      "dueDate": "Vencimento",
+      "amount": "Valor",
+      "statusLabel": "Status",
+      "paidAt": "Pago em",
+      "actions": "Ações",
+      "viewInvoice": "Ver fatura",
+      "status": {
+        "pending": "Pendente",
+        "confirmed": "Pago",
+        "overdue": "Vencido",
+        "refunded": "Reembolsado"
+      }
+    },
+    "changePlanModal": {
+      "title": "Mudar plano",
+      "current": "Plano atual",
+      "upgrade": "Fazer upgrade",
+      "downgrade": "Fazer downgrade",
+      "confirmUpgrade": {
+        "title": "Confirmar upgrade",
+        "body": "Upgrade aplicado imediatamente. Você continua com o ciclo atual até {date}, agora no plano superior. A janela de reembolso de 15 dias **não** é resetada.",
+        "confirm": "Confirmar upgrade"
+      },
+      "confirmDowngrade": {
+        "title": "Confirmar downgrade",
+        "body": "Downgrade será aplicado em {date}. Até lá você continua no plano atual.",
+        "confirm": "Confirmar downgrade"
+      }
+    },
+    "cancelModal": {
+      "title": "Cancelar assinatura?",
+      "body": "Você terá acesso até {date}. Após essa data, sua assinatura será encerrada e você perderá acesso aos recursos pagos.",
+      "reasonLabel": "Motivo (opcional)",
+      "reasonPlaceholder": "Conte o que motivou o cancelamento — ajuda a melhorar.",
+      "confirm": "Confirmar cancelamento"
+    },
+    "refundModal": {
+      "title": "Solicitar reembolso",
+      "body": "Você está dentro da janela de garantia de 15 dias. Após enviar, nossa equipe revisa em até 24h.",
+      "reasonLabel": "Motivo",
+      "reasonPlaceholder": "Conte por que está pedindo o reembolso (mínimo 10 caracteres).",
+      "confirm": "Enviar solicitação"
+    },
+    "refundStatus": {
+      "pending": "🕐 Solicitação em análise — retorno em até 24h.",
+      "approved": "✅ Reembolso aprovado.",
+      "rejected": "❌ Reembolso rejeitado: {reason}"
+    },
+    "globalSuspended": {
+      "title": "Sua assinatura está suspensa.",
+      "body": "Regularize o pagamento para reativar a operação automatizada.",
+      "payNow": "Pagar agora",
+      "goToBilling": "Ir para Assinatura"
+    },
+    "toasts": {
+      "planUpdated": "Plano atualizado.",
+      "subscriptionCancelled": "Assinatura cancelada — acesso até {date}.",
+      "refundRequested": "Solicitação de reembolso enviada.",
+      "wsPaymentConfirmed": "Pagamento confirmado.",
+      "wsPastDue": "Cobrança atrasada — pague em até 3 dias para evitar suspensão.",
+      "wsSuspended": "Assinatura suspensa por inadimplência.",
+      "wsRefunded": "Reembolso aprovado — cai em até 5 dias úteis.",
+      "wsActivated": "Assinatura reativada."
+    },
+    "errors": {
+      "SUB_NOT_FOUND_001": "Assinatura não encontrada.",
+      "SUB_ACTIVE_001": "Você já possui uma assinatura ativa.",
+      "SUBSCRIPTION_NOT_ACTIVE_001": "Sua assinatura precisa estar ativa para esta operação.",
+      "INVALID_PLAN_CHANGE_001": "Mudança de plano inválida para esta operação.",
+      "BILLING_GATEWAY_001": "Falha temporária no gateway de cobrança. Tente novamente em instantes.",
+      "BILLING_GATEWAY_002": "O gateway de cobrança rejeitou os dados. Verifique e tente de novo.",
+      "REFUND_WINDOW_EXPIRED_001": "A janela de 15 dias para reembolso já expirou.",
+      "REFUND_REQUEST_PENDING_001": "Você já tem uma solicitação de reembolso em análise.",
+      "REFUND_REQUEST_NOT_FOUND_001": "Solicitação de reembolso não encontrada.",
+      "PLAN_NOT_FOUND_001": "Plano não encontrado."
+    }
+  },
   "settings": {
     "title": "Meu Negócio",
     "tabs": {
@@ -1008,6 +1128,7 @@
     "services": "Serviços",
     "products": "Produtos",
     "ads": "Anúncios",
+    "billing": "Assinatura",
     "business": "Meu Negócio",
     "admin": {
       "title": "Admin",
@@ -1017,6 +1138,7 @@
       "subscriptions": "Assinaturas",
       "billing": "Faturamento",
       "invoices": "Cobranças",
+      "refunds": "Reembolsos",
       "avatars": "Avatares"
     }
   },
@@ -1169,6 +1291,56 @@
       "updated": "Plano atualizado.",
       "deleted": "Plano removido."
     },
+    "refunds": {
+      "title": "Solicitações de reembolso",
+      "subtitle": "Aprove ou rejeite reembolsos solicitados pelos usuários.",
+      "loadFailed": "Não foi possível carregar as solicitações.",
+      "empty": "Nenhuma solicitação para revisar.",
+      "filters": {
+        "pending": "Pendentes",
+        "approved": "Aprovadas",
+        "rejected": "Rejeitadas"
+      },
+      "columns": {
+        "user": "Usuário",
+        "reason": "Motivo",
+        "createdAt": "Solicitado em",
+        "statusLabel": "Status",
+        "actions": "Ações"
+      },
+      "status": {
+        "pending": "Pendente",
+        "approved": "Aprovado",
+        "rejected": "Rejeitado"
+      },
+      "actions": {
+        "approve": "Aprovar",
+        "reject": "Rejeitar"
+      },
+      "approveModal": {
+        "title": "Aprovar reembolso de {userName}?",
+        "body": "O Asaas será cobrado para estornar o último pagamento confirmado. A assinatura será cancelada (não haverá novas cobranças).",
+        "notesLabel": "Notas internas (opcional)",
+        "confirm": "Confirmar aprovação"
+      },
+      "rejectModal": {
+        "title": "Rejeitar reembolso de {userName}?",
+        "body": "O usuário verá seu motivo na notificação.",
+        "notesLabel": "Motivo da rejeição",
+        "confirm": "Confirmar rejeição"
+      },
+      "toasts": {
+        "approved": "Reembolso aprovado.",
+        "rejected": "Reembolso rejeitado."
+      },
+      "errors": {
+        "REFUND_REQUEST_NOT_FOUND_001": "Solicitação não encontrada.",
+        "REFUND_REQUEST_PENDING_001": "Esta solicitação já não está pendente.",
+        "BILLING_GATEWAY_001": "Falha temporária no Asaas. Tente novamente.",
+        "BILLING_GATEWAY_002": "O Asaas rejeitou o estorno.",
+        "GENERAL_VALIDATION_001": "Não há pagamento confirmado para estornar."
+      }
+    },
     "subscriptions": {
       "title": "Assinaturas",
       "subtitle": "Gestão de assinaturas ativas.",
@@ -1210,7 +1382,32 @@
         "actions": "Ações"
       },
       "created": "Assinatura criada.",
-      "updated": "Assinatura atualizada."
+      "updated": "Assinatura atualizada.",
+      "statusLabels": {
+        "active": "Ativa",
+        "past_due": "Atrasada",
+        "suspended": "Suspensa",
+        "cancelled": "Cancelada",
+        "ended": "Encerrada",
+        "refunded": "Reembolsada"
+      },
+      "columns": {
+        "currentPeriodEnd": "Próximo ciclo",
+        "asaasSubscriptionId": "ID Asaas"
+      },
+      "actions": {
+        "subscribe": "Assinar",
+        "upgrade": "Upgrade",
+        "downgrade": "Downgrade",
+        "cancel": "Cancelar",
+        "forceStatus": "Forçar status"
+      },
+      "forceStatusModal": {
+        "title": "Forçar status",
+        "body": "Use só após reconciliar manualmente com o Asaas. Esta ação não dispara cobrança nem estorno no gateway.",
+        "statusLabel": "Novo status",
+        "confirm": "Aplicar"
+      }
     },
     "invoices": {
       "title": "Cobranças",

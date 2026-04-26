@@ -656,6 +656,126 @@
     "empty": "No ads yet.",
     "loadFailed": "Failed to load ads. Please try again later."
   },
+  "billing": {
+    "title": "Billing",
+    "subtitle": "Manage your plan, payments and cancellations.",
+    "loadFailed": "Failed to load your subscription. Please try again later.",
+    "choosePlan": {
+      "title": "Pick your plan",
+      "subtitle": "Start with any plan. You can change anytime."
+    },
+    "plans": {
+      "solo": { "name": "Solo", "features": "For independent professionals" },
+      "fundador": { "name": "Fundador", "features": "For small teams" },
+      "essencial": { "name": "Essencial", "features": "Full operations" },
+      "operador": { "name": "Operador", "features": "Mid-volume" },
+      "estrategico": { "name": "Estratégico", "features": "High scale" }
+    },
+    "subscribe": "Subscribe",
+    "subscribeProcessing": "Waiting for payment — pay the PIX invoice and come back.",
+    "subscribeOpenInvoice": "Open PIX invoice",
+    "currentPlan": "Current plan",
+    "nextPaymentAt": "Next charge on {date}",
+    "noNextPayment": "No next charge scheduled",
+    "monthly": "/mo",
+    "status": {
+      "active": "Active",
+      "past_due": "Past due",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled — access until {date}",
+      "ended": "Ended",
+      "refunded": "Refunded on {date}"
+    },
+    "banners": {
+      "pendingChange": "Downgrade to {planName} will apply on {date}.",
+      "cancelAtPeriodEnd": "Cancellation scheduled. You have access until {date}.",
+      "refundEligible": "🔁 You can request a refund until {date}."
+    },
+    "actions": {
+      "changePlan": "Change plan",
+      "cancel": "Cancel subscription",
+      "requestRefund": "Request refund"
+    },
+    "payments": {
+      "title": "Invoices",
+      "empty": "No invoices issued yet.",
+      "dueDate": "Due date",
+      "amount": "Amount",
+      "statusLabel": "Status",
+      "paidAt": "Paid on",
+      "actions": "Actions",
+      "viewInvoice": "View invoice",
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Paid",
+        "overdue": "Overdue",
+        "refunded": "Refunded"
+      }
+    },
+    "changePlanModal": {
+      "title": "Change plan",
+      "current": "Current plan",
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade",
+      "confirmUpgrade": {
+        "title": "Confirm upgrade",
+        "body": "Upgrade applied immediately. You stay on the current cycle until {date}, now on the higher tier. The 15-day refund window is **not** reset.",
+        "confirm": "Confirm upgrade"
+      },
+      "confirmDowngrade": {
+        "title": "Confirm downgrade",
+        "body": "Downgrade will apply on {date}. Until then you stay on the current plan.",
+        "confirm": "Confirm downgrade"
+      }
+    },
+    "cancelModal": {
+      "title": "Cancel subscription?",
+      "body": "You'll have access until {date}. After that your subscription ends and you'll lose access to paid features.",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Tell us why — helps us improve.",
+      "confirm": "Confirm cancellation"
+    },
+    "refundModal": {
+      "title": "Request refund",
+      "body": "You're within the 15-day guarantee window. After submitting, our team reviews within 24h.",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Tell us why you're asking for a refund (10 chars minimum).",
+      "confirm": "Submit request"
+    },
+    "refundStatus": {
+      "pending": "🕐 Under review — back to you within 24h.",
+      "approved": "✅ Refund approved.",
+      "rejected": "❌ Refund rejected: {reason}"
+    },
+    "globalSuspended": {
+      "title": "Your subscription is suspended.",
+      "body": "Settle the payment to reactivate the automated operation.",
+      "payNow": "Pay now",
+      "goToBilling": "Go to Billing"
+    },
+    "toasts": {
+      "planUpdated": "Plan updated.",
+      "subscriptionCancelled": "Subscription cancelled — access until {date}.",
+      "refundRequested": "Refund request submitted.",
+      "wsPaymentConfirmed": "Payment confirmed.",
+      "wsPastDue": "Payment overdue — pay within 3 days to avoid suspension.",
+      "wsSuspended": "Subscription suspended for non-payment.",
+      "wsRefunded": "Refund approved — clears in up to 5 business days.",
+      "wsActivated": "Subscription reactivated."
+    },
+    "errors": {
+      "SUB_NOT_FOUND_001": "Subscription not found.",
+      "SUB_ACTIVE_001": "You already have an active subscription.",
+      "SUBSCRIPTION_NOT_ACTIVE_001": "Your subscription must be active for this operation.",
+      "INVALID_PLAN_CHANGE_001": "Invalid plan change for this operation.",
+      "BILLING_GATEWAY_001": "Temporary billing gateway failure. Please try again in a moment.",
+      "BILLING_GATEWAY_002": "Billing gateway rejected the data. Please review and try again.",
+      "REFUND_WINDOW_EXPIRED_001": "The 15-day refund window has expired.",
+      "REFUND_REQUEST_PENDING_001": "You already have a refund request under review.",
+      "REFUND_REQUEST_NOT_FOUND_001": "Refund request not found.",
+      "PLAN_NOT_FOUND_001": "Plan not found."
+    }
+  },
   "settings": {
     "title": "Settings",
     "tabs": {
@@ -700,6 +820,7 @@
     "services": "Services",
     "products": "Products",
     "ads": "Ads",
+    "billing": "Billing",
     "settings": "Settings",
     "admin": {
       "title": "Admin",
@@ -709,6 +830,7 @@
       "subscriptions": "Subscriptions",
       "billing": "Billing",
       "invoices": "Invoices",
+      "refunds": "Refunds",
       "avatars": "Avatars"
     }
   },
@@ -861,6 +983,56 @@
       "updated": "Plan updated.",
       "deleted": "Plan removed."
     },
+    "refunds": {
+      "title": "Refund requests",
+      "subtitle": "Approve or reject refunds requested by users.",
+      "loadFailed": "Failed to load requests.",
+      "empty": "No requests to review.",
+      "filters": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "columns": {
+        "user": "User",
+        "reason": "Reason",
+        "createdAt": "Requested on",
+        "statusLabel": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "approveModal": {
+        "title": "Approve refund for {userName}?",
+        "body": "Asaas will be charged to refund the last confirmed payment. The subscription will be cancelled (no further charges).",
+        "notesLabel": "Internal notes (optional)",
+        "confirm": "Confirm approval"
+      },
+      "rejectModal": {
+        "title": "Reject refund for {userName}?",
+        "body": "The user will see your reason in the notification.",
+        "notesLabel": "Rejection reason",
+        "confirm": "Confirm rejection"
+      },
+      "toasts": {
+        "approved": "Refund approved.",
+        "rejected": "Refund rejected."
+      },
+      "errors": {
+        "REFUND_REQUEST_NOT_FOUND_001": "Request not found.",
+        "REFUND_REQUEST_PENDING_001": "This request is no longer pending.",
+        "BILLING_GATEWAY_001": "Temporary Asaas failure. Please try again.",
+        "BILLING_GATEWAY_002": "Asaas rejected the refund.",
+        "GENERAL_VALIDATION_001": "There is no confirmed payment to refund."
+      }
+    },
     "subscriptions": {
       "title": "Subscriptions",
       "subtitle": "Active subscription management.",
@@ -902,7 +1074,32 @@
         "actions": "Actions"
       },
       "created": "Subscription created.",
-      "updated": "Subscription updated."
+      "updated": "Subscription updated.",
+      "statusLabels": {
+        "active": "Active",
+        "past_due": "Past due",
+        "suspended": "Suspended",
+        "cancelled": "Cancelled",
+        "ended": "Ended",
+        "refunded": "Refunded"
+      },
+      "columns": {
+        "currentPeriodEnd": "Next cycle",
+        "asaasSubscriptionId": "Asaas ID"
+      },
+      "actions": {
+        "subscribe": "Subscribe",
+        "upgrade": "Upgrade",
+        "downgrade": "Downgrade",
+        "cancel": "Cancel",
+        "forceStatus": "Force status"
+      },
+      "forceStatusModal": {
+        "title": "Force status",
+        "body": "Use only after reconciling manually with Asaas. This action does not trigger charge or refund at the gateway.",
+        "statusLabel": "New status",
+        "confirm": "Apply"
+      }
     },
     "invoices": {
       "title": "Invoices",
