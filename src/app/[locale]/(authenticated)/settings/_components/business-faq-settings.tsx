@@ -93,12 +93,16 @@ export function BusinessFaqSettings() {
   function handleConfirmDelete() {
     if (!faqToDelete) return;
     const target = faqToDelete;
+    // Close the dialog immediately so a fast second confirm (or a Strict-
+    // Mode-driven double invocation in dev) sees `faqToDelete === null`
+    // and bails out at the guard above instead of firing a duplicate
+    // DELETE that would 404.
+    setFaqToDelete(null);
+    if (expandedId === target.id) setExpandedId(null);
     startTransition(async () => {
       const result = await deleteFaq(target.id);
       if (result.success) {
         setFaqs((prev) => prev.filter((f) => f.id !== target.id));
-        if (expandedId === target.id) setExpandedId(null);
-        setFaqToDelete(null);
         toast.success(tc("delete"));
       } else {
         toast.error(result.error ?? "Erro ao excluir");
