@@ -13,11 +13,9 @@ import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Plus, Search, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { SearchableSelect } from "@/components/ui/searchable-select";
 import type {
   AdminUserPublic,
   PaginatedAdminUsers,
-  PlanOption,
 } from "@/lib/services";
 import { AdminHeader } from "../../_components/admin-header";
 import { formatDate } from "../../_lib/format";
@@ -31,20 +29,17 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 interface UsersViewFilters {
   readonly search: string;
-  readonly planId: string;
   readonly onboardingStatus: string;
 }
 
 interface UsersViewProps {
   readonly initialPage: PaginatedAdminUsers;
-  readonly initialPlans: readonly PlanOption[];
   readonly filters: UsersViewFilters;
   readonly errorMessage: string | null;
 }
 
 export function UsersView({
   initialPage,
-  initialPlans,
   filters,
   errorMessage,
 }: UsersViewProps) {
@@ -196,7 +191,7 @@ export function UsersView({
 
   const hasActiveFilters = useMemo(
     () =>
-      Boolean(filters.search || filters.planId || filters.onboardingStatus),
+      Boolean(filters.search || filters.onboardingStatus),
     [filters],
   );
 
@@ -224,8 +219,8 @@ export function UsersView({
         </div>
       )}
 
-      <div className="grid gap-3 rounded-xl bg-surface-container-lowest p-4 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="relative col-span-full lg:col-span-2">
+      <div className="grid gap-3 rounded-xl bg-surface-container-lowest p-4 sm:grid-cols-2">
+        <label className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" />
           <input
             className="h-10 w-full rounded-lg bg-surface-container-high pl-9 pr-3 text-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary/30"
@@ -235,14 +230,6 @@ export function UsersView({
             value={searchInput}
           />
         </label>
-        <SearchableSelect
-          allowClear
-          clearLabel={t("filters.allPlans")}
-          onChange={(v) => handleFilterChange("planId", v)}
-          options={initialPlans.map((p) => ({ value: p.id, label: p.name }))}
-          placeholder={t("filters.allPlans")}
-          value={filters.planId}
-        />
         <select
           className={FILTER_SELECT_CLASS}
           onChange={(e) =>
@@ -358,7 +345,6 @@ export function UsersView({
           formState?.mode === "edit" ? handleEditSubmit : handleCreateSubmit
         }
         open={formState !== null}
-        plans={initialPlans}
       />
 
       <ConfirmDialog

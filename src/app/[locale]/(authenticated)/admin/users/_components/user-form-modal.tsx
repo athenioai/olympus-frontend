@@ -2,26 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type {
-  AdminUserPublic,
-  PlanOption,
-  UserRole,
-} from "@/lib/services";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import type { AdminUserPublic, UserRole } from "@/lib/services";
 import { Modal } from "../../_components/modal";
 
 export interface UserFormValues {
   readonly name?: string;
   readonly email: string;
   readonly role?: UserRole;
-  readonly planId?: string;
 }
 
 interface UserFormModalProps {
   readonly open: boolean;
   readonly mode: "create" | "edit";
   readonly initialUser: AdminUserPublic | null;
-  readonly plans: readonly PlanOption[];
   readonly isPending: boolean;
   readonly onClose: () => void;
   readonly onSubmit: (values: UserFormValues) => void;
@@ -33,7 +26,6 @@ export function UserFormModal({
   open,
   mode,
   initialUser,
-  plans,
   isPending,
   onClose,
   onSubmit,
@@ -44,7 +36,6 @@ export function UserFormModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<UserRole>("user");
-  const [planId, setPlanId] = useState<string>("");
 
   useEffect(() => {
     if (!open) return;
@@ -52,29 +43,24 @@ export function UserFormModal({
       setName(initialUser.name ?? "");
       setEmail(initialUser.email);
       setRole(initialUser.role);
-      setPlanId(initialUser.planId ?? "");
     } else {
       setName("");
       setEmail("");
       setRole("user");
-      setPlanId("");
     }
   }, [open, mode, initialUser]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (mode === "create") {
-      if (!planId) return;
-      onSubmit({ email: email.trim(), planId });
+      onSubmit({ email: email.trim() });
       return;
     }
-    const values: UserFormValues = {
+    onSubmit({
       name: name.trim(),
       email: email.trim(),
       role,
-      ...(planId ? { planId } : {}),
-    };
-    onSubmit(values);
+    });
   }
 
   return (
@@ -103,16 +89,6 @@ export function UserFormModal({
             value={email}
           />
         </Field>
-        <Field label={t("plan")}>
-          <SearchableSelect
-            allowClear={mode === "edit"}
-            clearLabel={mode === "edit" ? t("noPlan") : undefined}
-            onChange={setPlanId}
-            options={plans.map((p) => ({ value: p.id, label: p.name }))}
-            placeholder={mode === "create" ? t("selectPlan") : t("noPlan")}
-            value={planId}
-          />
-        </Field>
         {mode === "edit" && (
           <Field label={t("role")}>
             <select
@@ -139,7 +115,7 @@ export function UserFormModal({
           </button>
           <button
             className="h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-5 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 disabled:opacity-60"
-            disabled={isPending || (mode === "create" && !planId)}
+            disabled={isPending}
             type="submit"
           >
             {mode === "create" ? t("submitCreate") : t("submitUpdate")}

@@ -20,14 +20,12 @@ const idSchema = z.string().uuid();
 
 const createUserSchema = z.object({
   email: z.string().trim().email(),
-  planId: z.string().uuid(),
 });
 
 const updateUserSchema = z.object({
   name: z.string().trim().min(1).max(255).optional(),
   email: z.string().trim().email().optional(),
   role: roleSchema.optional(),
-  planId: z.string().uuid().optional().or(z.literal("").transform(() => undefined)),
 });
 
 export async function createAdminUserAction(
