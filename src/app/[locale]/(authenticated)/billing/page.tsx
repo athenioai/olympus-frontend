@@ -2,15 +2,33 @@ import { getTranslations } from "next-intl/server";
 import { ApiError } from "@/lib/api-envelope";
 import { captureUnexpected } from "@/lib/observability/capture";
 import { subscriptionsService } from "@/lib/services";
+import type { SubscriptionStatus } from "@/lib/services";
 import { getPlanOptions } from "@/lib/services/plan-options-source";
 import { PlanGrid } from "./_components/plan-grid";
 import { SubscriptionOverview } from "./_components/subscription-overview";
 
 /**
- * /billing -- server component branching on whether the caller has a sub.
- *  - 404 from /subscriptions/me  -> render <PlanGrid> (Case A).
- *  - 200                         -> render <SubscriptionOverview> (Case B).
- *  - any other failure           -> render the loadFailed message.
+ * Statuses where the user has no live subscription and can re-subscribe.
+ * Backend keeps the historical record (so /me returns 200) but the user
+ * should see the plan grid, not an overview of a dead subscription.
+ *
+ * `cancelled` is intentionally NOT terminal: the user still has access
+ * until `currentPeriodEnd`, after which the backend transitions them to
+ * `ended`.
+ */
+const TERMINAL_STATUSES: ReadonlySet<SubscriptionStatus> = new Set([
+  "ended",
+  "refunded",
+]);
+
+/**
+ * /billing -- server component branching on subscription state.
+ *  - 404 from /subscriptions/me           -> <PlanGrid> (Case A).
+ *  - 200 with terminal status (ended /
+ *    refunded)                            -> <PlanGrid> (re-subscribe flow).
+ *  - 200 with live status (active /
+ *    past_due / suspended / cancelled)    -> <SubscriptionOverview> (Case B).
+ *  - any other failure                    -> loadFailed message.
  */
 export default async function BillingPage() {
   const t = await getTranslations("billing");
@@ -35,7 +53,10 @@ export default async function BillingPage() {
     }
   }
 
-  if (!subscription) {
+  const isTerminal =
+    subscription !== null && TERMINAL_STATUSES.has(subscription.status);
+
+  if (subscription === null || isTerminal) {
     const plans = await getPlanOptions();
     return (
       <div className="mx-auto max-w-5xl">
@@ -44,7 +65,7 @@ export default async function BillingPage() {
     );
   }
 
-  // Case B -- load payments concurrently with the plan catalog (used by change modal).
+  // Live subscription -- load payments and plan catalog concurrently.
   const [paymentsResult, plansResult] = await Promise.allSettled([
     subscriptionsService.listMyPayments(),
     getPlanOptions(),
