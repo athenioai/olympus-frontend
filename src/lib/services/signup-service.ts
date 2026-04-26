@@ -17,7 +17,7 @@ class SignupService implements ISignupService {
     const response = await fetch(`${API_URL}/signup/begin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ email: payload.email }),
     });
 
     if (!response.ok && response.status !== 200) {

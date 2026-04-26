@@ -247,11 +247,10 @@ export type {
   UpdatePlanPayload,
 } from "./interfaces/admin-plan-service";
 export type {
-  CreateSubscriptionPayload,
   IAdminSubscriptionService,
   ListAdminSubscriptionsParams,
   PaginatedAdminSubscriptions,
-  UpdateSubscriptionPayload,
+  UpdateSubscriptionStatusPayload,
 } from "./interfaces/admin-subscription-service";
 export type {
   CreateInvoicePayload,

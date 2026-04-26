@@ -21,7 +21,6 @@ export interface ListAdminUsersParams {
   readonly page?: number;
   readonly limit?: number;
   readonly search?: string;
-  readonly planId?: string;
   readonly role?: UserRole;
   readonly onboardingStatus?: OnboardingStatus;
 }
@@ -35,13 +34,11 @@ export interface PaginatedAdminUsers {
 
 export interface CreateAdminUserPayload {
   readonly email: string;
-  readonly planId: string;
 }
 
 export interface UpdateAdminUserPayload {
   readonly name?: string;
   readonly email?: string;
-  readonly planId?: string;
   readonly role?: UserRole;
 }
 

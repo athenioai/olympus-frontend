@@ -1,15 +1,12 @@
 import type { SubscriptionPublic, SubscriptionStatus } from "./admin-types";
 
-export interface CreateSubscriptionPayload {
-  readonly userId: string;
-  readonly planId: string;
-  readonly billingDay: number;
-}
-
-export interface UpdateSubscriptionPayload {
-  readonly planId?: string;
-  readonly billingDay?: number;
-  readonly status?: SubscriptionStatus;
+/**
+ * Manual override of subscription status (support tooling). Use only after
+ * reconciling with Asaas — backend will not push to gateway as part of this
+ * call.
+ */
+export interface UpdateSubscriptionStatusPayload {
+  readonly status: SubscriptionStatus;
 }
 
 export interface ListAdminSubscriptionsParams {
@@ -18,7 +15,6 @@ export interface ListAdminSubscriptionsParams {
   readonly status?: SubscriptionStatus;
   readonly planId?: string;
   readonly userId?: string;
-  readonly billingDay?: number;
 }
 
 export interface PaginatedAdminSubscriptions {
@@ -28,14 +24,23 @@ export interface PaginatedAdminSubscriptions {
   readonly limit: number;
 }
 
+/**
+ * Admin-side facade over `/admin/subscriptions`. Subscribe / upgrade /
+ * downgrade / cancel all act on a target user; the response is the resulting
+ * `SubscriptionPublic` (or void for cancel which only mutates state).
+ */
 export interface IAdminSubscriptionService {
-  create(payload: CreateSubscriptionPayload): Promise<SubscriptionPublic>;
   list(
     params?: ListAdminSubscriptionsParams,
   ): Promise<PaginatedAdminSubscriptions>;
   getById(id: string): Promise<SubscriptionPublic>;
-  update(
+  /** Force a status — support escape hatch. */
+  updateStatus(
     id: string,
-    payload: UpdateSubscriptionPayload,
+    payload: UpdateSubscriptionStatusPayload,
   ): Promise<SubscriptionPublic>;
+  subscribe(userId: string, planId: string): Promise<SubscriptionPublic>;
+  upgrade(userId: string, planId: string): Promise<SubscriptionPublic>;
+  downgrade(userId: string, planId: string): Promise<SubscriptionPublic>;
+  cancel(userId: string): Promise<SubscriptionPublic>;
 }

@@ -3,44 +3,34 @@ import { unwrapEnvelope } from "@/lib/api-envelope";
 import { CACHE_TAGS, CACHE_TIMES } from "@/lib/cache-config";
 import type { SubscriptionPublic } from "./interfaces/admin-types";
 import type {
-  CreateSubscriptionPayload,
   IAdminSubscriptionService,
   ListAdminSubscriptionsParams,
   PaginatedAdminSubscriptions,
-  UpdateSubscriptionPayload,
+  UpdateSubscriptionStatusPayload,
 } from "./interfaces/admin-subscription-service";
 
-class AdminSubscriptionService implements IAdminSubscriptionService {
-  async create(
-    payload: CreateSubscriptionPayload,
-  ): Promise<SubscriptionPublic> {
-    const response = await authFetch("/admin/subscriptions", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    return unwrapEnvelope<SubscriptionPublic>(response);
-  }
+function buildQuery(params?: ListAdminSubscriptionsParams): string {
+  const search = new URLSearchParams();
+  if (params?.page) search.set("page", String(params.page));
+  if (params?.limit) search.set("limit", String(params.limit));
+  if (params?.status) search.set("status", params.status);
+  if (params?.planId) search.set("planId", params.planId);
+  if (params?.userId) search.set("userId", params.userId);
+  return search.toString();
+}
 
+class AdminSubscriptionService implements IAdminSubscriptionService {
   async list(
     params?: ListAdminSubscriptionsParams,
   ): Promise<PaginatedAdminSubscriptions> {
-    const query = new URLSearchParams();
-    if (params?.page !== undefined) query.set("page", String(params.page));
-    if (params?.limit !== undefined) query.set("limit", String(params.limit));
-    if (params?.status) query.set("status", params.status);
-    if (params?.planId) query.set("planId", params.planId);
-    if (params?.userId) query.set("userId", params.userId);
-    if (params?.billingDay !== undefined) {
-      query.set("billingDay", String(params.billingDay));
-    }
-    const qs = query.toString();
-    const response = await authFetch(
-      qs ? `/admin/subscriptions?${qs}` : "/admin/subscriptions",
-      {
-        revalidate: CACHE_TIMES.adminSubscriptions,
-        tags: [CACHE_TAGS.adminSubscriptions],
-      },
-    );
+    const query = buildQuery(params);
+    const path = query
+      ? `/admin/subscriptions?${query}`
+      : "/admin/subscriptions";
+    const response = await authFetch(path, {
+      revalidate: CACHE_TIMES.adminSubscriptions,
+      tags: [CACHE_TAGS.adminSubscriptions],
+    });
     return unwrapEnvelope<PaginatedAdminSubscriptions>(response);
   }
 
@@ -55,16 +45,45 @@ class AdminSubscriptionService implements IAdminSubscriptionService {
     return unwrapEnvelope<SubscriptionPublic>(response);
   }
 
-  async update(
+  async updateStatus(
     id: string,
-    payload: UpdateSubscriptionPayload,
+    payload: UpdateSubscriptionStatusPayload,
   ): Promise<SubscriptionPublic> {
     const response = await authFetch(
       `/admin/subscriptions/${encodeURIComponent(id)}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-      },
+      { method: "PATCH", body: JSON.stringify(payload) },
+    );
+    return unwrapEnvelope<SubscriptionPublic>(response);
+  }
+
+  async subscribe(userId: string, planId: string): Promise<SubscriptionPublic> {
+    const response = await authFetch(
+      `/admin/subscriptions/${encodeURIComponent(userId)}/subscribe`,
+      { method: "POST", body: JSON.stringify({ planId }) },
+    );
+    return unwrapEnvelope<SubscriptionPublic>(response);
+  }
+
+  async upgrade(userId: string, planId: string): Promise<SubscriptionPublic> {
+    const response = await authFetch(
+      `/admin/subscriptions/${encodeURIComponent(userId)}/upgrade`,
+      { method: "POST", body: JSON.stringify({ planId }) },
+    );
+    return unwrapEnvelope<SubscriptionPublic>(response);
+  }
+
+  async downgrade(userId: string, planId: string): Promise<SubscriptionPublic> {
+    const response = await authFetch(
+      `/admin/subscriptions/${encodeURIComponent(userId)}/downgrade`,
+      { method: "POST", body: JSON.stringify({ planId }) },
+    );
+    return unwrapEnvelope<SubscriptionPublic>(response);
+  }
+
+  async cancel(userId: string): Promise<SubscriptionPublic> {
+    const response = await authFetch(
+      `/admin/subscriptions/${encodeURIComponent(userId)}/cancel`,
+      { method: "POST" },
     );
     return unwrapEnvelope<SubscriptionPublic>(response);
   }

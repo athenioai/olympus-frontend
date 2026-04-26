@@ -4,7 +4,13 @@
  */
 
 export type UserRole = "admin" | "user";
-export type SubscriptionStatus = "active" | "suspended" | "cancelled";
+export type SubscriptionStatus =
+  | "active"
+  | "past_due"
+  | "suspended"
+  | "cancelled"
+  | "ended"
+  | "refunded";
 export type AdminInvoiceStatus =
   | "pending"
   | "paid"
@@ -22,7 +28,6 @@ export interface AdminUserPublic {
   readonly name: string | null;
   readonly email: string;
   readonly role: UserRole;
-  readonly planId: string | null;
   readonly contractUrl: string | null;
   readonly onboardingSlug: string | null;
   readonly createdAt: string;
@@ -44,15 +49,24 @@ export interface SubscriptionPublic {
   readonly userEmail: string | null;
   readonly planId: string;
   /**
-   * Denormalized plan name returned by the backend (commit 490856d, QA Bug 9)
-   * so admin views don't have to join against /admin/plans client-side. `null`
-   * when the underlying plan was soft-deleted and the backend chose not to
-   * backfill — callers should fall back to a neutral label in that case.
+   * Denormalized plan name. Null when the plan was soft-deleted and the
+   * backend chose not to backfill — callers should fall back to a neutral
+   * label.
    */
   readonly planName: string | null;
   readonly status: SubscriptionStatus;
-  readonly billingDay: number;
+  /** Asaas-side subscription identifier; useful for support/troubleshooting. */
+  readonly asaasSubscriptionId: string | null;
+  /** ISO 8601 — end of the currently paid cycle. */
+  readonly currentPeriodEnd: string;
+  /** ISO 8601 — when Asaas will attempt the next charge. Null if not scheduled. */
+  readonly nextPaymentAt: string | null;
+  /** When true the subscription will end at currentPeriodEnd (no further charges). */
+  readonly cancelAtPeriodEnd: boolean;
   readonly cancelledAt: string | null;
+  readonly suspendedAt: string | null;
+  readonly refundedAt: string | null;
+  readonly startedAt: string;
   readonly createdAt: string;
 }
 

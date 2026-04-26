@@ -34,7 +34,6 @@ class AdminUserService implements IAdminUserService {
     if (params?.page !== undefined) query.set("page", String(params.page));
     if (params?.limit !== undefined) query.set("limit", String(params.limit));
     if (params?.search) query.set("search", params.search);
-    if (params?.planId) query.set("planId", params.planId);
     if (params?.role) query.set("role", params.role);
     if (params?.onboardingStatus) {
       query.set("onboardingStatus", params.onboardingStatus);

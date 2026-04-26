@@ -1,6 +1,5 @@
 export interface SignupBeginPayload {
   readonly email: string;
-  readonly planId?: string;
 }
 
 export interface SignupBeginResponse {
