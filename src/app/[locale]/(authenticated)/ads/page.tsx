@@ -12,7 +12,11 @@ interface AdsPageProps {
   }>;
 }
 
-const CATALOG_FETCH_LIMIT = 200;
+// Backend rejected 200 with GENERAL_VALIDATION_001. Cap appears to live at 100;
+// if a tenant ever has more than 100 services or 100 products the picker will
+// silently miss the overflow. Tracked as follow-up: server-side search inside
+// the picker.
+const CATALOG_FETCH_LIMIT = 100;
 
 interface ErrorShape {
   readonly kind: string;
