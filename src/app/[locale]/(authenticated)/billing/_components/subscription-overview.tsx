@@ -14,10 +14,6 @@ import { PaymentsTable } from "./payments-table";
 import { ChangePlanModal } from "./change-plan-modal";
 import { CancelModal } from "./cancel-modal";
 import { RefundRequestModal } from "./refund-request-modal";
-import {
-  RefundStatusCard,
-  type RefundStatusKind,
-} from "./refund-status-card";
 import { setSuspended } from "@/lib/subscription-banner-store";
 import type { MyPayment, MySubscription } from "@/lib/services";
 import type { PlanOption } from "@/lib/services/plan-options-source";
@@ -45,6 +41,14 @@ function formatDate(iso: string): string {
   });
 }
 
+function formatDateTime(iso: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(iso));
+}
+
 export function SubscriptionOverview({
   subscription,
   payments,
@@ -54,17 +58,16 @@ export function SubscriptionOverview({
   const tc = useTranslations("common");
   const router = useRouter();
   const [openModal, setOpenModal] = useState<ModalKind | null>(null);
-  const [refundStatus, setRefundStatus] = useState<{
-    kind: RefundStatusKind;
-    reason?: string;
-  } | null>(null);
 
   const actionsDisabled = DISABLED_STATUSES.has(subscription.status);
   const cancelDisabled =
     actionsDisabled || subscription.cancelAtPeriodEnd;
-  const refundEligible = isWithinRefundWindow(
-    subscription.refundEligibleUntil,
-  );
+  const canRequestRefund =
+    isWithinRefundWindow(subscription.refundEligibleUntil) &&
+    subscription.pendingRefundRequest === null &&
+    (subscription.status === "active" ||
+      subscription.status === "past_due" ||
+      subscription.status === "cancelled");
 
   // Reconcile the global suspended banner with /me data on first paint,
   // regardless of whether a 402 or WS event has fired yet.
@@ -90,8 +93,8 @@ export function SubscriptionOverview({
 
   function handleRefundConfirmed() {
     setOpenModal(null);
-    setRefundStatus({ kind: "pending" });
     toast.success(t("toasts.refundRequested"));
+    router.refresh();
   }
 
   return (
@@ -168,7 +171,7 @@ export function SubscriptionOverview({
         </motion.div>
       )}
 
-      {refundEligible && !refundStatus && (
+      {canRequestRefund && (
         <motion.div
           className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-emerald-500/10 px-5 py-3"
           variants={fadeInUp}
@@ -188,13 +191,28 @@ export function SubscriptionOverview({
         </motion.div>
       )}
 
-      {/* Refund status card */}
-      {refundStatus && (
-        <motion.div variants={fadeInUp}>
-          <RefundStatusCard
-            kind={refundStatus.kind}
-            reason={refundStatus.reason}
-          />
+      {/* Pending refund request — in analysis */}
+      {subscription.pendingRefundRequest !== null && (
+        <motion.div
+          className="rounded-xl bg-amber-500/10 p-4"
+          variants={fadeInUp}
+        >
+          <p className="font-display text-sm font-bold text-amber-700">
+            {t("refundPending.title")}
+          </p>
+          <p className="mt-1 text-[13px] text-on-surface">
+            {t("refundPending.requestedAt", {
+              date: formatDateTime(subscription.pendingRefundRequest.requestedAt),
+            })}
+          </p>
+          <p className="mt-0.5 text-[13px] text-on-surface">
+            {t("refundPending.reason", {
+              reason: subscription.pendingRefundRequest.reason,
+            })}
+          </p>
+          <p className="mt-2 text-[13px] text-on-surface-variant">
+            {t("refundPending.body")}
+          </p>
         </motion.div>
       )}
 

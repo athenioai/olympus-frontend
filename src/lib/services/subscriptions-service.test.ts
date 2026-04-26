@@ -57,6 +57,7 @@ describe("subscriptionsService", () => {
         refundEligibleUntil: "2026-05-10T00:00:00Z",
         pendingChange: null,
         cancelAtPeriodEnd: false,
+        pendingRefundRequest: null,
       }),
     );
     const result = await subscriptionsService.getMe();

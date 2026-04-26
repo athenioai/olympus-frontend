@@ -740,10 +740,11 @@
       "reasonPlaceholder": "Cuéntanos por qué pides el reembolso (mínimo 10 caracteres).",
       "confirm": "Enviar solicitud"
     },
-    "refundStatus": {
-      "pending": "🕐 Solicitud en revisión — respuesta en hasta 24h.",
-      "approved": "✅ Reembolso aprobado.",
-      "rejected": "❌ Reembolso rechazado: {reason}"
+    "refundPending": {
+      "title": "Reembolso en revisión",
+      "requestedAt": "Solicitado el {date}.",
+      "reason": "Motivo: \"{reason}\"",
+      "body": "Te avisaremos por aquí en cuanto haya respuesta."
     },
     "globalSuspended": {
       "title": "Tu suscripción está suspendida.",

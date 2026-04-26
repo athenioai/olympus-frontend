@@ -16,6 +16,13 @@ export interface PendingPlanChange {
   readonly effectiveAt: string;
 }
 
+export interface PendingRefundRequest {
+  readonly id: string;
+  readonly reason: string;
+  /** ISO-8601 UTC timestamp. */
+  readonly requestedAt: string;
+}
+
 /** User-facing snapshot of the caller's own subscription. */
 export interface MySubscription {
   readonly subscriptionId: string;
@@ -27,6 +34,12 @@ export interface MySubscription {
   readonly refundEligibleUntil: string;
   readonly pendingChange: PendingPlanChange | null;
   readonly cancelAtPeriodEnd: boolean;
+  /**
+   * When non-null, the user already has a pending refund request — UI should
+   * hide the "Solicitar reembolso" CTA and show an "in analysis" block
+   * instead. Becomes null again once admin approves/rejects the request.
+   */
+  readonly pendingRefundRequest: PendingRefundRequest | null;
 }
 
 export interface MyPayment {

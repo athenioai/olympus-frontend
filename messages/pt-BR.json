@@ -806,10 +806,11 @@
       "reasonPlaceholder": "Conte por que está pedindo o reembolso (mínimo 10 caracteres).",
       "confirm": "Enviar solicitação"
     },
-    "refundStatus": {
-      "pending": "🕐 Solicitação em análise — retorno em até 24h.",
-      "approved": "✅ Reembolso aprovado.",
-      "rejected": "❌ Reembolso rejeitado: {reason}"
+    "refundPending": {
+      "title": "Reembolso em análise",
+      "requestedAt": "Pedido em {date}.",
+      "reason": "Motivo: \"{reason}\"",
+      "body": "Vamos te avisar por aqui assim que houver uma resposta."
     },
     "globalSuspended": {
       "title": "Sua assinatura está suspensa.",

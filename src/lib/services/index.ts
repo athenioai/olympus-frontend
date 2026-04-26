@@ -273,6 +273,7 @@ export type {
   MySubscription,
   PaymentStatus,
   PendingPlanChange,
+  PendingRefundRequest,
   SubscribeResponse,
   SubscriptionPlan,
 } from "./interfaces/subscriptions-service";

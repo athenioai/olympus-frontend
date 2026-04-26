@@ -747,10 +747,11 @@
       "reasonPlaceholder": "Tell us why you're asking for a refund (10 chars minimum).",
       "confirm": "Submit request"
     },
-    "refundStatus": {
-      "pending": "🕐 Under review — back to you within 24h.",
-      "approved": "✅ Refund approved.",
-      "rejected": "❌ Refund rejected: {reason}"
+    "refundPending": {
+      "title": "Refund under review",
+      "requestedAt": "Requested on {date}.",
+      "reason": "Reason: \"{reason}\"",
+      "body": "We'll let you know here as soon as there's an answer."
     },
     "globalSuspended": {
       "title": "Your subscription is suspended.",
