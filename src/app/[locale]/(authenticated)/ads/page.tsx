@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { ApiError } from "@/lib/api-envelope";
 import { captureUnexpected } from "@/lib/observability/capture";
 import { adsService, financeService } from "@/lib/services";
 import type { Ad, Product, Service } from "@/lib/services";
@@ -17,28 +16,6 @@ interface AdsPageProps {
 // silently miss the overflow — server-side search in the picker is the
 // tracked follow-up.
 const CATALOG_FETCH_LIMIT = 100;
-
-interface ErrorShape {
-  readonly kind: string;
-  readonly message: string;
-  readonly code?: string;
-  readonly status?: number;
-}
-
-function logShape(reason: unknown): ErrorShape {
-  if (reason instanceof ApiError) {
-    return {
-      kind: "ApiError",
-      message: reason.message,
-      code: reason.code,
-      status: reason.status,
-    };
-  }
-  if (reason instanceof Error) {
-    return { kind: reason.name, message: reason.message };
-  }
-  return { kind: typeof reason, message: String(reason) };
-}
 
 /**
  * Standalone ads page — fetches ads + the user's services and products
@@ -70,9 +47,6 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
     ads = adsSettled.value;
   } else {
     captureUnexpected(adsSettled.reason);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[ads page] listAds failed:", logShape(adsSettled.reason));
-    }
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <p className="text-sm text-on-surface-variant">{t("loadFailed")}</p>
@@ -84,18 +58,12 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
     services = servicesSettled.value.items;
   } else {
     captureUnexpected(servicesSettled.reason);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[ads page] listServices failed:", logShape(servicesSettled.reason));
-    }
   }
 
   if (productsSettled.status === "fulfilled") {
     products = productsSettled.value.items;
   } else {
     captureUnexpected(productsSettled.reason);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[ads page] listProducts failed:", logShape(productsSettled.reason));
-    }
   }
 
   return (
