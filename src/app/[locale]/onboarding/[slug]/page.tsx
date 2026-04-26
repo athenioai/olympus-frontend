@@ -96,7 +96,15 @@ async function renderAuthenticated(slug: string) {
       if (err.status === 410) redirect("/onboarding/error/completed");
     }
     if (err instanceof Error && err.message === "NOT_AUTHENTICATED") {
-      redirect("/login");
+      // Defensive: when Next.js revalidates the route right after a step's
+      // server action, the cookies set inside that action are not always
+      // visible to the immediately following render — userService.getMe()
+      // ends up authFetch'ing without a token and throws NOT_AUTHENTICATED.
+      // The Wizard's client state already advanced past step 1, so just
+      // serve the unauthenticated shell instead of bouncing to /login.
+      // The next navigation/refresh sees the cookies and falls back into
+      // renderAuthenticated naturally.
+      return renderUnauthenticated(slug);
     }
     throw err;
   }
