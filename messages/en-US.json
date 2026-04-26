@@ -639,6 +639,7 @@
     "linksSubtitle": "Link services and products this ad promotes. The AI will know them when chatting with leads.",
     "linksEmpty": "No items linked. The AI won't mention specific products/services for this campaign.",
     "addItem": "Add item",
+    "removeItem": "Remove item",
     "addItemsCount": "Add {count, plural, one {# selected} other {# selected}}",
     "tabs": {
       "services": "Services",
@@ -653,7 +654,7 @@
     "searchPlaceholder": "Search by name...",
     "allStatuses": "All",
     "empty": "No ads yet.",
-    "loadFailed": "Failed to load ads."
+    "loadFailed": "Failed to load ads. Please try again later."
   },
   "settings": {
     "title": "Settings",

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { adsService, financeService } from "@/lib/services";
 import type { Ad, Product, Service } from "@/lib/services";
 import { AdsTable } from "./_components/ads-table";
@@ -19,6 +20,7 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const search = params.search ?? "";
+  const t = await getTranslations("ads");
 
   let ads: readonly Ad[] = [];
   let services: readonly Service[] = [];
@@ -40,9 +42,7 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
   } catch {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-sm text-on-surface-variant">
-          Não foi possível carregar os anúncios. Tente novamente mais tarde.
-        </p>
+        <p className="text-sm text-on-surface-variant">{t("loadFailed")}</p>
       </div>
     );
   }

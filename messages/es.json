@@ -632,6 +632,7 @@
     "linksSubtitle": "Vincula servicios y productos que este anuncio promueve. La IA los conocerá al hablar con leads.",
     "linksEmpty": "Sin ítems vinculados. La IA no mencionará productos/servicios específicos para esta campaña.",
     "addItem": "Agregar ítem",
+    "removeItem": "Eliminar ítem",
     "addItemsCount": "Agregar {count, plural, one {# seleccionado} other {# seleccionados}}",
     "tabs": {
       "services": "Servicios",
@@ -646,7 +647,7 @@
     "searchPlaceholder": "Buscar por nombre...",
     "allStatuses": "Todos",
     "empty": "Aún no hay anuncios.",
-    "loadFailed": "No se pudieron cargar los anuncios."
+    "loadFailed": "No se pudieron cargar los anuncios. Inténtalo de nuevo más tarde."
   },
   "settings": {
     "title": "Configuración",

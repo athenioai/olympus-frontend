@@ -111,7 +111,7 @@ export function ItemsPicker({
                   {formatBRL(item.price)}
                 </span>
                 <button
-                  aria-label="remover"
+                  aria-label={t("removeItem")}
                   className="ml-1 flex h-4 w-4 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-lowest hover:text-on-surface"
                   onClick={() => removeItem(item)}
                   type="button"
