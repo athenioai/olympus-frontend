@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { unwrapEnvelope } from "@/lib/api-envelope";
 import { API_URL, IS_PRODUCTION } from "@/lib/env";
+import { setSuspended } from "@/lib/subscription-banner-store";
 
 const TOKEN_CONFIG = {
   accessMaxAge: 60 * 60,
@@ -106,6 +107,19 @@ export async function authFetch(
   const response = await fetch(url, { ...fetchOptions, ...nextConfig, headers });
 
   if (response.status !== 401) {
+    if (response.status === 402) {
+      try {
+        const cloned = response.clone();
+        const envelope = (await cloned.json()) as {
+          error?: { code?: string };
+        } | null;
+        if (envelope?.error?.code === "SUBSCRIPTION_INACTIVE_001") {
+          setSuspended(true);
+        }
+      } catch {
+        // body wasn't JSON; leave the banner alone
+      }
+    }
     return response;
   }
 
@@ -141,5 +155,21 @@ export async function authFetch(
   }
 
   headers.Authorization = `Bearer ${tokens.accessToken}`;
-  return fetch(url, { ...fetchOptions, ...nextConfig, headers });
+  const retried = await fetch(url, { ...fetchOptions, ...nextConfig, headers });
+
+  if (retried.status === 402) {
+    try {
+      const cloned = retried.clone();
+      const envelope = (await cloned.json()) as {
+        error?: { code?: string };
+      } | null;
+      if (envelope?.error?.code === "SUBSCRIPTION_INACTIVE_001") {
+        setSuspended(true);
+      }
+    } catch {
+      // body wasn't JSON; leave the banner alone
+    }
+  }
+
+  return retried;
 }
