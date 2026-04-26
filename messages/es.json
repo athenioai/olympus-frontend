@@ -606,6 +606,48 @@
     "hasPromoNo": "Sin promoción",
     "requirePrepaymentNotice": "Los artículos de este catálogo requieren pago anticipado."
   },
+  "ads": {
+    "title": "Anuncios",
+    "subtitle": "Crea campañas para que la IA las mencione cuando los leads pregunten.",
+    "newAd": "Nuevo anuncio",
+    "name": "Nombre",
+    "content": "Mensaje del anuncio",
+    "contentHint": "La IA usará este texto al hablar con leads sobre la campaña.",
+    "platform": "Plataforma",
+    "platformPlaceholder": "Selecciona una plataforma",
+    "platforms": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "whatsapp": "WhatsApp",
+      "google": "Google",
+      "other": "Otra"
+    },
+    "validFrom": "Válido desde",
+    "validTo": "Válido hasta",
+    "validityHint": "Opcional. Déjalo vacío para validez indefinida.",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "linksTitle": "Vínculos del catálogo",
+    "linksSubtitle": "Vincula servicios y productos que este anuncio promueve. La IA los conocerá al hablar con leads.",
+    "linksEmpty": "Sin ítems vinculados. La IA no mencionará productos/servicios específicos para esta campaña.",
+    "addItem": "Agregar ítem",
+    "addItemsCount": "Agregar {count, plural, one {# seleccionado} other {# seleccionados}}",
+    "tabs": {
+      "services": "Servicios",
+      "products": "Productos"
+    },
+    "itemSearchPlaceholder": "Buscar en el catálogo...",
+    "itemsLimit": "{used}/{max}",
+    "itemsLimitReached": "Se alcanzó el límite de {max} ítems.",
+    "noItems": "0 ítems vinculados",
+    "itemsCount": "{count, plural, one {# ítem vinculado} other {# ítems vinculados}}",
+    "deleteConfirm": "¿Seguro que quieres eliminar este anuncio?",
+    "searchPlaceholder": "Buscar por nombre...",
+    "allStatuses": "Todos",
+    "empty": "Aún no hay anuncios.",
+    "loadFailed": "No se pudieron cargar los anuncios."
+  },
   "settings": {
     "title": "Configuración",
     "tabs": {
@@ -649,6 +691,7 @@
     "calendar": "Calendario",
     "services": "Servicios",
     "products": "Productos",
+    "ads": "Anuncios",
     "settings": "Configuración",
     "admin": {
       "title": "Admin",

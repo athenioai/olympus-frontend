@@ -672,6 +672,48 @@
     "hasPromoNo": "Sem promoção",
     "requirePrepaymentNotice": "Os itens deste catálogo exigem pagamento antecipado."
   },
+  "ads": {
+    "title": "Anúncios",
+    "subtitle": "Crie campanhas para a IA mencionar quando os leads perguntarem.",
+    "newAd": "Novo Anúncio",
+    "name": "Nome",
+    "content": "Mensagem do anúncio",
+    "contentHint": "A IA vai usar esse texto ao falar com leads sobre a campanha.",
+    "platform": "Plataforma",
+    "platformPlaceholder": "Selecione a plataforma",
+    "platforms": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "whatsapp": "WhatsApp",
+      "google": "Google",
+      "other": "Outra"
+    },
+    "validFrom": "Vigente a partir de",
+    "validTo": "Vigente até",
+    "validityHint": "Opcional. Deixe em branco para vigência indefinida.",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "linksTitle": "Vínculos com catálogo",
+    "linksSubtitle": "Vincule serviços e produtos que esse anúncio promove. A IA vai conhecer eles ao conversar com leads.",
+    "linksEmpty": "Nenhum item vinculado. A IA não vai mencionar produtos/serviços específicos quando responder sobre essa campanha.",
+    "addItem": "Adicionar item",
+    "addItemsCount": "Adicionar {count, plural, one {# selecionado} other {# selecionados}}",
+    "tabs": {
+      "services": "Serviços",
+      "products": "Produtos"
+    },
+    "itemSearchPlaceholder": "Buscar no catálogo...",
+    "itemsLimit": "{used}/{max}",
+    "itemsLimitReached": "Limite de {max} itens atingido.",
+    "noItems": "0 itens vinculados",
+    "itemsCount": "{count, plural, one {# item vinculado} other {# itens vinculados}}",
+    "deleteConfirm": "Tem certeza que deseja excluir este anúncio?",
+    "searchPlaceholder": "Buscar por nome...",
+    "allStatuses": "Todos",
+    "empty": "Nenhum anúncio cadastrado ainda.",
+    "loadFailed": "Não foi possível carregar os anúncios."
+  },
   "settings": {
     "title": "Meu Negócio",
     "tabs": {
@@ -964,6 +1006,7 @@
     "calendar": "Calendário",
     "services": "Serviços",
     "products": "Produtos",
+    "ads": "Anúncios",
     "business": "Meu Negócio",
     "admin": {
       "title": "Admin",

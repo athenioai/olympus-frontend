@@ -613,6 +613,48 @@
     "hasPromoNo": "Not on promo",
     "requirePrepaymentNotice": "Items in this catalog require prepayment."
   },
+  "ads": {
+    "title": "Ads",
+    "subtitle": "Create campaigns the AI can mention when leads ask.",
+    "newAd": "New Ad",
+    "name": "Name",
+    "content": "Ad message",
+    "contentHint": "The AI will use this copy when talking to leads about the campaign.",
+    "platform": "Platform",
+    "platformPlaceholder": "Pick a platform",
+    "platforms": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "whatsapp": "WhatsApp",
+      "google": "Google",
+      "other": "Other"
+    },
+    "validFrom": "Valid from",
+    "validTo": "Valid until",
+    "validityHint": "Optional. Leave blank for indefinite validity.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "linksTitle": "Catalog links",
+    "linksSubtitle": "Link services and products this ad promotes. The AI will know them when chatting with leads.",
+    "linksEmpty": "No items linked. The AI won't mention specific products/services for this campaign.",
+    "addItem": "Add item",
+    "addItemsCount": "Add {count, plural, one {# selected} other {# selected}}",
+    "tabs": {
+      "services": "Services",
+      "products": "Products"
+    },
+    "itemSearchPlaceholder": "Search catalog...",
+    "itemsLimit": "{used}/{max}",
+    "itemsLimitReached": "Reached the {max}-item limit.",
+    "noItems": "0 items linked",
+    "itemsCount": "{count, plural, one {# item linked} other {# items linked}}",
+    "deleteConfirm": "Are you sure you want to delete this ad?",
+    "searchPlaceholder": "Search by name...",
+    "allStatuses": "All",
+    "empty": "No ads yet.",
+    "loadFailed": "Failed to load ads."
+  },
   "settings": {
     "title": "Settings",
     "tabs": {
@@ -656,6 +698,7 @@
     "calendar": "Calendar",
     "services": "Services",
     "products": "Products",
+    "ads": "Ads",
     "settings": "Settings",
     "admin": {
       "title": "Admin",

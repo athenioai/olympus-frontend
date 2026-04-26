@@ -14,6 +14,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  Megaphone,
   Menu,
   X,
   LogOut,
@@ -59,6 +60,7 @@ const USER_NAV: NavItem[] = [
   { key: "calendar", href: "/calendar", icon: CalendarDays, labelKey: "sidebar.calendar" },
   { key: "services", href: "/services", icon: Package, labelKey: "sidebar.services" },
   { key: "products", href: "/products", icon: ShoppingBag, labelKey: "sidebar.products" },
+  { key: "ads", href: "/ads", icon: Megaphone, labelKey: "sidebar.ads" },
   { key: "settings", href: "/settings", icon: Building2, labelKey: "sidebar.business" },
 ];
 
