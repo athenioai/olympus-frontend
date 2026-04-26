@@ -6,7 +6,6 @@ import type {
   CreateAdPayload,
   IAdsService,
   ListAdsParams,
-  PaginatedAds,
   UpdateAdPayload,
 } from "./interfaces/ads-service";
 
@@ -20,14 +19,14 @@ function buildAdsQuery(params?: ListAdsParams): string {
 }
 
 class AdsService implements IAdsService {
-  async listAds(params?: ListAdsParams): Promise<PaginatedAds> {
+  async listAds(params?: ListAdsParams): Promise<readonly Ad[]> {
     const query = buildAdsQuery(params);
     const path = query ? `/ads?${query}` : "/ads";
     const response = await authFetch(path, {
       revalidate: CACHE_TIMES.ads,
       tags: [CACHE_TAGS.ads],
     });
-    return unwrapEnvelope<PaginatedAds>(response);
+    return unwrapEnvelope<readonly Ad[]>(response);
   }
 
   async getAd(id: string): Promise<Ad> {

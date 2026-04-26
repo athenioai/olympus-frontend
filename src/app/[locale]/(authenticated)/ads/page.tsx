@@ -12,10 +12,10 @@ interface AdsPageProps {
   }>;
 }
 
-// Backend rejected 200 with GENERAL_VALIDATION_001. Cap appears to live at 100;
-// if a tenant ever has more than 100 services or 100 products the picker will
-// silently miss the overflow. Tracked as follow-up: server-side search inside
-// the picker.
+// Backend caps `limit` at 100 (rejects 200 with GENERAL_VALIDATION_001).
+// If a tenant ever crosses 100 services or 100 products the picker will
+// silently miss the overflow — server-side search in the picker is the
+// tracked follow-up.
 const CATALOG_FETCH_LIMIT = 100;
 
 interface ErrorShape {
@@ -23,16 +23,6 @@ interface ErrorShape {
   readonly message: string;
   readonly code?: string;
   readonly status?: number;
-}
-
-function inspectShape(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return { kind: "array", length: value.length, first: value[0] ?? null };
-  }
-  if (value && typeof value === "object") {
-    return { kind: "object", keys: Object.keys(value) };
-  }
-  return { kind: typeof value, value };
 }
 
 function logShape(reason: unknown): ErrorShape {
@@ -64,8 +54,8 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
   let services: readonly Service[] = [];
   let products: readonly Product[] = [];
 
-  // Run the three loads independently so a single failure can be pinpointed
-  // (and an empty/unimplemented endpoint doesn't take the whole page down).
+  // Three independent loads so a single failure can be pinpointed and so
+  // a missing services/products list doesn't take the whole page down.
   const [adsSettled, servicesSettled, productsSettled] = await Promise.allSettled([
     adsService.listAds({
       page,
@@ -77,22 +67,7 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
   ]);
 
   if (adsSettled.status === "fulfilled") {
-    const value: unknown = adsSettled.value;
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[ads page] listAds value shape:", inspectShape(value));
-    }
-    if (Array.isArray(value)) {
-      ads = value as readonly Ad[];
-    } else if (
-      value &&
-      typeof value === "object" &&
-      "items" in value &&
-      Array.isArray((value as { items: unknown }).items)
-    ) {
-      ads = (value as { items: readonly Ad[] }).items;
-    } else {
-      ads = [];
-    }
+    ads = adsSettled.value;
   } else {
     captureUnexpected(adsSettled.reason);
     if (process.env.NODE_ENV !== "production") {

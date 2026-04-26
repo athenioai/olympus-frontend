@@ -61,15 +61,12 @@ export interface ListAdsParams {
   readonly active?: boolean;
 }
 
-export interface PaginatedAds {
-  readonly items: readonly Ad[];
-  readonly total: number;
-  readonly page: number;
-  readonly limit: number;
-}
-
 export interface IAdsService {
-  listAds(params?: ListAdsParams): Promise<PaginatedAds>;
+  /**
+   * Backend currently returns a flat array (no pagination envelope).
+   * Query params are still accepted but the response is `Ad[]`.
+   */
+  listAds(params?: ListAdsParams): Promise<readonly Ad[]>;
   getAd(id: string): Promise<Ad>;
   createAd(payload: CreateAdPayload): Promise<Ad>;
   updateAd(id: string, payload: UpdateAdPayload): Promise<Ad>;

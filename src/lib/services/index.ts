@@ -99,7 +99,6 @@ export type {
   CreateAdPayload,
   IAdsService,
   ListAdsParams,
-  PaginatedAds,
   UpdateAdPayload,
 } from "./interfaces/ads-service";
 

@@ -34,15 +34,14 @@ describe("adsService", () => {
     vi.unstubAllGlobals();
   });
 
-  it("listAds builds /ads with pagination + search", async () => {
-    fetchMock.mockResolvedValueOnce(
-      successEnvelope({ items: [], total: 0, page: 1, limit: 20 }),
-    );
-    await adsService.listAds({ page: 2, limit: 10, search: "promo" });
+  it("listAds builds /ads with pagination + search and unwraps the array", async () => {
+    fetchMock.mockResolvedValueOnce(successEnvelope([]));
+    const result = await adsService.listAds({ page: 2, limit: 10, search: "promo" });
     const [url] = fetchMock.mock.calls[0];
     expect(String(url)).toBe(
       "https://api.test/ads?page=2&limit=10&search=promo",
     );
+    expect(result).toEqual([]);
   });
 
   it("createAd serializes JSON body with items", async () => {
