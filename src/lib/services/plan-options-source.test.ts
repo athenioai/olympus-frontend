@@ -62,4 +62,45 @@ describe("getPlanOptions", () => {
     ]);
     expect(result.every((p) => p.id === null)).toBe(true);
   });
+
+  it("derives slug from name when backend omits it", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          data: [
+            { id: "u1", name: "Solo", cost: 697 },
+            { id: "u2", name: "Fundador", cost: 797 },
+            { id: "u3", name: "Estratégico", cost: 4997 },
+          ],
+          error: null,
+          meta: { requestId: "r1" },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    const result = await getPlanOptions();
+    expect(result.map((p) => p.slug)).toEqual([
+      "solo",
+      "fundador",
+      "estrategico",
+    ]);
+  });
+
+  it("returns null slug when backend name is unrecognizable", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          data: [{ id: "u1", name: "Mistério", cost: 999 }],
+          error: null,
+          meta: { requestId: "r1" },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    const [plan] = await getPlanOptions();
+    expect(plan.slug).toBeNull();
+    expect(plan.name).toBe("Mistério");
+  });
 });

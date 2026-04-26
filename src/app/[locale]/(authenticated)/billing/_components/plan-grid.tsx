@@ -88,15 +88,17 @@ export function PlanGrid({ plans }: PlanGridProps) {
           return (
             <motion.div
               className="flex flex-col rounded-xl bg-surface-container-lowest p-6 transition-colors hover:bg-surface-container-low/50"
-              key={plan.slug}
+              key={plan.id ?? plan.slug ?? plan.name}
               variants={fadeInUp}
             >
               <h3 className="font-display text-lg font-bold tracking-tight text-on-surface">
                 {plan.name}
               </h3>
-              <p className="mt-1 text-[13px] text-on-surface-variant">
-                {t(`plans.${plan.slug}.features`)}
-              </p>
+              {plan.slug && (
+                <p className="mt-1 text-[13px] text-on-surface-variant">
+                  {t(`plans.${plan.slug}.features`)}
+                </p>
+              )}
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="font-display text-2xl font-extrabold text-on-surface">
                   R$ {plan.cost.toFixed(0)}

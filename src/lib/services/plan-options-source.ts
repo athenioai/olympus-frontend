@@ -1,4 +1,3 @@
-// src/lib/services/plan-options-source.ts
 import { authFetch } from "./auth-fetch";
 import { ApiError, unwrapEnvelope } from "@/lib/api-envelope";
 
@@ -14,14 +13,56 @@ export interface PlanOption {
   readonly id: string | null;
   readonly name: string;
   readonly cost: number;
-  readonly slug: PlanSlug;
+  /**
+   * Maps to `billing.plans.<slug>.features` in the i18n bundle. `null` when
+   * the backend response includes a name we can't normalize to a known slug —
+   * components must degrade gracefully (skip the features line).
+   */
+  readonly slug: PlanSlug | null;
 }
 
+const KNOWN_SLUGS: readonly PlanSlug[] = [
+  "solo",
+  "fundador",
+  "essencial",
+  "operador",
+  "estrategico",
+];
+
 /**
- * Hardcoded catalog used when the backend route is missing. Replace `id` once
- * `GET /plans/options` ships (or wire env vars NEXT_PUBLIC_PLAN_<SLUG>_ID and
- * read them here — see brief decision 1-B).
+ * Strip accents + lowercase, then check the whitelist. Used when the backend
+ * sends a plan name without an explicit slug field.
  */
+function deriveSlugFromName(name: string): PlanSlug | null {
+  const normalized = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .trim();
+  return KNOWN_SLUGS.find((s) => s === normalized) ?? null;
+}
+
+interface RawPlanOption {
+  readonly id?: string | null;
+  readonly name?: string;
+  readonly cost?: number;
+  readonly slug?: PlanSlug | string | null;
+}
+
+function normalize(raw: RawPlanOption): PlanOption {
+  const name = raw.name ?? "";
+  const explicitSlug =
+    typeof raw.slug === "string" && KNOWN_SLUGS.includes(raw.slug as PlanSlug)
+      ? (raw.slug as PlanSlug)
+      : null;
+  return {
+    id: raw.id ?? null,
+    name,
+    cost: typeof raw.cost === "number" ? raw.cost : 0,
+    slug: explicitSlug ?? deriveSlugFromName(name),
+  };
+}
+
 const FALLBACK_CATALOG: readonly PlanOption[] = [
   { id: null, slug: "solo", name: "Solo", cost: 697 },
   { id: null, slug: "fundador", name: "Fundador", cost: 797 },
@@ -33,7 +74,8 @@ const FALLBACK_CATALOG: readonly PlanOption[] = [
 export async function getPlanOptions(): Promise<readonly PlanOption[]> {
   try {
     const response = await authFetch("/plans/options", { cache: "no-store" });
-    return await unwrapEnvelope<readonly PlanOption[]>(response);
+    const raw = await unwrapEnvelope<readonly RawPlanOption[]>(response);
+    return raw.map(normalize);
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) {
       return FALLBACK_CATALOG;

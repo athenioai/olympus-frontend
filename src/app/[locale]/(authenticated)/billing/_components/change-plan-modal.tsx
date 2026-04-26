@@ -109,7 +109,7 @@ export function ChangePlanModal({
                         ? "bg-primary/5 ring-1 ring-primary/20"
                         : "bg-surface-container-low hover:bg-surface-container-high",
                     )}
-                    key={plan.slug}
+                    key={plan.id ?? plan.slug ?? plan.name}
                   >
                     <h3 className="font-display text-sm font-bold text-on-surface">
                       {plan.name}
