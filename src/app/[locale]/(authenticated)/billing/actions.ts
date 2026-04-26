@@ -130,3 +130,18 @@ export async function requestRefund(
     return { success: false, error: errorMessage(err) };
   }
 }
+
+/**
+ * Retrieve the invoice URL for the first overdue payment, if any.
+ * Used by the global suspended banner to open the payment link.
+ * @returns The invoice URL string, or null if none found
+ */
+export async function getOverdueInvoiceUrl(): Promise<string | null> {
+  try {
+    const payments = await subscriptionsService.listMyPayments();
+    const overdue = payments.find((p) => p.status === "overdue");
+    return overdue?.invoiceUrl ?? null;
+  } catch {
+    return null;
+  }
+}

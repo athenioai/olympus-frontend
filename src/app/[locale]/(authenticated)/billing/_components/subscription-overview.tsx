@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
@@ -18,6 +18,7 @@ import {
   RefundStatusCard,
   type RefundStatusKind,
 } from "./refund-status-card";
+import { setSuspended } from "@/lib/subscription-banner-store";
 import type { MyPayment, MySubscription } from "@/lib/services";
 import type { PlanOption } from "@/lib/services/plan-options-source";
 
@@ -64,6 +65,12 @@ export function SubscriptionOverview({
   const refundEligible = isWithinRefundWindow(
     subscription.refundEligibleUntil,
   );
+
+  // Reconcile the global suspended banner with /me data on first paint,
+  // regardless of whether a 402 or WS event has fired yet.
+  useEffect(() => {
+    setSuspended(subscription.status === "suspended");
+  }, [subscription.status]);
 
   function handleChangeConfirmed() {
     setOpenModal(null);
