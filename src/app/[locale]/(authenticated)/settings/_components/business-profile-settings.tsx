@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useMemo, useState, useEffect, useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
@@ -233,6 +233,15 @@ export function BusinessProfileSettings() {
   const [newPlatform, setNewPlatform] = useState<SocialPlatform>("website");
   const [newUrl, setNewUrl] = useState("");
 
+  // Platforms not yet registered. The select must always be controlled
+  // against this list — otherwise the user sees the first visible option
+  // ("Instagram") but newPlatform is still "website", and submit posts
+  // with the stale platform.
+  const availablePlatforms = useMemo<readonly SocialPlatform[]>(
+    () => ALL_PLATFORMS.filter((p) => !socialLinks.some((l) => l.platform === p)),
+    [socialLinks],
+  );
+
   // Service area form
   const [newArea, setNewArea] = useState("");
 
@@ -284,6 +293,17 @@ export function BusinessProfileSettings() {
       cancelled = true;
     };
   }, []);
+
+  // Keep `newPlatform` in sync with the visible options. When the current
+  // value gets filtered out (e.g. user just registered "website"), fall
+  // back to the first available platform so the controlled select always
+  // matches a visible option.
+  useEffect(() => {
+    if (availablePlatforms.length === 0) return;
+    if (!availablePlatforms.includes(newPlatform)) {
+      setNewPlatform(availablePlatforms[0]);
+    }
+  }, [availablePlatforms, newPlatform]);
 
   function handleSave() {
     const trimmedName = businessName.trim();
@@ -646,7 +666,7 @@ export function BusinessProfileSettings() {
           <div className="flex-shrink-0">
             <label className={labelCls}>{t("profile.fields.platform")}</label>
             <select className={`${inputCls} w-40`} onChange={(e) => setNewPlatform(e.target.value as SocialPlatform)} value={newPlatform}>
-              {ALL_PLATFORMS.filter((p) => !socialLinks.some((l) => l.platform === p)).map((p) => (
+              {availablePlatforms.map((p) => (
                 <option key={p} value={p}>{PLATFORM_LABELS[p]}</option>
               ))}
             </select>
