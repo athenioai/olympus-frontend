@@ -10,10 +10,10 @@
 
 ## Current State
 
-- **Stage**: 5 — Finalization (release on main)
-- **Branch**: `feature/admin-panel` (stacked on `feature/signup-onboarding`, both awaiting merge to `main`)
-- **Build**: Passing — 25 routes, 62 tests (1 pre-existing failure), zero TS errors, 5 e2e smoke tests
-- **Status**: Ready for manual QA against production backend, then merge
+- **Stage**: feature complete — Asaas billing + admin refunds (PR open against `main`).
+- **Branch**: `feat/billing-asaas` (16 commits, pushed). Previous features (admin panel, signup, ads, settings) merged to `main` over the past weeks.
+- **Build**: Passing — 27 routes, 162 tests (26 files), zero TS errors.
+- **Status**: Awaiting 10-scenario manual QA against production (Lucas) before merge to `main`.
 
 ## What's Implemented (MVP — 7 features)
 
@@ -59,6 +59,60 @@ src/
 2. Set `NEXT_PUBLIC_API_URL` in hosting env vars
 3. Deploy to hosting (Vercel/Railway)
 4. Smoke test in production
+
+## Recent Work — Billing UI + Asaas (2026-04-26)
+
+Full billing surface for tenants + admin refund review. Backend feature (Asaas integration, 5 WS events, 402 enforcement on inactive subscription) was deployed in production days earlier; this PR makes the frontend track every flow. Branch: `feat/billing-asaas` (16 commits, pushed).
+
+**New routes**:
+- `/billing` — server component, branches by `GET /subscriptions/me`:
+  - 404 → `<PlanGrid>` (Caso A) with 5 plan tiles, "Assinar" → `POST /subscriptions/subscribe` → opens Asaas PIX in new tab → "Aguardando pagamento" state.
+  - 200 → `<SubscriptionOverview>` (Caso B) with header card (plan + status badge + next payment), pendingChange/cancelAtPeriodEnd/refundEligible banners, payments table, "Mudar plano" / "Cancelar" / "Solicitar reembolso" modals.
+- `/admin/refunds` — admin-gated. Status filter (pending/approved/rejected). Approve modal (optional notes) and reject modal (required notes).
+
+**New services** (`src/lib/services/`):
+- `subscriptions-service` — user-facing `GET /me`, `GET /me/payments`, `POST /subscribe|upgrade|downgrade|cancel|refund-request`. 8 unit tests.
+- `admin-refunds-service` — `GET /admin/refunds?status=`, `POST /admin/refunds/:id/approve|reject`. 4 unit tests.
+- `plan-options-source` — wraps `GET /plans/options` (live when backend ships) with hardcoded fallback catalog (`id: null` flags fallback mode). 2 tests.
+
+**BREAKING contract changes** (Rule Zero approved):
+- `SubscriptionStatus` expanded from 3 to 6 values (`active | past_due | suspended | cancelled | ended | refunded`).
+- `SubscriptionPublic` reshaped: drops `billingDay`, adds `asaasSubscriptionId`, `currentPeriodEnd`, `nextPaymentAt`, `cancelAtPeriodEnd`, `suspendedAt`, `refundedAt`, `startedAt`.
+- `AdminUserPublic`, `CreateAdminUserPayload`, `UpdateAdminUserPayload`, `ListAdminUsersParams`, `SignupBeginPayload` — all drop `planId`.
+- `IAdminSubscriptionService.create` → removed; per-user methods `subscribe(userId, planId)`, `upgrade(...)`, `downgrade(...)`, `cancel(userId)`, `updateStatus(...)` instead. `UpdateSubscriptionPayload` (multi-field) renamed to `UpdateSubscriptionStatusPayload` (status-only).
+
+**Consumer fixes**: `signup` form, `admin/users` (list + create + edit + filter), `admin/users/[id]` overview tab (now reads plan via `/admin/subscriptions?userId=`), `admin/subscriptions` (overhauled — drop `billingDay` column, add `currentPeriodEnd` and `asaasSubscriptionId`, replace edit modal with force-status modal, replace create-subscription affordance — admin/users will host the "Assinar" CTA in a follow-up).
+
+**WebSocket refactor** — `WsManager` migrated from chat-only `onMessage` callback to a generic `register(type, handler)` map. Existing chat consumer (`message-thread.tsx`) inlined the 5 defensive checks from the old `extractChatMessage` to preserve identical chat behavior. New `<SubscriptionEventsProvider>` mounted in `(authenticated)/layout.tsx` registers 5 handlers: `payment_confirmed`, `past_due`, `suspended`, `refunded`, `activated` — toasts + `router.refresh()` on `/billing` + flips global suspended state.
+
+**Global suspended banner** — driven by `subscription-banner-store` (module-level state + Set of subscribers). Three sources flip it:
+1. `<SubscriptionOverview>` reconciles on mount from `MySubscription.status === "suspended"`.
+2. `auth-fetch.ts` interceptor: any 402 with `error.code === "SUBSCRIPTION_INACTIVE_001"` → `setSuspended(true)`.
+3. WS `subscription.suspended` → `setSuspended(true)`; WS `subscription.activated` → `setSuspended(false)`.
+
+`<GlobalSuspendedBanner>` mounted in the authenticated layout reads from the store. "Pagar agora" button calls a `getOverdueInvoiceUrl` server action (client component can't import the service barrel because it pulls in `next/headers`).
+
+**i18n**: ~80 new keys in pt-BR/en-US/es covering `billing.*`, `admin.refunds.*`, `sidebar.billing`, `sidebar.admin.refunds`, status labels.
+
+**Tests**: 26 files, 162 tests (+8 files, +36 tests vs pre-feature baseline). All green.
+
+**Tech debt accreted**:
+1. `getPlanOptions()` falls back to a hardcoded catalog with `id: null` until backend ships `GET /plans/options`. Plan UUIDs need real values for Caso A "Assinar" to work end-to-end. Replace fallback once endpoint lands.
+2. `admin/users` doesn't yet have an "Assinar" CTA — admin still has to subscribe users programmatically (via `subscribeUser` server action) for now. Brief calls this out as a known gap.
+3. `ActionResult<T>` and the regex UUID schema are duplicated across `ads/`, `billing/`, `admin/refunds/`, `admin/subscriptions/` — candidate for `src/shared/`.
+4. WS URL derived as `API_URL.replace(/^http/, "ws") + "/ws"` in `(authenticated)/layout.tsx` — same pattern as `message-thread.tsx`. Worth consolidating into a `WS_URL` env helper later.
+
+**Manual QA pending** (10 scenarios from the brief — Lucas runs against production):
+1. New tenant → /billing → grid → Assinar Fundador → Asaas PIX → pay → reload → status active.
+2. Active tenant → payments table renders with working "Ver fatura" link.
+3. Active tenant → upgrade to Essencial → 200 + UI updates.
+4. Active tenant → downgrade to Solo → pendingChange banner with correct date.
+5. Active tenant → cancel with reason → cancelAtPeriodEnd banner; cancel button disabled.
+6. Active tenant within 15 days → request refund → "em análise" card; button disabled.
+7. Force tenant suspended (admin: PATCH /admin/subscriptions/:id { status: 'suspended' }) → reload → global banner; create-anything → 402 → banner persists.
+8. Force tenant active again → banner disappears via WS without reload.
+9. Admin /admin/refunds → list pendentes → approve → tenant receives `subscription.refunded` WS in real time (2-tab test).
+10. Public signup → form has no plan field → after onboarding, redirect to /billing.
 
 ## Recent Work — Admin panel (2026-04-17)
 
