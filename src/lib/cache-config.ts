@@ -19,6 +19,8 @@ export const CACHE_TIMES = {
   adminSubscriptions: 60,
   adminInvoices: 30,
   adminAvatars: 300,    // 5 min — rarely changes
+  subscriptions: 0,    // hot — billing data must reflect latest webhook state
+  refunds: 30,         // 30s — refund queue list
 } as const;
 
 export const CACHE_TAGS = {
@@ -39,4 +41,6 @@ export const CACHE_TAGS = {
   adminInvoices: "admin-invoices",
   adminInvoiceSummary: "admin-invoice-summary",
   adminAvatars: "admin-avatars",
+  subscriptions: "subscriptions",
+  refunds: "refunds",
 } as const;

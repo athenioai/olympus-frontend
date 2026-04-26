@@ -22,6 +22,8 @@ export { adminPlanService } from "./admin-plan-service";
 export { adminSubscriptionService } from "./admin-subscription-service";
 export { adminInvoiceService } from "./admin-invoice-service";
 export { adminAgentAvatarService } from "./admin-agent-avatar-service";
+export { subscriptionsService } from "./subscriptions-service";
+export { adminRefundsService } from "./admin-refunds-service";
 
 // Auth types
 export type {
@@ -263,3 +265,22 @@ export type {
   IAdminAgentAvatarService,
   ListAdminAgentAvatarsParams,
 } from "./interfaces/admin-agent-avatar-service";
+
+// Subscriptions (user-facing) types
+export type {
+  ISubscriptionsService,
+  MyPayment,
+  MySubscription,
+  PaymentStatus,
+  PendingPlanChange,
+  SubscribeResponse,
+  SubscriptionPlan,
+} from "./interfaces/subscriptions-service";
+
+// Admin refunds types
+export type {
+  IAdminRefundsService,
+  ListRefundRequestsParams,
+  RefundRequestPublic,
+  RefundRequestStatus,
+} from "./interfaces/admin-refunds-service";
