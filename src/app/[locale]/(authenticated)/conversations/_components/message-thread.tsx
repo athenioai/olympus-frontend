@@ -175,35 +175,68 @@ export function MessageThread({
       const manager = new WsManager({
         url: wsUrl,
         token,
-        onMessage: (message) => {
-          if (message.chatId !== chatId) return;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === message.id)) return prev;
-            // Human sends are echoed back with sender="user" and a fresh
-            // backend id. Match an optimistic "human" bubble by content
-            // within a short window and swap it in place, so the user
-            // doesn't see the same message twice.
-            if (message.sender === "user") {
-              const arrivedAt = new Date(message.createdAt).getTime();
-              const idx = prev.findIndex(
-                (m) =>
-                  m.sender === "human" &&
-                  m.content === message.content &&
-                  Math.abs(new Date(m.createdAt).getTime() - arrivedAt) < 30_000,
-              );
-              if (idx !== -1) {
-                const next = [...prev];
-                next[idx] = message;
-                return next;
-              }
-            }
-            return [...prev, message];
-          });
-          scrollToBottom();
-        },
         onStateChange: (state) => {
           if (!canceled) setWsState(state);
         },
+      });
+
+      manager.register("new_message", (envelope) => {
+        // Defensive extraction — preserves every check from the original
+        // extractChatMessage (ws-manager.ts lines 32-66 pre-refactor).
+        const messageRaw = envelope.message;
+        if (!messageRaw || typeof messageRaw !== "object") return;
+        const msg = messageRaw as Record<string, unknown>;
+        if (typeof msg.sender !== "string" || typeof msg.content !== "string") {
+          return;
+        }
+
+        const resolvedChatId =
+          typeof msg.chatId === "string"
+            ? msg.chatId
+            : typeof envelope.chatId === "string"
+              ? (envelope.chatId as string)
+              : null;
+        if (!resolvedChatId) return;
+
+        const chatMessage: ChatMessage = {
+          id: typeof msg.id === "string" ? msg.id : crypto.randomUUID(),
+          chatId: resolvedChatId,
+          sender: msg.sender,
+          content: msg.content,
+          createdAt:
+            typeof msg.createdAt === "string"
+              ? msg.createdAt
+              : new Date().toISOString(),
+          deletedAt:
+            typeof msg.deletedAt === "string" || msg.deletedAt === null
+              ? (msg.deletedAt as string | null)
+              : null,
+        };
+
+        if (chatMessage.chatId !== chatId) return;
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === chatMessage.id)) return prev;
+          // Human sends are echoed back with sender="user" and a fresh
+          // backend id. Match an optimistic "human" bubble by content
+          // within a short window and swap it in place, so the user
+          // doesn't see the same message twice.
+          if (chatMessage.sender === "user") {
+            const arrivedAt = new Date(chatMessage.createdAt).getTime();
+            const idx = prev.findIndex(
+              (m) =>
+                m.sender === "human" &&
+                m.content === chatMessage.content &&
+                Math.abs(new Date(m.createdAt).getTime() - arrivedAt) < 30_000,
+            );
+            if (idx !== -1) {
+              const next = [...prev];
+              next[idx] = chatMessage;
+              return next;
+            }
+          }
+          return [...prev, chatMessage];
+        });
+        scrollToBottom();
       });
 
       wsRef.current = manager;
@@ -214,6 +247,7 @@ export function MessageThread({
 
     return () => {
       canceled = true;
+      wsRef.current?.unregister("new_message");
       wsRef.current?.disconnect();
       wsRef.current = null;
     };
