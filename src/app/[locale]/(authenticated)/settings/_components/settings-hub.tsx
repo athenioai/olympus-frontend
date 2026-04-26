@@ -38,10 +38,13 @@ type Tab = "account" | "profile" | "agent" | "calendar" | "faqs" | "exceptions" 
 
 interface SettingsHubProps {
   readonly calendarConfig: CalendarConfig;
-  readonly agentConfig: AgentConfig;
+  /** `null` for fresh accounts whose backend record is still empty. */
+  readonly agentConfig: AgentConfig | null;
   readonly prepaymentSetting: PrepaymentSetting;
   readonly userId: string;
 }
+
+const DEFAULT_AGENT_TONE = "friendly" as const;
 
 // ---------------------------------------------------------------------------
 // Calendar settings
@@ -503,14 +506,16 @@ const TONE_CONFIG = {
   },
 } as const;
 
-function AgentSettings({ config }: { readonly config: AgentConfig }) {
+function AgentSettings({ config }: { readonly config: AgentConfig | null }) {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
-  const [agentName, setAgentName] = useState(config.agentName);
-  const [profession, setProfession] = useState(config.profession ?? "");
-  const [tone, setTone] = useState<"friendly" | "formal" | "casual">(config.tone);
+  const [agentName, setAgentName] = useState(config?.agentName ?? "");
+  const [profession, setProfession] = useState(config?.profession ?? "");
+  const [tone, setTone] = useState<"friendly" | "formal" | "casual">(
+    config?.tone ?? DEFAULT_AGENT_TONE,
+  );
 
   function handleSave() {
     startTransition(async () => {
@@ -529,9 +534,9 @@ function AgentSettings({ config }: { readonly config: AgentConfig }) {
   }
 
   function handleDiscard() {
-    setAgentName(config.agentName);
-    setProfession(config.profession ?? "");
-    setTone(config.tone);
+    setAgentName(config?.agentName ?? "");
+    setProfession(config?.profession ?? "");
+    setTone(config?.tone ?? DEFAULT_AGENT_TONE);
   }
 
   return (

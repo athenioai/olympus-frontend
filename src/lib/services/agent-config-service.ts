@@ -12,11 +12,11 @@ class AgentConfigService implements IAgentConfigService {
    * made via updateConfig are visible on the next reload without waiting
    * for a TTL (see business-profile-service for the full rationale).
    */
-  async getConfig(): Promise<AgentConfig> {
+  async getConfig(): Promise<AgentConfig | null> {
     const response = await authFetch("/agent/config", {
       cache: "no-store",
     });
-    return unwrapEnvelope<AgentConfig>(response);
+    return unwrapEnvelope<AgentConfig | null>(response);
   }
 
   /**

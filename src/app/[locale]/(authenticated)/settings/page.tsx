@@ -18,7 +18,7 @@ import { SettingsHub } from "./_components/settings-hub";
  */
 export default async function SettingsPage() {
   let calendarConfig: CalendarConfig;
-  let agentConfig: AgentConfig;
+  let agentConfig: AgentConfig | null;
   let prepaymentSetting: PrepaymentSetting;
 
   const user = await authService.getSession();
