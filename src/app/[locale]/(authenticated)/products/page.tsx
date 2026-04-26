@@ -1,5 +1,6 @@
-import { financeService } from "@/lib/services";
-import type { Product } from "@/lib/services";
+import { redirect } from "next/navigation";
+import { businessProfileService, financeService } from "@/lib/services";
+import type { Product, WorkType } from "@/lib/services";
 import { ProductsTable } from "./_components/products-table";
 
 interface ProductsPageProps {
@@ -14,6 +15,22 @@ interface ProductsPageProps {
  * and renders the ProductsTable component.
  */
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  // Block direct URL access for service-only businesses. Mirrors the sidebar
+  // filter in `getVisibleUserNav`. Null workType (pre-onboarding / transient
+  // failure) stays permissive — same fallback the layout uses. The redirect
+  // must run outside the try/catch because Next.js implements it via a thrown
+  // sentinel error that must propagate.
+  let workType: WorkType | null = null;
+  try {
+    const profileView = await businessProfileService.getProfile();
+    workType = profileView.profile?.workType ?? null;
+  } catch {
+    workType = null;
+  }
+  if (workType === "services") {
+    redirect("/dashboard");
+  }
+
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const search = params.search ?? "";
