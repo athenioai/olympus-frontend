@@ -36,7 +36,7 @@ describe("getPlanOptions", () => {
     );
     const result = await getPlanOptions();
     expect(result).toEqual([
-      { id: "u1", name: "Solo", cost: 697, slug: "solo" },
+      { id: "u1", name: "Solo", cost: 697, slug: "solo", features: null },
     ]);
   });
 
@@ -102,5 +102,52 @@ describe("getPlanOptions", () => {
     const [plan] = await getPlanOptions();
     expect(plan.slug).toBeNull();
     expect(plan.name).toBe("Mistério");
+  });
+
+  it("preserves backend features when shipped non-empty", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          data: [
+            {
+              id: "u1",
+              name: "Solo",
+              cost: 697,
+              features: ["1 atendente", "Sem gravação", "Suporte e-mail"],
+            },
+          ],
+          error: null,
+          meta: { requestId: "r1" },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    const [plan] = await getPlanOptions();
+    expect(plan.features).toEqual([
+      "1 atendente",
+      "Sem gravação",
+      "Suporte e-mail",
+    ]);
+  });
+
+  it("normalizes empty/missing features to null (fallback to i18n)", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          data: [
+            { id: "u1", name: "Solo", cost: 697, features: [] },
+            { id: "u2", name: "Fundador", cost: 797 },
+            { id: "u3", name: "Essencial", cost: 1597, features: ["", "  "] },
+          ],
+          error: null,
+          meta: { requestId: "r1" },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    const result = await getPlanOptions();
+    expect(result.every((p) => p.features === null)).toBe(true);
   });
 });

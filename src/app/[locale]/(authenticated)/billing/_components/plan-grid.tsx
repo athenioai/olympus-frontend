@@ -94,11 +94,20 @@ export function PlanGrid({ plans }: PlanGridProps) {
               <h3 className="font-display text-lg font-bold tracking-tight text-on-surface">
                 {plan.name}
               </h3>
-              {plan.slug && (
+              {plan.features && plan.features.length > 0 ? (
+                <ul className="mt-2 space-y-1 text-[13px] text-on-surface-variant">
+                  {plan.features.map((f) => (
+                    <li className="flex gap-2" key={f}>
+                      <span aria-hidden="true">·</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : plan.slug ? (
                 <p className="mt-1 text-[13px] text-on-surface-variant">
                   {t(`plans.${plan.slug}.features`)}
                 </p>
-              )}
+              ) : null}
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="font-display text-2xl font-extrabold text-on-surface">
                   R$ {plan.cost.toFixed(0)}

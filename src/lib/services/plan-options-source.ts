@@ -19,6 +19,12 @@ export interface PlanOption {
    * components must degrade gracefully (skip the features line).
    */
   readonly slug: PlanSlug | null;
+  /**
+   * Backend may ship per-plan features as an array of strings. When non-empty,
+   * components render this verbatim instead of the i18n fallback. Empty/null
+   * means: fall back to `t(\`plans.<slug>.features\`)` if a slug exists.
+   */
+  readonly features: readonly string[] | null;
 }
 
 const KNOWN_SLUGS: readonly PlanSlug[] = [
@@ -47,6 +53,13 @@ interface RawPlanOption {
   readonly name?: string;
   readonly cost?: number;
   readonly slug?: PlanSlug | string | null;
+  readonly features?: readonly unknown[] | null;
+}
+
+function normalizeFeatures(raw: readonly unknown[] | null | undefined): readonly string[] | null {
+  if (!Array.isArray(raw)) return null;
+  const cleaned = raw.filter((f): f is string => typeof f === "string" && f.trim() !== "");
+  return cleaned.length > 0 ? cleaned : null;
 }
 
 function normalize(raw: RawPlanOption): PlanOption {
@@ -60,15 +73,16 @@ function normalize(raw: RawPlanOption): PlanOption {
     name,
     cost: typeof raw.cost === "number" ? raw.cost : 0,
     slug: explicitSlug ?? deriveSlugFromName(name),
+    features: normalizeFeatures(raw.features),
   };
 }
 
 const FALLBACK_CATALOG: readonly PlanOption[] = [
-  { id: null, slug: "solo", name: "Solo", cost: 697 },
-  { id: null, slug: "fundador", name: "Fundador", cost: 797 },
-  { id: null, slug: "essencial", name: "Essencial", cost: 1597 },
-  { id: null, slug: "operador", name: "Operador", cost: 2997 },
-  { id: null, slug: "estrategico", name: "Estratégico", cost: 4997 },
+  { id: null, slug: "solo", name: "Solo", cost: 697, features: null },
+  { id: null, slug: "fundador", name: "Fundador", cost: 797, features: null },
+  { id: null, slug: "essencial", name: "Essencial", cost: 1597, features: null },
+  { id: null, slug: "operador", name: "Operador", cost: 2997, features: null },
+  { id: null, slug: "estrategico", name: "Estratégico", cost: 4997, features: null },
 ];
 
 export async function getPlanOptions(): Promise<readonly PlanOption[]> {
