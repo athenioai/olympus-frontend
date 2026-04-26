@@ -25,6 +25,16 @@ interface ErrorShape {
   readonly status?: number;
 }
 
+function inspectShape(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return { kind: "array", length: value.length, first: value[0] ?? null };
+  }
+  if (value && typeof value === "object") {
+    return { kind: "object", keys: Object.keys(value) };
+  }
+  return { kind: typeof value, value };
+}
+
 function logShape(reason: unknown): ErrorShape {
   if (reason instanceof ApiError) {
     return {
@@ -67,7 +77,22 @@ export default async function AdsPage({ searchParams }: AdsPageProps) {
   ]);
 
   if (adsSettled.status === "fulfilled") {
-    ads = adsSettled.value.items;
+    const value: unknown = adsSettled.value;
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[ads page] listAds value shape:", inspectShape(value));
+    }
+    if (Array.isArray(value)) {
+      ads = value as readonly Ad[];
+    } else if (
+      value &&
+      typeof value === "object" &&
+      "items" in value &&
+      Array.isArray((value as { items: unknown }).items)
+    ) {
+      ads = (value as { items: readonly Ad[] }).items;
+    } else {
+      ads = [];
+    }
   } else {
     captureUnexpected(adsSettled.reason);
     if (process.env.NODE_ENV !== "production") {
